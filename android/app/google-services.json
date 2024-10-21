@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "165163098882",
+    "project_id": "smarn-fet",
+    "storage_bucket": "smarn-fet.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165163098882:android:1fc05523fa27762f9d981b",
+        "android_client_info": {
+          "package_name": "com.fet.smarn"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPzZj5CRk029u7fBhF1pcF7ytGJlxmDhw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
