@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:smarn/CRUD_test.dart';
 import 'package:smarn/firebase_options.dart';
 import 'package:smarn/pages/Home.dart';
 
@@ -8,7 +9,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  // call method from CRUD_test.dart to test it
+  // open console on web to see logs
+  view_teachers();
+  //runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
