@@ -11,8 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8  # Correctly placed Cupertino icons
-  path_provider: ^2.1.4    # Correctly placed path provider
+  cupertino_icons: ^1.0.8  
+  path_provider: ^2.1.4    
 
 dev_dependencies:
   flutter_test:

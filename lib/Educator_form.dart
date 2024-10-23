@@ -1,28 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/admin_dashboard.dart';
 
-class StudentForm extends StatefulWidget {
-  const StudentForm({super.key});
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
-  _StudentFormState createState() => _StudentFormState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: AdminForm(),
+      routes: {
+        '/dashboard': (context) => AdminDashboard(),
+      },
+    );
+  }
 }
 
-class _StudentFormState extends State<StudentForm> {
-  final _formKey = GlobalKey<FormState>();
+class AdminForm extends StatefulWidget {
+  const AdminForm({super.key});
 
-  final TextEditingController _classController = TextEditingController();
-  final TextEditingController _keyController = TextEditingController();
+  @override
+  _AdminFormState createState() => _AdminFormState();
+}
+
+class _AdminFormState extends State<AdminForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2), // Light grey background
       appBar: AppBar(
-        backgroundColor: Colors.blue, // AppBar color set to blue
-        title: const Text('Student Form'),
+        title: const Text('Educator Form'),
+        backgroundColor: Colors.blue, // AppBar color blue
       ),
       body: Center(
-        // Center the form on the screen
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Container(
@@ -39,77 +54,81 @@ class _StudentFormState extends State<StudentForm> {
               ],
             ),
             padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 400, // Optional: Limits the form width for larger screens
-                ),
-                child: ListView(
-                  shrinkWrap: true, // Makes the ListView fit its content
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 400, // Match the width of StudentForm
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
-                      'Student Information',
+                      'Login',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: Colors.blue, // Text color blue
                       ),
-                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
-
-                    // Class Field
                     TextFormField(
-                      controller: _classController,
+                      controller: _usernameController,
                       decoration: const InputDecoration(
-                        labelText: 'Class',
                         border: OutlineInputBorder(),
+                        labelText: 'Username',
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter the class';
+                          return 'Please enter your username';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 20),
-
-                    // Key Field
                     TextFormField(
-                      controller: _keyController,
+                      controller: _passwordController,
+                      obscureText: true,
                       decoration: const InputDecoration(
-                        labelText: 'Key to Connect',
                         border: OutlineInputBorder(),
+                        labelText: 'Password',
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter the key to connect';
+                          return 'Please enter your password';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 30),
-
-                    // Submit Button
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Form Submitted')),
-                          );
+                          if (_usernameController.text == 'admin' &&
+                              _passwordController.text == 'admin') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AdminDashboard()),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Invalid credentials')),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue, // Button color set to blue
+                        backgroundColor: Colors.blue, // Button color blue
                       ),
                       child: const Text(
                         'Submit',
                         style: TextStyle(
-                          color: Colors.white, // Text color set to white
+                          color: Colors.white, // Button text color white
                         ),
                       ),
                     ),
-                    const SizedBox(height: 30),
                   ],
                 ),
               ),

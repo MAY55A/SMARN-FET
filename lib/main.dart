@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/Home.dart';
+import 'package:smarn/Home.dart'; // Ensure you have this file
 
 void main() {
   runApp(const MyApp());
@@ -11,12 +11,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      
       debugShowCheckedModeBanner: false,
       title: 'SMARN',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      // Choose one home screen to display
       home: const HomePage(),
     );
   }
