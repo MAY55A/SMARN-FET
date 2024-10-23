@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:165163098882:android:1fc05523fa27762f9d981b",
+        "mobilesdk_app_id": "1:165163098882:android:273b81d58556812a9d981b",
         "android_client_info": {
-          "package_name": "com.fet.smarn"
+          "package_name": "com.smarn.fet"
         }
       },
       "oauth_client": [],
