@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/student_form.dart';
-import 'package:smarn/admin_form.dart'; // Import the AdminForm widget
+import 'package:smarn/pages/student_form.dart';
+import 'package:smarn/pages/admin_form.dart'; // Import the AdminForm widget
 
 class SelectionPage extends StatelessWidget {
   const SelectionPage({super.key});

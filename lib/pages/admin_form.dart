@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/admin_dashboard.dart';
+import 'package:smarn/pages/admin_dashboard.dart';
 
 void main() => runApp(MyApp());
 

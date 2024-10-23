@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/SelectionPage.dart';
+import 'package:smarn/pages/SelectionPage.dart';
 
 
 class HomePage extends StatelessWidget {
