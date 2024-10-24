@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/Home.dart'; // Ensure you have this file
+import 'package:smarn/home.dart'; // Ensure you have this file
 
 void main() {
   runApp(const MyApp());

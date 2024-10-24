@@ -9,25 +9,23 @@ class StudentForm extends StatefulWidget {
 
 class _StudentFormState extends State<StudentForm> {
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController _classController = TextEditingController();
   final TextEditingController _keyController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2), // Light grey background
+      backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
       appBar: AppBar(
-        backgroundColor: Colors.blue, // AppBar color set to blue
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // AppBar color
         title: const Text('Student Form'),
       ),
       body: Center(
-        // Center the form on the screen
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color.fromARGB(255, 249, 254, 255),
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
@@ -43,7 +41,7 @@ class _StudentFormState extends State<StudentForm> {
               key: _formKey,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
-                  maxWidth: 400, // Optional: Limits the form width for larger screens
+                  maxWidth: 400, // Limits the form width for larger screens
                 ),
                 child: ListView(
                   shrinkWrap: true, // Makes the ListView fit its content
@@ -90,25 +88,30 @@ class _StudentFormState extends State<StudentForm> {
                     ),
                     const SizedBox(height: 30),
 
-                    // Submit Button
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Form Submitted')),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue, // Button color set to blue
-                      ),
-                      child: const Text(
-                        'Submit',
-                        style: TextStyle(
-                          color: Colors.white, // Text color set to white
+    
+    
+  
+                       ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Form Submitted')),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 5), // Less vertical padding
+                          backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Button color
+                        ),
+                        child: const Text(
+                          'Submit',
+                          style: TextStyle(
+                            fontSize: 12, // Smaller font size
+                            color: Color.fromARGB(255, 255, 236, 249), // Text color set to white
+                          ),
                         ),
                       ),
-                    ),
+                    
                     const SizedBox(height: 30),
                   ],
                 ),

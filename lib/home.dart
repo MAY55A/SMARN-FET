@@ -9,66 +9,74 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2), // Light grey background
       appBar: AppBar(
-        title: const Text('Smarn'),
-        backgroundColor: Colors.blue, // Changed AppBar color to blue
+        title: const  Text(
+          'Smarn',
+          style: const TextStyle( // Use default font
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // AppBar color
+        elevation: 0,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Image section at the top
-          Expanded(
-            child: Stack(
+          // Background image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/img/i6.jpg', // Background image
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Overlay text describing the app
+          const Positioned(
+            bottom: 180, // Position text above the button
+            left: 30,
+            right: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Background image
-                Positioned.fill(
-                  child: Image.asset(
-                    'assets/img/i1.jpg', // Add a descriptive image related to the timetable generation
-                    fit: BoxFit.cover,
+                Text(
+                  'Welcome to Smarn',
+                  style: TextStyle(
+                    fontSize: 36, // Increased font size
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                // Overlay text describing the app
-                const Positioned(
-                  bottom: 40,
-                  left: 20,
-                  right: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Welcome to Smarn',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(198, 255, 255, 255),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        'Automate your timetable generation easily with Smarn, the administrative app that makes scheduling a breeze!',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Color.fromARGB(198, 255, 255, 255),
-                        ),
-                      ),
-                    ],
+                SizedBox(height: 10),
+                Text(
+                  'Automate your timetable generation easily with Smarn,',
+                  style: TextStyle(
+                    fontSize: 20, // Increased font size
+                    color: Colors.white70,
+                  ),
+                ),
+                Text(
+                  'the administrative app that makes scheduling a breeze!',
+                  style: TextStyle(
+                    fontSize: 20, // Increased font size
+                    color: Colors.white70,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          // Login Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
+          // Login Button at the bottom of the image
+          Positioned(
+            bottom: 140, // Position the button closer to the bottom
+            right: 40,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
-                    vertical: 24,
-                    horizontal: 40), // Increased padding for height and width
-                backgroundColor: Colors.blue, // Changed button color to blue
+                    vertical: 20, horizontal: 30), // Adjust padding
+                backgroundColor:
+                    const Color.fromARGB(255, 59, 130, 189), // Button color
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius:
+                      BorderRadius.circular(30), // Modern rounded button
                 ),
-                elevation: 5, // Optional: adds a shadow effect
+                elevation: 5, // Shadow effect
               ),
               onPressed: () {
                 Navigator.push(
@@ -80,16 +88,14 @@ class HomePage extends StatelessWidget {
               },
               child: const Text(
                 'Login',
-                style: TextStyle(
-                  fontSize: 24, // Increased font size for better visibility
-                  color:
-                      Colors.white, // Changed text color to white for contrast
+                style: TextStyle( // Use default font
+                  fontSize: 24, // Font size
+                  color: Colors.white, // Text color
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 40),
         ],
       ),
     );

@@ -32,17 +32,17 @@ class _AdminFormState extends State<AdminForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2), // Light grey background
+      backgroundColor:  const Color.fromARGB(255, 0, 9, 17), // Light grey background
       appBar: AppBar(
         title: const Text('Educator Form'),
-        backgroundColor: Colors.blue, // AppBar color blue
+        backgroundColor:const Color.fromARGB(255, 129, 77, 139), // AppBar color blue
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color.fromARGB(255, 239, 249, 255),
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
@@ -125,7 +125,7 @@ class _AdminFormState extends State<AdminForm> {
                       child: const Text(
                         'Submit',
                         style: TextStyle(
-                          color: Colors.white, // Button text color white
+                          color: Color.fromARGB(255, 255, 231, 252), // Button text color white
                         ),
                       ),
                     ),
