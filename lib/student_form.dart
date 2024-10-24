@@ -17,7 +17,8 @@ class _StudentFormState extends State<StudentForm> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // AppBar color
+        backgroundColor:
+            const Color.fromARGB(255, 129, 77, 139), // AppBar color
         title: const Text('Student Form'),
       ),
       body: Center(
@@ -25,7 +26,7 @@ class _StudentFormState extends State<StudentForm> {
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 249, 254, 255),
+              color: const Color.fromARGB(255, 236, 248, 253),
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
@@ -88,30 +89,30 @@ class _StudentFormState extends State<StudentForm> {
                     ),
                     const SizedBox(height: 30),
 
-    
-    
-  
-                       ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Form Submitted')),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 5), // Less vertical padding
-                          backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Button color
-                        ),
-                        child: const Text(
-                          'Submit',
-                          style: TextStyle(
-                            fontSize: 12, // Smaller font size
-                            color: Color.fromARGB(255, 255, 236, 249), // Text color set to white
-                          ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Form Submitted')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5), // Less vertical padding
+                        backgroundColor: const Color.fromARGB(
+                            255, 129, 77, 139), // Button color
+                      ),
+                      child: const Text(
+                        'Submit',
+                        style: TextStyle(
+                          fontSize: 12, // Smaller font size
+                          color: Color.fromARGB(
+                              255, 255, 236, 249), // Text color set to white
                         ),
                       ),
-                    
+                    ),
+
                     const SizedBox(height: 30),
                   ],
                 ),

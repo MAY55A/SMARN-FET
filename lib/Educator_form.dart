@@ -42,7 +42,7 @@ class _AdminFormState extends State<AdminForm> {
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 239, 249, 255),
+              color: const Color.fromARGB(255, 236, 248, 253),
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
@@ -125,7 +125,7 @@ class _AdminFormState extends State<AdminForm> {
                       child: const Text(
                         'Submit',
                         style: TextStyle(
-                          color: Color.fromARGB(255, 255, 231, 252), // Button text color white
+                          color: Color.fromARGB(255, 255, 255, 255), // Button text color white
                         ),
                       ),
                     ),

@@ -101,7 +101,7 @@ class AdminDashboard extends StatelessWidget {
           ],
         ),
         child: InkWell(
-          splashColor: Colors.blue.withOpacity(0.3), // Splash effect
+          splashColor: const Color.fromARGB(255, 17, 111, 188).withOpacity(0.3), // Splash effect
           borderRadius: BorderRadius.circular(15),
           child: Padding(
             padding: const EdgeInsets.all(12.0), // Adjusted padding
