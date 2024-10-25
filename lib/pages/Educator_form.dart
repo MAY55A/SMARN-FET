@@ -1,25 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/admin_dashboard.dart';
 
-class StudentForm extends StatefulWidget {
-  const StudentForm({super.key});
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
-  _StudentFormState createState() => _StudentFormState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: AdminForm(),
+      routes: {
+        '/dashboard': (context) => AdminDashboard(),
+      },
+    );
+  }
 }
 
-class _StudentFormState extends State<StudentForm> {
+class AdminForm extends StatefulWidget {
+  const AdminForm({super.key});
+
+  @override
+  _AdminFormState createState() => _AdminFormState();
+}
+
+class _AdminFormState extends State<AdminForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _classController = TextEditingController();
-  final TextEditingController _keyController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
+      backgroundColor:  const Color.fromARGB(255, 0, 9, 17), // Light grey background
       appBar: AppBar(
-        backgroundColor:
-            const Color.fromARGB(255, 129, 77, 139), // AppBar color
-        title: const Text('Student Form'),
+        title: const Text('Educator Form'),
+        backgroundColor:const Color.fromARGB(255, 129, 77, 139), // AppBar color blue
       ),
       body: Center(
         child: Padding(
@@ -38,82 +55,81 @@ class _StudentFormState extends State<StudentForm> {
               ],
             ),
             padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 400, // Limits the form width for larger screens
-                ),
-                child: ListView(
-                  shrinkWrap: true, // Makes the ListView fit its content
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 400, // Match the width of StudentForm
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
-                      'Student Information',
+                      'Login',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: Colors.blue, // Text color blue
                       ),
-                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
-
-                    // Class Field
                     TextFormField(
-                      controller: _classController,
+                      controller: _usernameController,
                       decoration: const InputDecoration(
-                        labelText: 'Class',
                         border: OutlineInputBorder(),
+                        labelText: 'Username',
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter the class';
+                          return 'Please enter your username';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 20),
-
-                    // Key Field
                     TextFormField(
-                      controller: _keyController,
+                      controller: _passwordController,
+                      obscureText: true,
                       decoration: const InputDecoration(
-                        labelText: 'Key to Connect',
                         border: OutlineInputBorder(),
+                        labelText: 'Password',
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter the key to connect';
+                          return 'Please enter your password';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 30),
-
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Form Submitted')),
-                          );
+                          if (_usernameController.text == 'admin' &&
+                              _passwordController.text == 'admin') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AdminDashboard()),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Invalid credentials')),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5), // Less vertical padding
-                        backgroundColor: const Color.fromARGB(
-                            255, 129, 77, 139), // Button color
+                        backgroundColor: Colors.blue, // Button color blue
                       ),
                       child: const Text(
                         'Submit',
                         style: TextStyle(
-                          fontSize: 12, // Smaller font size
-                          color: Color.fromARGB(
-                              255, 255, 236, 249), // Text color set to white
+                          color: Color.fromARGB(255, 255, 255, 255), // Button text color white
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 30),
                   ],
                 ),
               ),
