@@ -1,26 +1,26 @@
-import 'package:smarn/services/teacherService.dart';
+import 'package:smarn/services/teacher_service.dart';
 import 'models/teacher.dart';
 
-final teacherService = Teacherservice();
+final teacherService = TeacherService();
 
-void add_teacher() async {
+void addTeacher() async {
 
   // Example of adding a teacher
-  Map<String, dynamic> teacher = {
-    'name': 'Ahlem Ben Saleh',
-    'email': 'ahlem@gmail.com',
-    'phone': '22 345 678',
-    'nbHours': 14,
-    'password': '2222'
-  };
+  Teacher teacher = Teacher(
+    name: 'Ahmed Ben Saleh',
+    phone: '22 345 678',
+    nbHours: 14,
+    subjects: [],
+    activities: []
+  );
 
-  await teacherService.addTeacherWithCustomId(teacher);
+  await teacherService.createTeacherAccount("ahmed@gmail.com", "Ahmed1234", teacher);
 }
 
-void view_teachers() async {
+void viewTeachers() async {
   // Example of getting all teachers
   List<Teacher> teachers = await teacherService.getTeachers();
-  teachers.forEach((t) {
-    print("Teacher : " + t.name);
-  });
+  for (var t in teachers) {
+    print("Teacher : ${t.name}");
+  }
 }

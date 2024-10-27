@@ -2,23 +2,21 @@ import 'package:smarn/models/activity.dart';
 import 'package:smarn/models/subject.dart';
 
 class Teacher {
-  String id;
+  String? id;
   String name;
-  String email;
+  String? email;
   String phone;
   int nbHours;
-  String password;
-  Set<Subject> subjects;
-  Set<Activity> activities;
+  List<Subject> subjects;
+  List<Activity> activities;
 
   // Constructor
   Teacher(
-      {required this.id,
+      {this.id,
       required this.name,
-      required this.email,
+      this.email,
       required this.phone,
       required this.nbHours,
-      required this.password,
       required this.subjects,
       required this.activities});
 
@@ -30,9 +28,8 @@ class Teacher {
       'email': email,
       'phone': phone,
       'nbHours': nbHours,
-      'password': password,
-      'subjects': subjects,
-      'activities': activities
+      'subjects': subjects.map((s) => s.toMap()).toList(),
+      'activities': activities.map((a) => a.toMap()).toList()
     };
   }
 
@@ -44,8 +41,11 @@ class Teacher {
         email: map['email'],
         phone: map['phone'],
         nbHours: map['nbHours'],
-        password: map['password'],
-        subjects: map['subjects'],
-        activities: map['activities']);
+        subjects: (map['subjects'] as List)
+            .map((subjectMap) => Subject.fromMap(subjectMap))
+            .toList(),
+        activities: (map['activities'] as List)
+            .map((activityMap) => Activity.fromMap(activityMap))
+            .toList());
   }
 }
