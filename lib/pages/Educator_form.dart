@@ -1,42 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/admin_dashboard.dart';
+import 'package:smarn/pages/teacher_dashboard.dart';
+import 'package:smarn/services/teacher_service.dart';
 
-
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class EducatorForm extends StatefulWidget {
+  const EducatorForm({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: AdminForm(),
-      routes: {
-        '/dashboard': (context) => AdminDashboard(),
-      },
-    );
-  }
+  _EducatorFormState createState() => _EducatorFormState();
 }
 
-class AdminForm extends StatefulWidget {
-  const AdminForm({super.key});
-
-  @override
-  _AdminFormState createState() => _AdminFormState();
-}
-
-class _AdminFormState extends State<AdminForm> {
+class _EducatorFormState extends State<EducatorForm> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final TeacherService _teacherService = TeacherService();
+
+  Future<void> _loginTeacher() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        bool success = await _teacherService.login(
+          _usernameController.text.trim(),
+          _passwordController.text.trim(),
+        );
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/teacher_dashboard');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text("Login failed. Please check your credentials.")),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("An error occurred: $e")),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:  const Color.fromARGB(255, 0, 9, 17), // Light grey background
+      backgroundColor:
+          const Color.fromARGB(255, 0, 9, 17), // Light grey background
       appBar: AppBar(
         title: const Text('Educator Form'),
-        backgroundColor:const Color.fromARGB(255, 129, 77, 139), // AppBar color blue
+        backgroundColor:
+            const Color.fromARGB(255, 129, 77, 139), // AppBar color blue
       ),
       body: Center(
         child: Padding(
@@ -103,30 +113,15 @@ class _AdminFormState extends State<AdminForm> {
                     ),
                     const SizedBox(height: 30),
                     ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          if (_usernameController.text == 'admin' &&
-                              _passwordController.text == 'admin') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AdminDashboard()),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Invalid credentials')),
-                            );
-                          }
-                        }
-                      },
+                      onPressed: _loginTeacher,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue, // Button color blue
                       ),
                       child: const Text(
                         'Submit',
                         style: TextStyle(
-                          color: Color.fromARGB(255, 255, 255, 255), // Button text color white
+                          color: Color.fromARGB(
+                              255, 255, 255, 255), // Button text color white
                         ),
                       ),
                     ),
