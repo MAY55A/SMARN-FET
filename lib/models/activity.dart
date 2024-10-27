@@ -5,7 +5,7 @@ import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
 
 class Activity {
-  String id;
+  String? id;
   String name;
   Subject subject;
   Teacher teacher;
@@ -17,7 +17,7 @@ class Activity {
 
   // Constructor
   Activity({
-    required this.id,
+    this.id,
     required this.name,
     required this.subject,
     required this.teacher,
@@ -33,11 +33,11 @@ class Activity {
     return {
       'id': id,
       'name': name,
-      'subject': subject,
-      'teacher': teacher,
-      'class': studentsClass,
-      'tag': tag,
-      'room': room,
+      'subject': subject.toMap(),
+      'teacher': teacher.toMap(),
+      'class': studentsClass.toMap(),
+      'tag': tag.name,
+      'room': room?.toMap(),
       'isActive': isActive,
       'duration': duration,
     };
@@ -48,12 +48,12 @@ class Activity {
     return Activity(
         id: map['id'],
         name: map['name'],
-        subject: map['subject'],
-        teacher: map['teacher'],
-        studentsClass: map['class'],
-        tag: map['tag'],
+        subject: Subject.fromMap(map['subject']),
+        teacher: Teacher.fromMap(map['teacher']),
+        studentsClass: Class.fromMap(map['class']),
+        tag: ActivityTag.values.firstWhere((e) => e.name == map['tag']),
         isActive: map['isActive'],
         duration: map['duration'],
-        room: map['room']);
+        room: Room.fromMap(map['room']));
   }
 }

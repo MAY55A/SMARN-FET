@@ -1,12 +1,12 @@
 class Building {
-  String id;
+  String? id;
   String name;
   String longName;
   String description;
 
   // Constructor
   Building({
-    required this.id,
+    this.id,
     required this.name,
     required this.longName,
     required this.description,
