@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/class_dashboard.dart';
+import 'package:smarn/services/class_service.dart';
 
 class StudentForm extends StatefulWidget {
   const StudentForm({super.key});
@@ -11,6 +13,23 @@ class _StudentFormState extends State<StudentForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _classController = TextEditingController();
   final TextEditingController _keyController = TextEditingController();
+  final ClassService _classService = ClassService();
+
+  Future<void> _accessClassSchedule() async {
+    if (_formKey.currentState!.validate()) {
+      var studentsClass = await _classService.login(
+        _classController.text.trim(),
+        _keyController.text.trim(),
+      );
+      if (studentsClass != null) {
+        Navigator.pushReplacementNamed(context, '/class_dashboard');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Class not found. Please check your inputs.")),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,13 +109,7 @@ class _StudentFormState extends State<StudentForm> {
                     const SizedBox(height: 30),
 
                     ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Form Submitted')),
-                          );
-                        }
-                      },
+                      onPressed: _accessClassSchedule,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             vertical: 5), // Less vertical padding

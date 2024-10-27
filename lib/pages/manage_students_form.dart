@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/student_dashboard.dart'; // Import the new student dashboard
+import 'package:smarn/pages/class_dashboard.dart'; // Import the new student dashboard
 
 class ManageStudentsForm extends StatefulWidget {
   const ManageStudentsForm({super.key});
@@ -81,12 +81,6 @@ class _ManageStudentsFormState extends State<ManageStudentsForm> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         // Navigate to the student dashboard on successful login
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const StudentDashboard(),
-                          ),
-                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(

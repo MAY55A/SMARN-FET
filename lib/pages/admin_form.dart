@@ -1,19 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/admin_dashboard.dart';
-
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: AdminForm(),
-      routes: {
-        '/dashboard': (context) => AdminDashboard(),
-      },
-    );
-  }
-}
+import 'package:smarn/services/admin_service.dart';
 
 class AdminForm extends StatefulWidget {
   const AdminForm({super.key});
@@ -26,6 +12,23 @@ class _AdminFormState extends State<AdminForm> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final AdminService _adminService = AdminService();
+
+  Future<void> _loginAdmin() async {
+    if (_formKey.currentState!.validate()) {
+      bool success = await _adminService.login(
+        _usernameController.text.trim(),
+        _passwordController.text.trim(),
+      );
+      if (success) {
+        Navigator.pushReplacementNamed(context, '/admin_dashboard');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Login failed. Unauthorized access.")),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,21 +98,7 @@ class _AdminFormState extends State<AdminForm> {
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-  if (_usernameController.text == 'admin' &&
-      _passwordController.text == 'admin') {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AdminDashboard()),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Invalid credentials')),
-    );
-  }
-}        
-                    },
+                    onPressed: _loginAdmin,
                     child: const Text('Login'),
                   ),
                 ],
