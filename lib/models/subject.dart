@@ -1,15 +1,15 @@
 import 'package:smarn/models/teacher.dart';
 
 class Subject {
-  String id;
+  String? id;
   String name;
   String longName;
   String description;
-  Set<Teacher> teachers;
+  List<Teacher> teachers;
 
   // Constructor
   Subject({
-    required this.id,
+    this.id,
     required this.name,
     required this.longName,
     required this.description,
@@ -23,7 +23,7 @@ class Subject {
       'name': name,
       'longName': longName,
       'description': description,
-      'teachers': teachers
+      'teachers': teachers.map((t) => t.toMap()).toList(),
     };
   }
 
@@ -34,6 +34,8 @@ class Subject {
         name: map['name'],
         longName: map['longName'],
         description: map['description'],
-        teachers: map['teachers']);
+        teachers: (map['teachers'] as List)
+            .map((teacherMap) => Teacher.fromMap(teacherMap))
+            .toList());
   }
 }

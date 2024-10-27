@@ -2,7 +2,7 @@ import 'package:smarn/models/building.dart';
 import 'package:smarn/models/room_type.dart';
 
 class Room {
-  String id;
+  String? id;
   String name;
   RoomType type;
   String description;
@@ -11,7 +11,7 @@ class Room {
 
   // Constructor
   Room(
-      {required this.id,
+      {this.id,
       required this.name,
       required this.type,
       required this.description,
@@ -23,10 +23,10 @@ class Room {
     return {
       'id': id,
       'name': name,
-      'type': type,
+      'type': type.name,
       'description': description,
       'capacity': capacity,
-      'building': building
+      'building': building.toMap()
     };
   }
 
@@ -35,9 +35,9 @@ class Room {
     return Room(
         id: map['id'],
         name: map['name'],
-        type: map['type'],
+        type: RoomType.values.firstWhere((e) => e.name == map['type']),
         description: map['description'],
         capacity: map['capacity'],
-        building: map['building']);
+        building: Building.fromMap(map['building']));
   }
 }

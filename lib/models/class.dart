@@ -1,5 +1,5 @@
 class Class {
-  String id;
+  String? id;
   String name;
   String longName;
   int nbStudents;
@@ -7,7 +7,7 @@ class Class {
 
   // Constructor
   Class(
-      {required this.id,
+      {this.id,
       required this.name,
       required this.longName,
       required this.nbStudents,
