@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/admin_form.dart';
 import 'package:smarn/pages/student_form.dart';
 import 'package:smarn/pages/Educator_form.dart'; // Import the AdminForm widget
 
-class SelectionPage extends StatelessWidget {
-  const SelectionPage({super.key});
+class SelectionPage extends StatefulWidget {
+  @override
+  _SelectionPageState createState() => _SelectionPageState();
+}
+
+class _SelectionPageState extends State<SelectionPage> {
+  bool _isButtonVisible = false;
+
+  void _revealButton() {
+    setState(() {
+      _isButtonVisible = true; // Show the admin login form
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +67,8 @@ class SelectionPage extends StatelessWidget {
                             icon: Icons.school,
                             label: ' Student ',
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const StudentForm()),
-                              );
+                              Navigator.pushReplacementNamed(
+                                  context, '/class_access');
                             },
                           ),
                           const SizedBox(width: 30), // Space between buttons
@@ -69,11 +78,8 @@ class SelectionPage extends StatelessWidget {
                             icon: Icons.people,
                             label: 'Educator',
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const AdminForm()),
-                              );
+                              Navigator.pushReplacementNamed(
+                                  context, '/teacher_login');
                             },
                           ),
                         ],
@@ -91,6 +97,27 @@ class SelectionPage extends StatelessWidget {
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
+                      // Hidden area for long press detection
+                      GestureDetector(
+                        onLongPress:
+                            _revealButton, // Long press to reveal button
+                        child: Container(
+                          width: 200, // Set a width for the hidden area
+                          height: 200, // Set a height for the hidden area
+                          color: Colors
+                              .transparent, // Transparent color for invisibility
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      if (_isButtonVisible)
+                        ElevatedButton(
+                          onPressed: () {
+                            // Navigate to Admin Login Form
+                            Navigator.pushReplacementNamed(
+                                context, '/admin_login');
+                          },
+                          child: Text("Go to Admin Login"),
+                        ),
                     ],
                   ),
                 ),
