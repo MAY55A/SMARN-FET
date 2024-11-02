@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/edit_personal_information_form.dart';
 
 class ManagePersonnelInformationForm extends StatefulWidget {
   const ManagePersonnelInformationForm({super.key});
@@ -10,78 +11,133 @@ class ManagePersonnelInformationForm extends StatefulWidget {
 
 class _ManagePersonnelInformationFormState
     extends State<ManagePersonnelInformationForm> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _personnelNameController =
-      TextEditingController();
-  final TextEditingController _personnelIdController = TextEditingController();
+  // Variables to hold personnel information
+  String personnelName = "Ahmed Ben Saleh";
+  String personnelId = "TEA001";
+  String email = "ahmed@gmail.com";
+  String phoneNumber = "22 345 678";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Manage Personnel Information"),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color.fromARGB(
+            255, 129, 77, 139), // Top bar color from the image
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Container(
-        color: const Color(0xFFF2F2F2),
+        color: Colors.black87, // Dark background color
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                shrinkWrap: true,
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(
+                    0xFFE0F7FA), // Light blue background for the card
+                borderRadius:
+                    BorderRadius.circular(20), // Rounded corners for the card
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    "Personnel Information",
-                    style: TextStyle(fontSize: 20, color: Color(0xFF023E8A)),
-                    textAlign: TextAlign.center,
+                  // Profile image
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: AssetImage(
+                        'teachers/i3.jpg'), // Replace with your image
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _personnelNameController,
-                    decoration: InputDecoration(
-                      labelText: "Personnel Name",
-                      border: const OutlineInputBorder(),
-                      labelStyle: const TextStyle(color: Color(0xFF023E8A)),
+
+                  // Name of the personnel
+                  Text(
+                    personnelName,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue, // Name text color
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter personnel name";
-                      }
-                      return null;
-                    },
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _personnelIdController,
-                    decoration: InputDecoration(
-                      labelText: "Personnel ID",
-                      border: const OutlineInputBorder(),
-                      labelStyle: const TextStyle(color: Color(0xFF023E8A)),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter personnel ID";
-                      }
-                      return null;
-                    },
+
+                  // Personnel ID with icon
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.badge, color: Colors.blue),
+                      const SizedBox(width: 10),
+                      Text(
+                        personnelId,
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.black87),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
+
+                  // Email with icon
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.email, color: Colors.blue),
+                      const SizedBox(width: 10),
+                      Text(
+                        email,
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.black87),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Phone number with icon
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.phone, color: Colors.blue),
+                      const SizedBox(width: 10),
+                      Text(
+                        phoneNumber,
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.black87),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Change Personnel Information Button
                   ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("Personnel Information Saved")),
-                        );
-                      }
+                      // Navigate to EditPersonnelInformationForm page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => EditPersonnelInformationForm(
+                                  personnelName: personnelName,
+                                  personnelId: personnelId,
+                                  email: email,
+                                  phoneNumber: phoneNumber,
+                                )),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blue, // Button color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 32), // Padding for button
                     ),
-                    child: const Text("Save Personnel Information"),
+                    child: const Text(
+                      "Change Personnel Information",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ],
               ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/class_dashboard.dart';
 import 'package:smarn/services/class_service.dart';
+
 class StudentForm extends StatefulWidget {
   const StudentForm({super.key});
 
@@ -23,7 +25,7 @@ class _StudentFormState extends State<StudentForm> {
         Navigator.pushReplacementNamed(context, '/class_dashboard');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Class not found. Please check your inputs.")),
+          const SnackBar(content: Text("Class not found. Please check your inputs.")),
         );
       }
     }
@@ -34,8 +36,7 @@ class _StudentFormState extends State<StudentForm> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
       appBar: AppBar(
-        backgroundColor:
-            const Color.fromARGB(255, 129, 77, 139), // AppBar color
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // AppBar color
         title: const Text('Student Form'),
       ),
       body: Center(
@@ -106,27 +107,29 @@ class _StudentFormState extends State<StudentForm> {
                     ),
                     const SizedBox(height: 30),
 
-              // Submit Button
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // If the form is valid, display a snackbar or perform an action
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Form Submitted')),
-                    );
-                    // Perform your submission action here
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 109, 168, 250),
+                    ElevatedButton(
+                      onPressed: _accessClassSchedule,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 5), // Less vertical padding
+                        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Button color
+                      ),
+                      child: const Text(
+                        'Submit',
+                        style: TextStyle(
+                          fontSize: 16, // Adjust font size if needed
+                          color: Color.fromARGB(255, 255, 236, 249), // Text color set to white
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 30),
+                  ],
                 ),
-                child: const Text('Submit'),
               ),
-              const SizedBox(height :30),
-            ]
+            ),
           ),
         ),
-            ),
-    ))));
+      ),
+    );
   }
 }

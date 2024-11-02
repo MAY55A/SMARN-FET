@@ -25,66 +25,106 @@ class _SelectionPageState extends State<SelectionPage> {
         title: const Text('Smarn'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Blue AppBar
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Login as:',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(
-                    221, 8, 5, 17), // Darker text color for contrast
-              ),
+      body: Stack(
+        children: [
+          // Background image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/img/i66.jpg', // Your background image
+              fit: BoxFit.cover, // Ensure the image covers the entire container
             ),
-            const SizedBox(height: 70),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(width: 12),
-                // Pupil Button
-                _buildButton(
-                  context,
-                  icon: Icons.school,
-                  label: '  Student ',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const StudentForm()),
-                    );
-                  },
+          ),
+          // Dark overlay for contrast
+          Container(
+            color: Colors.black.withOpacity(0.5), // Dark overlay for contrast
+          ),
+          // Main content
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Login as:',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 50),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Student Button
+                          _buildButton(
+                            context,
+                            icon: Icons.school,
+                            label: ' Student ',
+                            onTap: () {
+                              Navigator.pushReplacementNamed(
+                                  context, '/class_access');
+                            },
+                          ),
+                          const SizedBox(width: 30), // Space between buttons
+                          // Educator Button
+                          _buildButton(
+                            context,
+                            icon: Icons.people,
+                            label: 'Educator',
+                            onTap: () {
+                              Navigator.pushReplacementNamed(
+                                  context, '/teacher_login');
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 40),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.blue, // Text color
+                        ),
+                        child: const Text(
+                          'Refer to the home page',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      // Hidden area for long press detection
+                      GestureDetector(
+                        onLongPress:
+                            _revealButton, // Long press to reveal button
+                        child: Container(
+                          width: 200, // Set a width for the hidden area
+                          height: 200, // Set a height for the hidden area
+                          color: Colors
+                              .transparent, // Transparent color for invisibility
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      if (_isButtonVisible)
+                        ElevatedButton(
+                          onPressed: () {
+                            // Navigate to Admin Login Form
+                            Navigator.pushReplacementNamed(
+                                context, '/admin_login');
+                          },
+                          child: Text("Go to Admin Login"),
+                        ),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 40), // Space between buttons
-                // Admin Button
-                _buildButton(
-                  context,
-                  icon: Icons.people,
-                  label: 'Educator',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>  AdminForm()),
-                    );
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.blue, // Text color
               ),
-              child: const Text('Refer to the home page'),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
