@@ -10,81 +10,79 @@ class ManageQualifiedSubjectsForm extends StatefulWidget {
 
 class _ManageQualifiedSubjectsFormState
     extends State<ManageQualifiedSubjectsForm> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _subjectNameController = TextEditingController();
-  final TextEditingController _subjectCodeController = TextEditingController();
+  // A static list of qualified subjects for the teacher
+  final List<Map<String, String>> _qualifiedSubjects = [
+    {"name": "Mathematics", "code": "MAT101"},
+    {"name": "Physics", "code": "PHY102"},
+    {"name": "Chemistry", "code": "CHE103"},
+    {"name": "Biology", "code": "BIO104"},
+    {"name": "Computer Science", "code": "CSE105"},
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Manage Qualified Subjects"),
-        backgroundColor: Colors.blue,
+        title: const Text("Subjects"),
+        backgroundColor: const Color.fromARGB(
+            255, 129, 77, 139), // Keeping the blue theme color
       ),
       body: Container(
-        color: const Color(0xFFF2F2F2),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  const Text(
-                    "Qualified Subject Information",
-                    style: TextStyle(fontSize: 20, color: Color(0xFF023E8A)),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _subjectNameController,
-                    decoration: InputDecoration(
-                      labelText: "Subject Name",
-                      border: const OutlineInputBorder(),
-                      labelStyle: const TextStyle(color: Color(0xFF023E8A)),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter subject name";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _subjectCodeController,
-                    decoration: InputDecoration(
-                      labelText: "Subject Code",
-                      border: const OutlineInputBorder(),
-                      labelStyle: const TextStyle(color: Color(0xFF023E8A)),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter subject code";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("Qualified Subject Saved")),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text("Save Qualified Subject"),
-                  ),
-                ],
+        color: const Color.fromARGB(255, 31, 31, 31), // Light gray background
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const Text(
+                "Qualified Subjects",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Color.fromARGB(
+                      255, 215, 225, 255), // Dark blue text color
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
+              const SizedBox(height: 20),
+
+              // Display the list of subjects using ListView.builder
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _qualifiedSubjects.length,
+                  itemBuilder: (context, index) {
+                    final subject = _qualifiedSubjects[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 4,
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.book,
+                          color: Colors.blue, // Icon color to match theme
+                        ),
+                        title: Text(
+                          subject['name'] ?? '',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Color(0xFF023E8A), // Text color
+                          ),
+                        ),
+                        subtitle: Text(
+                          "Code: ${subject['code'] ?? ''}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color:
+                                Colors.black87, // Slightly lighter text color
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 20), // Button to save changes, if n
+            ],
           ),
         ),
       ),

@@ -33,10 +33,10 @@ class _AdminFormState extends State<AdminForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2),
+      backgroundColor: const Color.fromARGB(255, 0, 9, 17),
       appBar: AppBar(
         title: const Text('Admin Form'),
-        backgroundColor: const Color(0xFFC0EEF2),
+        backgroundColor:  const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Center(
         child: Padding(
@@ -72,11 +72,11 @@ class _AdminFormState extends State<AdminForm> {
                     controller: _usernameController,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Username',
+                      labelText: 'Email',
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your username';
+                        return 'Please enter your Email';
                       }
                       return null;
                     },

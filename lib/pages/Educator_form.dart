@@ -87,11 +87,11 @@ class _EducatorFormState extends State<EducatorForm> {
                       controller: _usernameController,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'Username',
+                        labelText: 'Email',
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your username';
+                          return 'Please enter your Email';
                         }
                         return null;
                       },
