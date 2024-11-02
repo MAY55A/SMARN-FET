@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/admin_form.dart';
 import 'package:smarn/pages/student_form.dart';
 import 'package:smarn/pages/Educator_form.dart'; // Import the AdminForm widget
 
-class SelectionPage extends StatelessWidget {
-  const SelectionPage({super.key});
+class SelectionPage extends StatefulWidget {
+  @override
+  _SelectionPageState createState() => _SelectionPageState();
+}
+
+class _SelectionPageState extends State<SelectionPage> {
+  bool _isButtonVisible = false;
+
+  void _revealButton() {
+    setState(() {
+      _isButtonVisible = true; // Show the admin login form
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,91 +25,66 @@ class SelectionPage extends StatelessWidget {
         title: const Text('Smarn'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Blue AppBar
       ),
-      body: Stack(
-        children: [
-          // Background image
-          Positioned.fill(
-            child: Image.asset(
-              'assets/img/i66.jpg', // Your background image
-              fit: BoxFit.cover, // Ensure the image covers the entire container
-            ),
-          ),
-          // Dark overlay for contrast
-          Container(
-            color: Colors.black.withOpacity(0.5), // Dark overlay for contrast
-          ),
-          // Main content
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Login as:',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 50),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Student Button
-                          _buildButton(
-                            context,
-                            icon: Icons.school,
-                            label: ' Student ',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const StudentForm()),
-                              );
-                            },
-                          ),
-                          const SizedBox(width: 30), // Space between buttons
-                          // Educator Button
-                          _buildButton(
-                            context,
-                            icon: Icons.people,
-                            label: 'Educator',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const AdminForm()),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 40),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.blue, // Text color
-                        ),
-                        child: const Text(
-                          'Refer to the home page',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Login as:',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(
+                    221, 8, 5, 17), // Darker text color for contrast
               ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 70),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(width: 12),
+                // Pupil Button
+                _buildButton(
+                  context,
+                  icon: Icons.school,
+                  label: '  Student ',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const StudentForm()),
+                    );
+                  },
+                ),
+                const SizedBox(width: 40), // Space between buttons
+                // Admin Button
+                _buildButton(
+                  context,
+                  icon: Icons.people,
+                  label: 'Educator',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>  AdminForm()),
+                    );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue, // Text color
+              ),
+              child: const Text('Refer to the home page'),
+            ),
+          ],
+        ),
       ),
     );
   }

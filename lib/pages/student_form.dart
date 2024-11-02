@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:smarn/services/class_service.dart';
 class StudentForm extends StatefulWidget {
   const StudentForm({super.key});
 
@@ -11,6 +11,23 @@ class _StudentFormState extends State<StudentForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _classController = TextEditingController();
   final TextEditingController _keyController = TextEditingController();
+  final ClassService _classService = ClassService();
+
+  Future<void> _accessClassSchedule() async {
+    if (_formKey.currentState!.validate()) {
+      var studentsClass = await _classService.login(
+        _classController.text.trim(),
+        _keyController.text.trim(),
+      );
+      if (studentsClass != null) {
+        Navigator.pushReplacementNamed(context, '/class_dashboard');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Class not found. Please check your inputs.")),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,38 +106,27 @@ class _StudentFormState extends State<StudentForm> {
                     ),
                     const SizedBox(height: 30),
 
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Form Submitted')),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5), // Less vertical padding
-                        backgroundColor: const Color.fromARGB(
-                            255, 129, 77, 139), // Button color
-                      ),
-                      child: const Text(
-                        'Submit',
-                        style: TextStyle(
-                          fontSize: 12, // Smaller font size
-                          color: Color.fromARGB(
-                              255, 255, 236, 249), // Text color set to white
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 30),
-                  ],
+              // Submit Button
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    // If the form is valid, display a snackbar or perform an action
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Form Submitted')),
+                    );
+                    // Perform your submission action here
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 109, 168, 250),
                 ),
+                child: const Text('Submit'),
               ),
-            ),
+              const SizedBox(height :30),
+            ]
           ),
         ),
-      ),
-    );
+            ),
+    ))));
   }
 }
