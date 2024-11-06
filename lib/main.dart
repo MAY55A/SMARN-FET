@@ -9,7 +9,7 @@ import 'package:smarn/pages/class_dashboard.dart';
 import 'package:smarn/pages/student_form.dart';
 import 'package:smarn/pages/teacher_dashboard.dart';
 
-//Firebase configuration
+// Firebase configuration
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -32,17 +32,18 @@ class MyApp extends StatelessWidget {
       // Choose one home screen to display
       initialRoute: '/',
       routes: {
-        '/': (context) =>
-            HomePage(), // Home screen (choose admin, teacher, or student)
+        '/': (context) => HomePage(), // Home screen (choose admin, teacher, or student)
         '/admin_login': (context) => AdminForm(), // Admin login form
-        '/class_access': (context) =>
-            StudentForm(), // Student class access form
-        '/teacher_login': (context) => EducatorForm(), // Teacher login form
+        '/class_access': (context) => StudentForm(), // Student class access form
+        '/teacher_login': (context) => EducatorForm(
+          onLoginSuccess: () {
+            // Handle success (e.g., navigate to the teacher dashboard)
+            Navigator.pushReplacementNamed(context, '/teacher_dashboard');
+          },
+        ), // Teacher login form with onLoginSuccess
         '/admin_dashboard': (context) => AdminDashboard(), // Admin dashboard
-        '/class_dashboard': (context) =>
-            ClassDashboard(), // Class schedule screen
-        '/teacher_dashboard': (context) =>
-            TeacherDashboard(), // Teacher dashboard
+        '/class_dashboard': (context) => ClassDashboard(), // Class schedule screen
+        '/teacher_dashboard': (context) => TeacherDashboard(), // Teacher dashboard
       },
     );
   }

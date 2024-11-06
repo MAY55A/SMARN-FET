@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/manage_activities_form.dart'; // Import the Manage Activities form
 import 'package:smarn/pages/manage_complaints_form.dart';
 import 'package:smarn/pages/manage_students_form.dart';
 import 'package:smarn/pages/manage_subjects_form.dart';
@@ -6,6 +7,7 @@ import 'package:smarn/pages/manage_teachers_form.dart';
 import 'package:smarn/pages/manage_timetables_form.dart';
 import 'package:smarn/pages/space_constraints_form.dart';
 import 'package:smarn/pages/time_constraints_form.dart';
+import 'package:smarn/services/auth_service.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -30,12 +32,20 @@ class AdminDashboard extends StatelessWidget {
                 BoxShadow(blurRadius: 10, color: Colors.black12)
               ], // Shadow for depth
             ),
-            child: ListView(
-              padding: const EdgeInsets.all(8),
+            child: Column(
               children: [
-                _buildSidebarItem(context, Icons.person_outline, 'Manage Teachers', const ManageTeachersForm()),
-                _buildSidebarItem(context, Icons.schedule, 'Manage Timetables', const ManageTimetablesForm()),
-                _buildSidebarItem(context, Icons.report_problem_outlined, 'Manage Complaints', const ManageComplaintsForm()),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(8),
+                    children: [
+                      _buildSidebarItem(context, Icons.person_outline, 'Manage Teachers', const ManageTeachersForm()),
+                      _buildSidebarItem(context, Icons.schedule, 'Manage Timetables', const ManageTimetablesForm()),
+                      _buildSidebarItem(context, Icons.report_problem_outlined, 'Manage Complaints', const ManageComplaintsForm()),
+                      _buildSidebarItem(context, Icons.assignment, 'Manage Activities', const ManageActivitiesForm()), // New sidebar item
+                    ],
+                  ),
+                ),
+                _buildLogoutButton(context), // Logout Button at the bottom
               ],
             ),
           ),
@@ -52,6 +62,7 @@ class AdminDashboard extends StatelessWidget {
                   _buildAnimatedDashboardCard(context, 'Manage Subjects', Icons.book_outlined, const ManageSubjectsForm()),
                   _buildAnimatedDashboardCard(context, 'Time Constraints', Icons.timer_outlined, const TimeConstraintsForm()),
                   _buildAnimatedDashboardCard(context, 'Space Constraints', Icons.location_on_outlined, const SpaceConstraintsForm()),
+                  _buildAnimatedDashboardCard(context, 'Manage Activities', Icons.assignment, const ManageActivitiesForm()), // New dashboard card
                 ],
               ),
             ),
@@ -123,6 +134,28 @@ class AdminDashboard extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // Logout button widget
+  Widget _buildLogoutButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: ListTile(
+        leading: const Icon(Icons.logout, color: Colors.redAccent, size: 20), // Logout icon
+        title: const Text(
+          'Logout',
+          style: TextStyle(color: Colors.redAccent, fontSize: 12), // Logout text style
+        ),
+        tileColor: Colors.transparent,
+        onTap: () async {
+          // Call the sign-out method from AuthService
+          await AuthService().signOut();
+          // Navigate to the home page
+          Navigator.pushReplacementNamed(context, '/'); // Redirect to HomePage
+        },
+        hoverColor: Colors.red.withOpacity(0.2), // Hover color effect
       ),
     );
   }

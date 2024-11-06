@@ -35,15 +35,22 @@ class AuthService {
 
   // Check if user is teacher
   Future<bool> isTeacher(User? user) async {
-    if (user == null) return false;
+  if (user == null) return false;
+  try {
     DocumentSnapshot userDoc = await _firestore.collection('teachers').doc(user.uid).get();
+    print('Checking if user is a teacher: ${user.uid}, Exists: ${userDoc.exists}');
     return userDoc.exists;
+  } catch (e) {
+    print('Error checking if user is a teacher: $e');
+    return false; // Return false if there's an error
   }
+}
 
-  // Get current user
+  
   User? getCurrentUser() {
     return _auth.currentUser;
   }
+
 
   // Create a new user
   Future<User?> register(String email, String password) async {
@@ -56,4 +63,6 @@ class AuthService {
       return null;
     }
   }
+
+  
 }

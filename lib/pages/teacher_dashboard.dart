@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smarn/pages/manage_qualified_subjects_form.dart';
 import 'package:smarn/pages/manage_personnel_information_form.dart';
 import 'package:smarn/pages/view_complaints_or_print_timetable.dart';
+import 'package:smarn/services/auth_service.dart'; // Import the AuthService for logout functionality
 
 class TeacherDashboard extends StatelessWidget {
   const TeacherDashboard({super.key});
@@ -23,7 +24,7 @@ class TeacherDashboard extends StatelessWidget {
       ),
       body: Row(
         children: [
-          // Static Sidebar on the left
+          // Sidebar on the left
           Container(
             width: 170, // Sidebar width
             color: Colors.grey[800], // Background color for sidebar
@@ -60,10 +61,15 @@ class TeacherDashboard extends StatelessWidget {
                     );
                   },
                 ),
+                const Spacer(), // Fills up remaining space in the column
+
+                // Logout Button placed at the bottom
+                _buildLogoutButton(context),
               ],
             ),
           ),
 
+          // Main content area
           Expanded(
             child: Stack(
               children: [
@@ -114,6 +120,28 @@ class TeacherDashboard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Logout button widget
+  Widget _buildLogoutButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: ListTile(
+        leading: const Icon(Icons.logout, color: Colors.redAccent, size: 20), // Logout icon
+        title: const Text(
+          'Logout',
+          style: TextStyle(color: Colors.redAccent, fontSize: 12), // Logout text style
+        ),
+        tileColor: Colors.transparent,
+        onTap: () async {
+          // Call the sign-out method from AuthService
+          await AuthService().signOut();
+          // Navigate to the home page
+          Navigator.pushReplacementNamed(context, '/'); // Redirect to HomePage
+        },
+        hoverColor: Colors.red.withOpacity(0.2), // Hover color effect
       ),
     );
   }

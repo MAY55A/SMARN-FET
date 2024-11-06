@@ -3,7 +3,9 @@ import 'package:smarn/pages/teacher_dashboard.dart';
 import 'package:smarn/services/teacher_service.dart';
 
 class EducatorForm extends StatefulWidget {
-  const EducatorForm({super.key});
+  final Function onLoginSuccess; // Callback for login success
+
+  const EducatorForm({super.key, required this.onLoginSuccess});
 
   @override
   _EducatorFormState createState() => _EducatorFormState();
@@ -23,6 +25,7 @@ class _EducatorFormState extends State<EducatorForm> {
           _passwordController.text.trim(),
         );
         if (success) {
+          widget.onLoginSuccess(); // Trigger the callback
           Navigator.pushReplacementNamed(context, '/teacher_dashboard');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -41,12 +44,10 @@ class _EducatorFormState extends State<EducatorForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          const Color.fromARGB(255, 0, 9, 17), // Light grey background
+      backgroundColor: const Color.fromARGB(255, 0, 9, 17),
       appBar: AppBar(
         title: const Text('Educator Form'),
-        backgroundColor:
-            const Color.fromARGB(255, 129, 77, 139), // AppBar color blue
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Center(
         child: Padding(
@@ -67,7 +68,7 @@ class _EducatorFormState extends State<EducatorForm> {
             padding: const EdgeInsets.all(20),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
-                maxWidth: 400, // Match the width of StudentForm
+                maxWidth: 400,
               ),
               child: Form(
                 key: _formKey,
@@ -79,7 +80,7 @@ class _EducatorFormState extends State<EducatorForm> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue, // Text color blue
+                        color: Colors.blue,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -115,13 +116,12 @@ class _EducatorFormState extends State<EducatorForm> {
                     ElevatedButton(
                       onPressed: _loginTeacher,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue, // Button color blue
+                        backgroundColor: Colors.blue,
                       ),
                       child: const Text(
                         'Submit',
                         style: TextStyle(
-                          color: Color.fromARGB(
-                              255, 255, 255, 255), // Button text color white
+                          color: Color.fromARGB(255, 255, 255, 255),
                         ),
                       ),
                     ),

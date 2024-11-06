@@ -1,23 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/teacher_dashboard.dart'; // Import the new dashboard
+import 'package:smarn/models/teacher.dart';
+import 'package:smarn/services/teacher_service.dart';
+import 'add_teacher_form.dart'; // Assuming you have this file
+import 'edit_teacher_form.dart'; // Assuming you have this file
 
 class ManageTeachersForm extends StatefulWidget {
-  const ManageTeachersForm({super.key});
+  const ManageTeachersForm({Key? key}) : super(key: key);
 
   @override
   _ManageTeachersFormState createState() => _ManageTeachersFormState();
 }
 
 class _ManageTeachersFormState extends State<ManageTeachersForm> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _teacherNameController = TextEditingController();
-  final TextEditingController _teacherIdController = TextEditingController();
+  final TeacherService _teacherService = TeacherService();
+  late Future<List<Teacher>> _teachersFuture;
 
   @override
-  void dispose() {
-    _teacherNameController.dispose();
-    _teacherIdController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _teachersFuture = _teacherService.getTeachers();
+  }
+
+  Future<void> _refreshTeachers() async {
+    setState(() {
+      _teachersFuture = _teacherService.getTeachers();
+    });
   }
 
   @override
@@ -25,80 +32,95 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Manage Teachers"),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              // Navigate to add teacher page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddTeacherForm(
+                    refreshTeachers: _refreshTeachers,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Container(
-        color: const Color(0xFFF2F2F2),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  const Text(
-                    "Teacher Information",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Color(0xFF023E8A),
+        color: const Color.fromARGB(255, 0, 10, 19),
+        child: FutureBuilder<List<Teacher>>(
+          future: _teachersFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text("No teachers found."));
+            }
+
+            final teachers = snapshot.data!;
+            return ListView.builder(
+              itemCount: teachers.length,
+              itemBuilder: (context, index) {
+                final teacher = teachers[index];
+                return Card(
+                  color: Colors.white,
+                  margin: const EdgeInsets.all(8.0),
+                  child: ListTile(
+                    title: Text(teacher.name),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Email: ${teacher.email}"),
+                        Text("Phone: ${teacher.phone ?? 'Not provided'}"),
+                        // Display subjects as a list
+                        Text("Subjects: ${teacher.subjects.join(', ')}"),
+                        // Display activities as a list
+                        Text("Activities: ${teacher.activities.join(', ')}"),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _teacherNameController,
-                    decoration: InputDecoration(
-                      labelText: "Teacher Name",
-                      border: const OutlineInputBorder(),
-                      labelStyle: const TextStyle(color: Color(0xFF023E8A)),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            // Navigate to edit teacher page with teacher data
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditTeacherForm(
+                                  teacher: teacher,
+                                  refreshTeachers: _refreshTeachers,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () async {
+                            try {
+                              await _teacherService.deleteTeacher(teacher.id!); // Call the delete function
+                              _refreshTeachers(); // Refresh the list after deletion
+                            } catch (e) {
+                              print("Error deleting teacher: $e");
+                              // Optionally show an error message to the user
+                            }
+                          },
+                        ),
+                      ],
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter teacher name";
-                      }
-                      return null;
-                    },
                   ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _teacherIdController,
-                    keyboardType: TextInputType.number, // Set input type
-                    decoration: InputDecoration(
-                      labelText: "Teacher ID",
-                      border: const OutlineInputBorder(),
-                      labelStyle: const TextStyle(color: Color(0xFF023E8A)),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter teacher ID";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // Navigate to the dashboard on successful login
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const TeacherDashboard(),
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text("Login"),
-                  ),
-                ],
-              ),
-            ),
-          ),
+                );
+              },
+            );
+          },
         ),
       ),
     );

@@ -1,17 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/SelectionPage.dart';
+import 'package:smarn/pages/admin_dashboard.dart'; // Import AdminDashboard page
+import 'package:smarn/pages/teacher_dashboard.dart'; // Import TeacherDashboard page
+import 'package:smarn/services/auth_service.dart'; // Import AuthService
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase for user management
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool _isAdmin = false;
+  bool _isTeacher = false; // Track if the user is a teacher
+  User? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUserStatus();
+  }
+
+  Future<void> _checkUserStatus() async {
+    // Get the current user
+    User? user = AuthService().getCurrentUser();
+    if (user != null) {
+      bool isAdmin = await AuthService().isAdmin(user);
+      bool isTeacher = await AuthService().isTeacher(user); // Check if the user is a teacher
+      setState(() {
+        _isAdmin = isAdmin;
+        _isTeacher = isTeacher;
+        _currentUser = user;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2), // Light grey background
       appBar: AppBar(
-        title: const  Text(
+        title: const Text(
           'Smarn',
-          style: const TextStyle( // Use default font
+          style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -62,7 +95,7 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
-          // Login Button at the bottom of the image
+          // Conditional Button at the bottom of the image
           Positioned(
             bottom: 140, // Position the button closer to the bottom
             right: 40,
@@ -78,17 +111,40 @@ class HomePage extends StatelessWidget {
                 ),
                 elevation: 5, // Shadow effect
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SelectionPage(),
-                  ),
-                );
-              },
-              child: const Text(
-                'Login',
-                style: TextStyle( // Use default font
+              // Change the button based on admin or teacher status
+              onPressed: _isAdmin
+                  ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminDashboard(),
+                        ),
+                      );
+                    }
+                  : _isTeacher
+                      ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TeacherDashboard(),
+                            ),
+                          );
+                        }
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SelectionPage(),
+                            ),
+                          );
+                        },
+              child: Text(
+                _isAdmin
+                    ? 'Admin Dashboard'
+                    : _isTeacher
+                        ? 'Teacher Dashboard'
+                        : 'Login',
+                style: const TextStyle(
                   fontSize: 24, // Font size
                   color: Colors.white, // Text color
                   fontWeight: FontWeight.bold,
