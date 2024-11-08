@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/manage_qualified_subjects_form.dart';
-import 'package:smarn/pages/manage_personnel_information_form.dart';
-import 'package:smarn/pages/view_complaints_or_print_timetable.dart';
+import 'package:smarn/pages/Teacher/manage_qualified_subjects_form.dart';
+import 'package:smarn/pages/Teacher/manage_personnel_information_form.dart';
+import 'package:smarn/pages/Admin/view_complaints_or_print_timetable.dart';
 
-class ClassDashboard extends StatelessWidget {
-  const ClassDashboard({super.key});
+class StudentDashboard extends StatelessWidget {
+  const StudentDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Class Dashboard"),
+        title: const Text("Student Dashboard"),
         backgroundColor: Colors.blue,
       ),
       body: Container(
@@ -21,7 +21,7 @@ class ClassDashboard extends StatelessWidget {
             shrinkWrap: true,
             children: [
               const Text(
-                "Welcome to the Class Dashboard",
+                "Welcome to the Student Dashboard",
                 style: TextStyle(fontSize: 20, color: Color(0xFF023E8A)),
                 textAlign: TextAlign.center,
               ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/class_dashboard.dart'; // Import the new student dashboard
+import 'package:smarn/pages/Student/class_dashboard.dart'; // Import the new student dashboard
 
 class ManageStudentsForm extends StatefulWidget {
   const ManageStudentsForm({super.key});

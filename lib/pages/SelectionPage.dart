@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/admin_form.dart';
-import 'package:smarn/pages/student_form.dart';
-import 'package:smarn/pages/Educator_form.dart'; // Import the AdminForm widget
+import 'package:smarn/pages/Admin/admin_form.dart';
+import 'package:smarn/pages/Student/student_form.dart';
+import 'package:smarn/pages/Teacher/Educator_form.dart'; // Import the AdminForm widget
 
 class SelectionPage extends StatefulWidget {
   @override

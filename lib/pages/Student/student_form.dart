@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/class_dashboard.dart';
+import 'package:smarn/pages/Student/class_dashboard.dart';
 import 'package:smarn/services/class_service.dart';
 
 class StudentForm extends StatefulWidget {

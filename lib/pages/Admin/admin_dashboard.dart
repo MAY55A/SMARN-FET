@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/manage_activities_form.dart'; // Import the Manage Activities form
-import 'package:smarn/pages/manage_complaints_form.dart';
-import 'package:smarn/pages/manage_students_form.dart';
-import 'package:smarn/pages/manage_subjects_form.dart';
-import 'package:smarn/pages/manage_teachers_form.dart';
-import 'package:smarn/pages/manage_timetables_form.dart';
-import 'package:smarn/pages/space_constraints_form.dart';
-import 'package:smarn/pages/time_constraints_form.dart';
+import 'package:smarn/pages/Admin/manage_activities_form.dart'; // Import the Manage Activities form
+import 'package:smarn/pages/Admin/manage_complaints_form.dart';
+import 'package:smarn/pages/Admin/manage_students_form.dart';
+import 'package:smarn/pages/Admin/manage_subjects_form.dart';
+import 'package:smarn/pages/Admin/manage_teachers_form.dart';
+import 'package:smarn/pages/Admin/manage_timetables_form.dart';
+import 'package:smarn/pages/Admin/space_constraints_form.dart';
+import 'package:smarn/pages/Admin/time_constraints_form.dart';
 import 'package:smarn/services/auth_service.dart';
 
 class AdminDashboard extends StatelessWidget {
@@ -18,7 +18,8 @@ class AdminDashboard extends StatelessWidget {
       backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // AppBar color
+        backgroundColor:
+            const Color.fromARGB(255, 129, 77, 139), // AppBar color
         elevation: 4, // Slight elevation for shadow effect
       ),
       body: Row(
@@ -38,10 +39,13 @@ class AdminDashboard extends StatelessWidget {
                   child: ListView(
                     padding: const EdgeInsets.all(8),
                     children: [
-                      _buildSidebarItem(context, Icons.person_outline, 'Manage Teachers', const ManageTeachersForm()),
-                      _buildSidebarItem(context, Icons.schedule, 'Manage Timetables', const ManageTimetablesForm()),
-                      _buildSidebarItem(context, Icons.report_problem_outlined, 'Manage Complaints', const ManageComplaintsForm()),
-                      _buildSidebarItem(context, Icons.assignment, 'Manage Activities', const ManageActivitiesForm()), // New sidebar item
+                      _buildSidebarItem(context, Icons.person_outline,
+                          'Manage Teachers', const ManageTeachersForm()),
+                      _buildSidebarItem(context, Icons.schedule,
+                          'Manage Timetables', const ManageTimetablesForm()),
+                      _buildSidebarItem(context, Icons.report_problem_outlined,
+                          'Manage Complaints', const ManageComplaintsForm()),
+                      // New sidebar item
                     ],
                   ),
                 ),
@@ -58,11 +62,19 @@ class AdminDashboard extends StatelessWidget {
                 crossAxisSpacing: 16, // Adjusted spacing for better fit
                 mainAxisSpacing: 16,
                 children: [
-                  _buildAnimatedDashboardCard(context, 'Manage Students', Icons.group, const ManageStudentsForm()),
-                  _buildAnimatedDashboardCard(context, 'Manage Subjects', Icons.book_outlined, const ManageSubjectsForm()),
-                  _buildAnimatedDashboardCard(context, 'Time Constraints', Icons.timer_outlined, const TimeConstraintsForm()),
-                  _buildAnimatedDashboardCard(context, 'Space Constraints', Icons.location_on_outlined, const SpaceConstraintsForm()),
-                  _buildAnimatedDashboardCard(context, 'Manage Activities', Icons.assignment, const ManageActivitiesForm()), // New dashboard card
+                  _buildAnimatedDashboardCard(context, 'Manage Classes',
+                      Icons.group, const ManageStudentsForm()),
+                  _buildAnimatedDashboardCard(context, 'Manage Subjects',
+                      Icons.book_outlined, const ManageSubjectsForm()),
+                  _buildAnimatedDashboardCard(context, 'Time Constraints',
+                      Icons.timer_outlined, const TimeConstraintsForm()),
+                  _buildAnimatedDashboardCard(context, 'Manage Space',
+                      Icons.location_on_outlined, const SpaceConstraintsForm()),
+                  _buildAnimatedDashboardCard(
+                      context,
+                      'Manage Activities',
+                      Icons.assignment,
+                      const ManageActivitiesForm()), // New dashboard card
                 ],
               ),
             ),
@@ -73,18 +85,24 @@ class AdminDashboard extends StatelessWidget {
   }
 
   // Sidebar item with hover effect and icon
-  Widget _buildSidebarItem(BuildContext context, IconData icon, String title, Widget page) {
+  Widget _buildSidebarItem(
+      BuildContext context, IconData icon, String title, Widget page) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: ListTile(
         leading: Icon(icon, color: Colors.white, size: 20), // Reduced icon size
         title: Text(
           title,
-          style: const TextStyle(color: Colors.white, fontSize: 12), // Smaller font size
+          style: const TextStyle(
+              color: Colors.white, fontSize: 12), // Smaller font size
         ),
         tileColor: Colors.transparent,
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => page)); // Navigate to the specified page
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      page)); // Navigate to the specified page
         },
         hoverColor: Colors.white24,
       ),
@@ -92,10 +110,14 @@ class AdminDashboard extends StatelessWidget {
   }
 
   // Dashboard card with 3D effect, shadow, and hover animation
-  Widget _buildAnimatedDashboardCard(BuildContext context, String title, IconData icon, Widget page) {
+  Widget _buildAnimatedDashboardCard(
+      BuildContext context, String title, IconData icon, Widget page) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => page)); // Navigate to the specified page
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => page)); // Navigate to the specified page
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -112,14 +134,16 @@ class AdminDashboard extends StatelessWidget {
           ],
         ),
         child: InkWell(
-          splashColor: const Color.fromARGB(255, 17, 111, 188).withOpacity(0.3), // Splash effect
+          splashColor: const Color.fromARGB(255, 17, 111, 188)
+              .withOpacity(0.3), // Splash effect
           borderRadius: BorderRadius.circular(15),
           child: Padding(
             padding: const EdgeInsets.all(12.0), // Adjusted padding
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 36, color: Colors.blue), // Further reduced icon size
+                Icon(icon,
+                    size: 36, color: Colors.blue), // Further reduced icon size
                 const SizedBox(height: 8), // Reduced spacing
                 Text(
                   title,
@@ -143,10 +167,12 @@ class AdminDashboard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: ListTile(
-        leading: const Icon(Icons.logout, color: Colors.redAccent, size: 20), // Logout icon
+        leading: const Icon(Icons.logout,
+            color: Colors.redAccent, size: 20), // Logout icon
         title: const Text(
           'Logout',
-          style: TextStyle(color: Colors.redAccent, fontSize: 12), // Logout text style
+          style: TextStyle(
+              color: Colors.redAccent, fontSize: 12), // Logout text style
         ),
         tileColor: Colors.transparent,
         onTap: () async {

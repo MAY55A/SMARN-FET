@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/SelectionPage.dart';
-import 'package:smarn/pages/admin_dashboard.dart'; // Import AdminDashboard page
-import 'package:smarn/pages/teacher_dashboard.dart'; // Import TeacherDashboard page
+import 'package:smarn/pages/Admin/admin_dashboard.dart'; // Import AdminDashboard page
+import 'package:smarn/pages/Teacher/teacher_dashboard.dart'; // Import TeacherDashboard page
 import 'package:smarn/services/auth_service.dart'; // Import AuthService
 import 'package:firebase_auth/firebase_auth.dart'; // Firebase for user management
 

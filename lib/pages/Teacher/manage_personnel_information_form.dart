@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/edit_personal_information_form.dart';
+import 'package:smarn/pages/Teacher/edit_personal_information_form.dart';
 
 class ManagePersonnelInformationForm extends StatefulWidget {
   const ManagePersonnelInformationForm({super.key});
