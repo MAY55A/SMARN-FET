@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/Student/class_dashboard.dart';
+import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/class_service.dart';
 
 class StudentForm extends StatefulWidget {
@@ -34,9 +35,9 @@ class _StudentFormState extends State<StudentForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
+      backgroundColor: AppColors.backgroundColor, // Dark background
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // AppBar color
+        backgroundColor: AppColors.appBarColor, // AppBar color
         title: const Text('Student Form'),
       ),
       body: Center(
@@ -44,11 +45,11 @@ class _StudentFormState extends State<StudentForm> {
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 236, 248, 253),
+              color: AppColors.formColor,
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.blue.withOpacity(0.5),
+                  color: const Color.fromARGB(255, 66, 66, 66).withOpacity(0.5),
                   spreadRadius: 3,
                   blurRadius: 5,
                   offset: const Offset(0, 3),
@@ -68,6 +69,7 @@ class _StudentFormState extends State<StudentForm> {
                     const Text(
                       'Student Information',
                       style: TextStyle(
+                        color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -80,7 +82,7 @@ class _StudentFormState extends State<StudentForm> {
                       controller: _classController,
                       decoration: const InputDecoration(
                         labelText: 'Class',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color:Colors.white),                        border: OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -96,6 +98,7 @@ class _StudentFormState extends State<StudentForm> {
                       controller: _keyController,
                       decoration: const InputDecoration(
                         labelText: 'Key to Connect',
+                        labelStyle: TextStyle(color:Colors.white),
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {

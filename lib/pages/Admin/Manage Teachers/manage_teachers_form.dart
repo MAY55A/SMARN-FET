@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/teacher.dart';
+import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'add_teacher_form.dart'; // Assuming you have this file
 import 'edit_teacher_form.dart'; // Assuming you have this file
@@ -33,25 +34,9 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
       appBar: AppBar(
         title: const Text("Manage Teachers"),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              // Navigate to add teacher page
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddTeacherForm(
-                    refreshTeachers: _refreshTeachers,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
       ),
       body: Container(
-        color: const Color.fromARGB(255, 0, 10, 19),
+        color: AppColors.backgroundColor,
         child: FutureBuilder<List<Teacher>>(
           future: _teachersFuture,
           builder: (context, snapshot) {
@@ -69,28 +54,25 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
               itemBuilder: (context, index) {
                 final teacher = teachers[index];
                 return Card(
-                  color: Colors.white,
+                  color: AppColors.formColor,
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text(teacher.name),
+                    title: Text(teacher.name, style: const TextStyle(color: Colors.white)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Email: ${teacher.email}"),
-                        Text("Phone: ${teacher.phone ?? 'Not provided'}"),
-                        // Display subjects as a list
-                        Text("Subjects: ${teacher.subjects.join(', ')}"),
-                        // Display activities as a list
-                        Text("Activities: ${teacher.activities.join(', ')}"),
+                        Text("Email: ${teacher.email}", style: const TextStyle(color: Colors.white)),
+                        Text("Phone: ${teacher.phone ?? 'Not provided'}", style: const TextStyle(color: Colors.white)),
+                        Text("Subjects: ${teacher.subjects.join(', ')}", style: const TextStyle(color: Colors.white)),
+                        Text("Activities: ${teacher.activities.join(', ')}", style: const TextStyle(color: Colors.white)),
                       ],
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit),
+                          icon: const Icon(Icons.edit, color: Colors.white),
                           onPressed: () {
-                            // Navigate to edit teacher page with teacher data
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -103,14 +85,13 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                           },
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete),
+                          icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () async {
                             try {
-                              await _teacherService.deleteTeacher(teacher.id!); // Call the delete function
-                              _refreshTeachers(); // Refresh the list after deletion
+                              await _teacherService.deleteTeacher(teacher.id!);
+                              _refreshTeachers();
                             } catch (e) {
                               print("Error deleting teacher: $e");
-                              // Optionally show an error message to the user
                             }
                           },
                         ),
@@ -122,6 +103,20 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
             );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddTeacherForm(
+                refreshTeachers: _refreshTeachers,
+              ),
+            ),
+          );
+        },
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Match your app's primary color
+        child: const Icon(Icons.add),
       ),
     );
   }

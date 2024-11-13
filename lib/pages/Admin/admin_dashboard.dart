@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/Admin/manage_activities_form.dart'; // Import the Manage Activities form
-import 'package:smarn/pages/Admin/manage_complaints_form.dart';
-import 'package:smarn/pages/Admin/manage_students_form.dart';
-import 'package:smarn/pages/Admin/manage_subjects_form.dart';
-import 'package:smarn/pages/Admin/manage_teachers_form.dart';
-import 'package:smarn/pages/Admin/manage_timetables_form.dart';
-import 'package:smarn/pages/Admin/space_constraints_form.dart';
-import 'package:smarn/pages/Admin/time_constraints_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Activities/manage_activities_form.dart'; // Import the Manage Activities form
+import 'package:smarn/pages/Admin/Manage%20requests/manage_complaints_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Classes/manage_students_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Teachers/manage_teachers_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Tables/manage_timetables_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Time%20Constarints/time_constraints_form.dart';
+import 'package:smarn/pages/widgets/AppBar.dart';
+import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/auth_service.dart';
 
 class AdminDashboard extends StatelessWidget {
@@ -15,20 +17,15 @@ class AdminDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
-      appBar: AppBar(
-        title: const Text('Admin Dashboard'),
-        backgroundColor:
-            const Color.fromARGB(255, 129, 77, 139), // AppBar color
-        elevation: 4, // Slight elevation for shadow effect
-      ),
+      backgroundColor: AppColors.backgroundColor, // Dark background
+      appBar: Appbar(),
       body: Row(
         children: [
           // Sidebar with adjusted width
           Container(
-            width: 160, // Reduced sidebar width
+            width: 150, // Reduced sidebar width
             decoration: const BoxDecoration(
-              color: Color.fromARGB(255, 44, 44, 44), // Dark sidebar
+              color: Color.fromARGB(255, 56, 56, 56), // Dark sidebar
               boxShadow: [
                 BoxShadow(blurRadius: 10, color: Colors.black12)
               ], // Shadow for depth
@@ -42,9 +39,9 @@ class AdminDashboard extends StatelessWidget {
                       _buildSidebarItem(context, Icons.person_outline,
                           'Manage Teachers', const ManageTeachersForm()),
                       _buildSidebarItem(context, Icons.schedule,
-                          'Manage Timetables', const ManageTimetablesForm()),
+                          'Manage Tables', const ManageTimetablesForm()),
                       _buildSidebarItem(context, Icons.report_problem_outlined,
-                          'Manage Complaints', const ManageComplaintsForm()),
+                          'Manage Requests', const ManageComplaintsForm()),
                       // New sidebar item
                     ],
                   ),
@@ -84,30 +81,33 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 
+
   // Sidebar item with hover effect and icon
-  Widget _buildSidebarItem(
-      BuildContext context, IconData icon, String title, Widget page) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.white, size: 20), // Reduced icon size
-        title: Text(
-          title,
-          style: const TextStyle(
-              color: Colors.white, fontSize: 12), // Smaller font size
-        ),
-        tileColor: Colors.transparent,
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      page)); // Navigate to the specified page
-        },
-        hoverColor: Colors.white24,
+Widget _buildSidebarItem(
+    BuildContext context, IconData icon, String title, Widget page) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 10), // Reduced vertical margin
+    child: ListTile(
+      leading: Icon(icon, color: Colors.white, size: 20), // Reduced icon size
+      title: Text(
+        title,
+        style: const TextStyle(
+            color: Colors.white, fontSize: 12), // Smaller font size
       ),
-    );
-  }
+      tileColor: Colors.transparent,
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    page)); // Navigate to the specified page
+      },
+      hoverColor: Colors.white24,
+    ),
+  );
+}
+
+  
 
   // Dashboard card with 3D effect, shadow, and hover animation
   Widget _buildAnimatedDashboardCard(
@@ -123,7 +123,7 @@ class AdminDashboard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15), // Slightly adjusted radius
-          color: const Color.fromARGB(255, 232, 232, 232),
+          color: const Color.fromARGB(255, 84, 84, 84),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.2),
@@ -134,8 +134,8 @@ class AdminDashboard extends StatelessWidget {
           ],
         ),
         child: InkWell(
-          splashColor: const Color.fromARGB(255, 17, 111, 188)
-              .withOpacity(0.3), // Splash effect
+          splashColor: Color.fromARGB(255, 56, 56, 56),
+               // Splash effect
           borderRadius: BorderRadius.circular(15),
           child: Padding(
             padding: const EdgeInsets.all(12.0), // Adjusted padding
@@ -143,14 +143,14 @@ class AdminDashboard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(icon,
-                    size: 36, color: Colors.blue), // Further reduced icon size
+                    size: 36, color:AppColors.appBarColor ), // Further reduced icon size
                 const SizedBox(height: 8), // Reduced spacing
                 Text(
                   title,
                   style: const TextStyle(
                     fontSize: 12, // Smaller font size
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF023E8A), // Same as sidebar for uniformity
+                    color: Color.fromARGB(255, 254, 254, 254), // Same as sidebar for uniformity
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -186,3 +186,5 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 }
+
+

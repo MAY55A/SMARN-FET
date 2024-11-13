@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/widgets/canstants.dart';
 
 class ManageQualifiedSubjectsForm extends StatefulWidget {
   const ManageQualifiedSubjectsForm({super.key});
@@ -24,11 +25,10 @@ class _ManageQualifiedSubjectsFormState
     return Scaffold(
       appBar: AppBar(
         title: const Text("Subjects"),
-        backgroundColor: const Color.fromARGB(
-            255, 129, 77, 139), // Keeping the blue theme color
+        backgroundColor: AppColors.appBarColor // Keeping the blue theme color
       ),
       body: Container(
-        color: const Color.fromARGB(255, 31, 31, 31), // Light gray background
+        color: AppColors.backgroundColor, // Light gray background
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -37,8 +37,8 @@ class _ManageQualifiedSubjectsFormState
                 "Qualified Subjects",
                 style: TextStyle(
                   fontSize: 20,
-                  color: Color.fromARGB(
-                      255, 215, 225, 255), // Dark blue text color
+                  color : Color.fromARGB(255, 255, 255, 255)
+                       // Dark blue text color
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -47,10 +47,12 @@ class _ManageQualifiedSubjectsFormState
               // Display the list of subjects using ListView.builder
               Expanded(
                 child: ListView.builder(
+                  
                   itemCount: _qualifiedSubjects.length,
                   itemBuilder: (context, index) {
                     final subject = _qualifiedSubjects[index];
                     return Card(
+                      color :AppColors.formColor,
                       margin: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -65,7 +67,7 @@ class _ManageQualifiedSubjectsFormState
                           subject['name'] ?? '',
                           style: const TextStyle(
                             fontSize: 18,
-                            color: Color(0xFF023E8A), // Text color
+                            color: Color.fromARGB(255, 255, 255, 255), // Text color
                           ),
                         ),
                         subtitle: Text(
@@ -73,7 +75,7 @@ class _ManageQualifiedSubjectsFormState
                           style: const TextStyle(
                             fontSize: 16,
                             color:
-                                Colors.black87, // Slightly lighter text color
+                                Color.fromARGB(221, 184, 220, 240), // Slightly lighter text color
                           ),
                         ),
                       ),
