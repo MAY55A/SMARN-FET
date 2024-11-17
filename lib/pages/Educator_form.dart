@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/CRUD_test.dart';
 import 'package:smarn/pages/teacher_dashboard.dart';
+import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 
 class EducatorForm extends StatefulWidget {
@@ -14,20 +16,23 @@ class _EducatorFormState extends State<EducatorForm> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final TeacherService _teacherService = TeacherService();
+  final AuthService _auth = AuthService();
 
   Future<void> _loginTeacher() async {
     if (_formKey.currentState!.validate()) {
       try {
-        bool success = await _teacherService.login(
+        var res = await _teacherService.login(
           _usernameController.text.trim(),
           _passwordController.text.trim(),
         );
-        if (success) {
+        if (res['success']) {
+          //getTeacher(_auth.getCurrentUser()!.uid);
+          //updateTeacher(_auth.getCurrentUser()!.uid);
+          //requestCrud();
           Navigator.pushReplacementNamed(context, '/teacher_dashboard');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text("Login failed. Please check your credentials.")),
+            SnackBar(content: Text(res['message'])),
           );
         }
       } catch (e) {
