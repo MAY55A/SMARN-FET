@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/teacher.dart';
-import 'package:smarn/pages/widgets/canstants.dart';
+import 'package:smarn/pages/widgets/canstants.dart'; // Ensure to have your constants file
 import 'package:smarn/services/teacher_service.dart';
 import 'add_teacher_form.dart'; // Assuming you have this file
 import 'edit_teacher_form.dart'; // Assuming you have this file
@@ -14,17 +14,17 @@ class ManageTeachersForm extends StatefulWidget {
 
 class _ManageTeachersFormState extends State<ManageTeachersForm> {
   final TeacherService _teacherService = TeacherService();
-  late Future<List<Teacher>> _teachersFuture;
+  late Future<List<Teacher>?> _teachersFuture; 
 
   @override
   void initState() {
     super.initState();
-    _teachersFuture = _teacherService.getTeachers();
+    _teachersFuture = _teacherService.getTeachers(); // Fetch teachers
   }
 
   Future<void> _refreshTeachers() async {
     setState(() {
-      _teachersFuture = _teacherService.getTeachers();
+      _teachersFuture = _teacherService.getTeachers(); // Refresh teacher list
     });
   }
 
@@ -36,15 +36,16 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Container(
-        color: AppColors.backgroundColor,
-        child: FutureBuilder<List<Teacher>>(
+        color: const Color.fromARGB(255, 0, 0, 0),
+        child: FutureBuilder<List<Teacher>?>( 
           future: _teachersFuture,
           builder: (context, snapshot) {
+            // Check for loading state
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text("Error: ${snapshot.error}"));
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            } else if (snapshot.data == null || snapshot.data!.isEmpty) {
               return const Center(child: Text("No teachers found."));
             }
 
@@ -57,14 +58,16 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                   color: AppColors.formColor,
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text(teacher.name, style: const TextStyle(color: Colors.white)),
+                    title: Text(teacher.name ?? 'No name provided', style: const TextStyle(color: Colors.white)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Email: ${teacher.email}", style: const TextStyle(color: Colors.white)),
+                        Text("Email: ${teacher.email ?? 'No email provided'}", style: const TextStyle(color: Colors.white)),
                         Text("Phone: ${teacher.phone ?? 'Not provided'}", style: const TextStyle(color: Colors.white)),
-                        Text("Subjects: ${teacher.subjects.join(', ')}", style: const TextStyle(color: Colors.white)),
-                        Text("Activities: ${teacher.activities.join(', ')}", style: const TextStyle(color: Colors.white)),
+                        // Show subjects only if they're not null
+                        Text("Subjects: ${teacher.subjects?.isNotEmpty == true ? teacher.subjects!.join(', ') : 'No subjects available'}", style: const TextStyle(color: Colors.white)),
+                        // Show activities only if they're not null
+                        Text("Activities: ${teacher.activities?.isNotEmpty == true ? teacher.activities!.join(', ') : 'No activities available'}", style: const TextStyle(color: Colors.white)),
                       ],
                     ),
                     trailing: Row(
@@ -88,7 +91,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                           icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () async {
                             try {
-                              await _teacherService.deleteTeacher(teacher.id!);
+                              await _teacherService.deleteTeacherAccount(teacher.id!);
                               _refreshTeachers();
                             } catch (e) {
                               print("Error deleting teacher: $e");
@@ -115,7 +118,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
             ),
           );
         },
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Match your app's primary color
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
         child: const Icon(Icons.add),
       ),
     );

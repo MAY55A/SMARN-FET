@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/widgets/canstants.dart';
+import 'package:smarn/pages/Admin/Manage%20Space/Manage%20Buildings/Manage_buildings.dart';
+import 'package:smarn/pages/Admin/Manage%20Space/Manage%20Rooms/manage_rooms.dart';
+import 'package:smarn/pages/widgets/canstants.dart'; // Assuming constants like colors are defined here
 
+// Import the ManageRooms and ManageBuildings screens
 class SpaceConstraintsForm extends StatefulWidget {
   const SpaceConstraintsForm({super.key});
 
@@ -31,8 +34,10 @@ class _SpaceConstraintsFormState extends State<SpaceConstraintsForm> {
                   // Elevated card-like button for Manage Rooms
                   GestureDetector(
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Manage Rooms")),
+                      // Navigate to ManageRooms screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ManageRooms()),
                       );
                     },
                     child: AnimatedContainer(
@@ -75,12 +80,14 @@ class _SpaceConstraintsFormState extends State<SpaceConstraintsForm> {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  
+
                   // Elevated card-like button for Manage Buildings
                   GestureDetector(
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Manage Buildings")),
+                      // Navigate to ManageBuildings screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ManageBuildings()),
                       );
                     },
                     child: AnimatedContainer(
@@ -105,9 +112,9 @@ class _SpaceConstraintsFormState extends State<SpaceConstraintsForm> {
                       ),
                       padding: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 25),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        children:  [
                           Icon(Icons.apartment, color: Colors.white),
                           SizedBox(width: 10),
                           Text(
@@ -131,3 +138,25 @@ class _SpaceConstraintsFormState extends State<SpaceConstraintsForm> {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

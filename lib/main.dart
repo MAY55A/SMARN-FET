@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       // Choose one home screen to display
       initialRoute: '/',
       routes: {
-        '/': (context) => HomePage(), // Home screen (choose admin, teacher, or student)
+        '/': (context) => const HomePage(), // Home screen (choose admin, teacher, or student)
         '/admin_login': (context) => AdminForm(), // Admin login form
         '/class_access': (context) => StudentForm(), // Student class access form
         '/teacher_login': (context) => EducatorForm(

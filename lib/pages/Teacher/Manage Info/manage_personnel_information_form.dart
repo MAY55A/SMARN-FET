@@ -16,7 +16,7 @@ class ManagePersonnelInformationForm extends StatefulWidget {
 class _ManagePersonnelInformationFormState
     extends State<ManagePersonnelInformationForm> {
   String personnelName = "";
-  String personnelId = ""; // This will now hold the custom teacher ID from Firestore
+  String personnelId = ""; 
   String email = "";
   String phoneNumber = "";
 
@@ -37,8 +37,7 @@ class _ManagePersonnelInformationFormState
             email = currentUser.email ?? "No email provided";
             phoneNumber = teacher.phone ?? currentUser.phoneNumber ?? "No phone number provided";
             
-            // Use teacher's custom ID (teacherId) instead of Firebase UID
-            personnelId = teacher.id ?? currentUser.uid; // Assuming teacher.id is the custom ID
+            personnelId = teacher.id ?? currentUser.uid; 
           });
         }
       }

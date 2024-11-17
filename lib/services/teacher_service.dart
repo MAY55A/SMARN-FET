@@ -96,19 +96,21 @@ class TeacherService {
     }
   }
 
-  // Retrieve a list of teachers
-  Future<List<Teacher>> getTeachers() async {
-    try {
-      final snapshot = await _teachersCollection.get();
-      return snapshot.docs.map((doc) {
-        return Teacher.fromMap(doc.data() as Map<String, dynamic>)
-          ..id = doc.id; // Get document ID
-      }).toList();
-    } catch (e) {
-      print("Error getting teachers: $e");
-      return List.empty(); // Propagate the error
+Future<List<Teacher>> getTeachers() async {
+  try {
+    final snapshot = await _teachersCollection.get();
+    if (snapshot.docs.isEmpty) {
+      return []; // Return an empty list if no teachers are found
     }
+    return snapshot.docs.map((doc) {
+      return Teacher.fromMap(doc.data() as Map<String, dynamic>)
+        ..id = doc.id; // Get document ID
+    }).toList();
+  } catch (e) {
+    print("Error getting teachers: $e");
+    return []; // Return an empty list in case of error
   }
+}
 
   // Update a teacher's information
   Future<void> updateTeacher(Teacher teacher) async {
@@ -148,4 +150,5 @@ class TeacherService {
     print("Error deleting user: $e");
   }
 }
+
 }

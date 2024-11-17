@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/Admin/Manage%20Activities/manage_activities_form.dart'; // Import the Manage Activities form
-import 'package:smarn/pages/Admin/Manage%20requests/manage_complaints_form.dart';
-import 'package:smarn/pages/Admin/Manage%20Classes/manage_students_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Classes/manage_classes.dart';
 import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Teachers/manage_teachers_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Tables/manage_timetables_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Time%20Constarints/time_constraints_form.dart';
+import 'package:smarn/pages/Admin/Manage%20requests/manage_complaints_form.dart';
+import 'package:smarn/pages/Admin/Manage%20requests/view_complaints_or_print_timetable.dart';
 import 'package:smarn/pages/widgets/AppBar.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/auth_service.dart';
@@ -17,7 +18,7 @@ class AdminDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor, // Dark background
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0), // Dark background
       appBar: Appbar(),
       body: Row(
         children: [
@@ -60,7 +61,7 @@ class AdminDashboard extends StatelessWidget {
                 mainAxisSpacing: 16,
                 children: [
                   _buildAnimatedDashboardCard(context, 'Manage Classes',
-                      Icons.group, const ManageStudentsForm()),
+                      Icons.group, const ManageClasses()),
                   _buildAnimatedDashboardCard(context, 'Manage Subjects',
                       Icons.book_outlined, const ManageSubjectsForm()),
                   _buildAnimatedDashboardCard(context, 'Time Constraints',
