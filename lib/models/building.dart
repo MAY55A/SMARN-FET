@@ -31,4 +31,9 @@ class Building {
       description: map['description'],
     );
   }
+
+  @override
+  String toString() {
+    return "building $id : \n name: $name\n long name: $longName\ndescription: $description";
+  }
 }

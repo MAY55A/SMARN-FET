@@ -7,7 +7,7 @@ class Room {
   RoomType type;
   String description;
   int capacity;
-  Building building;
+  String building;
 
   // Constructor
   Room(
@@ -26,7 +26,7 @@ class Room {
       'type': type.name,
       'description': description,
       'capacity': capacity,
-      'building': building.toMap()
+      'building': building
     };
   }
 
@@ -38,6 +38,11 @@ class Room {
         type: RoomType.values.firstWhere((e) => e.name == map['type']),
         description: map['description'],
         capacity: map['capacity'],
-        building: Building.fromMap(map['building']));
+        building: map['building']);
+  }
+
+  @override
+  String toString() {
+    return "room $id : \n name: $name\n type: $type\ndescription: $description\n capacity: $capacity\n building: $building";
   }
 }
