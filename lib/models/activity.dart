@@ -1,24 +1,19 @@
 import 'package:smarn/models/activity_tag.dart';
-import 'package:smarn/models/class.dart';
-import 'package:smarn/models/room.dart';
-import 'package:smarn/models/subject.dart';
-import 'package:smarn/models/teacher.dart';
 
 class Activity {
   String? id;
-  String name;
-  Subject subject;
-  Teacher teacher;
-  Class studentsClass;
+  String subject;
+  String teacher;
+  String studentsClass;
   bool isActive;
+  // duration in minutes
   int duration;
   ActivityTag tag;
-  Room? room;
+  String? room;
 
   // Constructor
   Activity({
     this.id,
-    required this.name,
     required this.subject,
     required this.teacher,
     required this.studentsClass,
@@ -32,12 +27,11 @@ class Activity {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': name,
-      'subject': subject.toMap(),
-      'teacher': teacher.toMap(),
-      'class': studentsClass.toMap(),
+      'subject': subject,
+      'teacher': teacher,
+      'class': studentsClass,
       'tag': tag.name,
-      'room': room?.toMap(),
+      'room': room,
       'isActive': isActive,
       'duration': duration,
     };
@@ -47,13 +41,17 @@ class Activity {
   factory Activity.fromMap(Map<String, dynamic> map) {
     return Activity(
         id: map['id'],
-        name: map['name'],
-        subject: Subject.fromMap(map['subject']),
-        teacher: Teacher.fromMap(map['teacher']),
-        studentsClass: Class.fromMap(map['class']),
+        subject: map['subject'],
+        teacher: map['teacher'],
+        studentsClass: map['class'],
         tag: ActivityTag.values.firstWhere((e) => e.name == map['tag']),
         isActive: map['isActive'],
         duration: map['duration'],
-        room: Room.fromMap(map['room']));
+        room: map['room']);
+  }
+
+  @override
+  String toString() {
+    return 'Activity{\nid: $id,\n subject: $subject,\n teacher: $teacher,\n class: $studentsClass,\n tag: $tag,\n isActive: $isActive,\n duration(minutes): $duration,\n room: $room\n}';
   }
 }

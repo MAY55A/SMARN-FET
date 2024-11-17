@@ -1,14 +1,11 @@
-import 'package:smarn/models/activity.dart';
-import 'package:smarn/models/subject.dart';
-
 class Teacher {
   String? id;
   String name;
   String? email;
   String phone;
+  String picture;
   int nbHours;
-  List<Subject> subjects;
-  List<Activity> activities;
+  List<String> subjects;
 
   // Constructor
   Teacher(
@@ -16,9 +13,9 @@ class Teacher {
       required this.name,
       this.email,
       required this.phone,
+      this.picture = "/teachers/default.jpg",
       required this.nbHours,
-      required this.subjects,
-      required this.activities});
+      required this.subjects});
 
   // Convert a Teacher object into a Map
   Map<String, dynamic> toMap() {
@@ -26,10 +23,10 @@ class Teacher {
       'id': id,
       'name': name,
       'email': email,
+      'picture': picture,
       'phone': phone,
       'nbHours': nbHours,
-      'subjects': subjects.map((s) => s.toMap()).toList(),
-      'activities': activities.map((a) => a.toMap()).toList()
+      'subjects': subjects
     };
   }
 
@@ -40,12 +37,13 @@ class Teacher {
         name: map['name'],
         email: map['email'],
         phone: map['phone'],
+        picture: map['picture'],
         nbHours: map['nbHours'],
-        subjects: (map['subjects'] as List)
-            .map((subjectMap) => Subject.fromMap(subjectMap))
-            .toList(),
-        activities: (map['activities'] as List)
-            .map((activityMap) => Activity.fromMap(activityMap))
-            .toList());
+        subjects: List<String>.from(map['subjects']));
+  }
+
+  @override
+  String toString() {
+    return 'Teacher{\nid: $id,\n name: $name,\n email: $email,\n phone: $phone,\n picture: $picture,\n nbHours: $nbHours\n}';
   }
 }
