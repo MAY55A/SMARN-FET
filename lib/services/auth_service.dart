@@ -1,43 +1,28 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Sign In method
-  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+  Future<User?> signInWithEmailAndPassword(
+      String email, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       return result.user;
     } catch (e) {
-      print('Error signing in: $e');
-      return null;
+      rethrow;
     }
   }
 
   // Sign Out method
-  Future<void> signOut() async {
+  Future<String> signOut() async {
     try {
       await _auth.signOut();
+      return 'Successfully signed out';
     } catch (e) {
-      print('Error signing out: $e');
+      return 'Error signing out: $e';
     }
-  }
-
-  // Check if user is admin
-  Future<bool> isAdmin(User? user) async {
-    if (user == null) return false;
-    DocumentSnapshot userDoc = await _firestore.collection('admin').doc(user.uid).get();
-    return userDoc.exists;
-  }
-
-  // Check if user is teacher
-  Future<bool> isTeacher(User? user) async {
-    if (user == null) return false;
-    DocumentSnapshot userDoc = await _firestore.collection('teachers').doc(user.uid).get();
-    return userDoc.exists;
   }
 
   // Get current user
@@ -45,15 +30,59 @@ class AuthService {
     return _auth.currentUser;
   }
 
-  // Create a new user
-  Future<User?> register(String email, String password) async {
+  Future<String?> getUserRole(User? user) async {
+    if (user == null) return null;
+
     try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      return result.user;
+      var tokenResult = await user.getIdTokenResult();
+      var claims = tokenResult.claims;
+
+      // Return the role (teacher, admin, etc.)
+      return claims?['role'];
     } catch (e) {
-      print('Error registering new user: $e');
+      print("Error fetching user role: $e");
       return null;
+    }
+  }
+
+  Future<String> updateUserCredentials({
+    String? newEmail,
+    String? newPassword,
+    required String currentPassword,
+  }) async {
+    User? user = getCurrentUser();
+
+    if (user == null) {
+      return "User must be signed in to update credentials.";
+    }
+
+    try {
+      // Re-authenticate the user
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+
+      // Update email if provided
+      if (newEmail != null) {
+        await user.verifyBeforeUpdateEmail(newEmail);
+      }
+
+      // Update password if provided
+      if (newPassword != null) {
+        await user.updatePassword(newPassword);
+      }
+
+      return "Credentials updated successfully!";
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        return "Re-authentication required. Please log in again.";
+      }
+      return e.message ?? "Failed to update credentials.";
+    } catch (e) {
+      return "An error occurred: $e";
     }
   }
 }

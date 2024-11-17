@@ -1,151 +1,165 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
 import 'package:smarn/services/auth_service.dart';
-import 'package:smarn/services/id_generator.dart';
 
 class TeacherService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
+  final useFunctionsEmulator =
+      FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
 
-  // Collection reference
-  CollectionReference get _teachersCollection =>
-      _firestore.collection('teachers');
-
-  // Add a new teacher with custom ID
-  Future<void> createTeacherAccount(
+  // Add a new teacher
+  Future<dynamic> createTeacher(
       String email, String password, Teacher teacher) async {
     try {
-      // Step 1: Save the current admin user details
-      User? adminUser = _authService.getCurrentUser();
-      String adminEmail = adminUser!.email!;
-      String adminPassword = "adminkey";
-
-      // Step 2: Create Firebase Auth user
-      User? user = await _authService.register(email, password);
-      String uid = user!.uid;
-
-      // Step 3: Re-authenticate as admin after teacher creation
-      await _authService.signOut();
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: adminEmail,
-        password: adminPassword,
-      );
-
-      // Step 4: Generate a unique ID for the teacher after successful authentication
-      String teacherId = await generateId("TEA", "teachers");
-
-      // Step 5: Use the generated ID to create a Teacher instance with updated id
-      Teacher newTeacher = Teacher(
-        id: teacherId,
-        name: teacher.name,
-        email: email,
-        phone: teacher.phone,
-        nbHours: teacher.nbHours,
-        subjects: teacher.subjects,
-        activities: teacher.activities,
-      );
-
-      // Step 6: Save the teacher profile with the custom ID in Firestore
-      await _teachersCollection.doc(uid).set(newTeacher.toMap());
-
-      print(
-          "Teacher created with custom ID: $teacherId and Firebase UID: $uid as doc ID");
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('createTeacherAccount');
+      final response = await callable.call(<String, dynamic>{
+        'email': email,
+        'password': password,
+        'teacher': teacher.toMap(),
+      });
+      return response.data;
     } catch (e) {
-      print("Error creating teacher account: $e");
-      throw e;
+      return 'Error creating teacher: $e';
     }
   }
 
-  Future<bool> login(String email, String password) async {
-    User? user = await _authService.signInWithEmailAndPassword(email, password);
-    bool isteacher = await _authService.isTeacher(user);
-    if (isteacher) {
-      print("Teacher logged in successfully.");
-      return true;
-    } else {
-      print("Error logging in teacher.");
-      return false;
-    }
-  }
-
-  Future<Teacher?> fetchTeacherData() async {
+  Future<Map<String, dynamic>> login(String email, String password) async {
     try {
-      // Get current user's UID
-      String? uid = _authService.getCurrentUser()?.uid;
-
-      if (uid != null) {
-        // Retrieve teacher data from Firestore
-        DocumentSnapshot teacherDoc = await _teachersCollection.doc(uid).get();
-
-        if (teacherDoc.exists) {
-          // Map data to Teacher model or directly use it
-          return Teacher.fromMap(teacherDoc.data() as Map<String, dynamic>);
-          // Use teacher data to populate the dashboard
-        } else {
-          print('No teacher data found for this UID.');
-          return null;
-        }
+      User? user =
+          await _authService.signInWithEmailAndPassword(email, password);
+      if (await _authService.getUserRole(user) == 'teacher') {
+        return {'success': true, 'message': "Teacher logged in successfully."};
       } else {
-        print('User not authenticated.');
-        return null;
+        _authService.signOut();
+        return {
+          'success': false,
+          'message': "This form in only for teacher access."
+        };
       }
     } catch (e) {
-      print('Error retrieving teacher data: $e');
+      return {
+        'success': false,
+        'message': "Login failed. Please check your credentials"
+      };
+    }
+  }
+
+  Future<Teacher?> getTeacher(String teacherDocId) async {
+    try {
+      // Call function to get teacher details
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getTeacher');
+      final response =
+          await callable.call(<String, dynamic>{'teacherDocId': teacherDocId});
+
+      return Teacher.fromMap(response.data);
+    } catch (e) {
+      print('Error fetching teacher: $e');
       return null;
     }
   }
 
-  // Retrieve a list of teachers
-  Future<List<Teacher>> getTeachers() async {
+  Future<List<Map<String, dynamic>>> getAllTeachers() async {
     try {
-      final snapshot = await _teachersCollection.get();
-      return snapshot.docs.map((doc) {
-        return Teacher.fromMap(doc.data() as Map<String, dynamic>)
-          ..id = doc.id; // Get document ID
-      }).toList();
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getAllTeachers');
+      final response = await callable.call();
+
+      // Ensure the response contains the list of teachers
+      List<Map<String, dynamic>> teachersList = [];
+      for (Map<String, dynamic> t in response.data["teachers"]) {
+        teachersList
+            .add({"id": t["id"], "teacher": Teacher.fromMap(t["teacher"])});
+      }
+      return teachersList;
     } catch (e) {
-      print("Error getting teachers: $e");
-      return List.empty(); // Propagate the error
+      print('Error fetching all teachers: $e');
+      return [];
     }
   }
 
-  // Update a teacher's information
-  Future<void> updateTeacher(Teacher teacher) async {
+  Future<Map<String, dynamic>> updateTeacher(
+      String teacherDocId, Teacher teacher) async {
     try {
-      await _teachersCollection.doc(teacher.id).update(teacher.toMap());
+      // Call function to update teacher
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('updateTeacherAccount');
+      final response = await callable.call(<String, dynamic>{
+        'teacherDocId': teacherDocId,
+        'updateData': teacher.toMap(),
+      });
+
+      return response.data;
     } catch (e) {
-      print("Error updating teacher: $e");
-      throw e; // Propagate the error
+      return {'success': false, 'message': "Error updating teacher: $e."};
     }
   }
 
-  // Delete a teacher
-  Future<void> deleteTeacher(String teacherId) async {
+  /// Updates the subjects of a teacher in the database.
+  ///
+  /// This function calls the 'updateTeacherSubjects' Cloud Function to update the subjects of a teacher.
+  /// It takes two parameters:
+  /// - [teacherDocId]: A string representing the document ID of the teacher in the database.
+  /// - [newSubjects]: A list of strings representing the IDs of the new subjects to be assigned to the teacher.
+  ///
+  /// The function returns a [Map<String, dynamic>] containing the following keys:
+  /// - 'success': A boolean indicating whether the update was successful.
+  /// - 'message': A string providing a message about the outcome of the update.
+  ///
+  /// If an error occurs during the update, the function returns a map with 'success' set to false and
+  /// a descriptive 'message' indicating the error.
+  Future<Map<String, dynamic>> updateTeacherSubjects(
+      String teacherDocId, List<String> newSubjects) async {
     try {
+      // Call function to update teacher
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('updateTeacherSubjects');
+      final response = await callable.call(<String, dynamic>{
+        'teacherDocId': teacherDocId,
+        'updatedSubjects': newSubjects,
+      });
+
+      return response.data;
     } catch (e) {
-      print("Error deleting teacher: $e");
-      throw e; // Propagate the error
+      return {'success': false, 'message': "Error updating teacher: $e."};
     }
   }
 
-  // Call for teacher to delete his account (not by admin)
-  Future<void> deleteTeacherAccount(String teacherId) async {
-  try {
-    // Delete user document in Firestore
-      await _teachersCollection.doc(teacherId).delete();
-    print("Teacher document deleted from Firestore.");
+  Future<Map<String, dynamic>> deleteTeacher(String teacherDocId) async {
+    try {
+      // Call function to delete teacher
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('deleteTeacherAccount');
+      final response =
+          await callable.call(<String, dynamic>{'teacherDocId': teacherDocId});
 
-    // Delete the authenticated user's account
-    User? user = _authService.getCurrentUser();
-    if (user != null && user.uid == teacherId) {
-      await user.delete();
-      print("User deleted from Firebase Auth.");
-    } else {
-      print("User not authenticated, or mismatched UID.");
+      return response.data;
+    } catch (e) {
+      return {'success': false, 'message': "Error deleting teacher: $e."};
     }
-  } catch (e) {
-    print("Error deleting user: $e");
   }
-}
+
+  Future<List<Map<String, dynamic>>> getTeachersBySubject(
+      String subjectId) async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getTeachersBySubject');
+      final response =
+          await callable.call(<String, dynamic>{'subjectId': subjectId});
+
+      // Ensure the response contains the list of teachers
+      List<Map<String, dynamic>> teachersList = [];
+      for (Map<String, dynamic> t in response.data["teachers"]) {
+        teachersList
+            .add({"id": t["id"], "teacher": Teacher.fromMap(t["teacher"])});
+      }
+      return teachersList;
+    } catch (e) {
+      print('Error fetching teachers teaching this subject : $e');
+      return [];
+    }
+  }
 }
