@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/CRUD_test.dart';
 import 'package:smarn/services/admin_service.dart';
 
 class AdminForm extends StatefulWidget {
@@ -16,15 +17,18 @@ class _AdminFormState extends State<AdminForm> {
 
   Future<void> _loginAdmin() async {
     if (_formKey.currentState!.validate()) {
-      bool success = await _adminService.login(
+      var res = await _adminService.login(
         _usernameController.text.trim(),
         _passwordController.text.trim(),
       );
-      if (success) {
+      if (res["success"]) {
+        //viewTeachers();
+        //activityCrud();
+        //changePassword();
         Navigator.pushReplacementNamed(context, '/admin_dashboard');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login failed. Unauthorized access.")),
+          SnackBar(content: Text(res["message"])),
         );
       }
     }
@@ -36,7 +40,7 @@ class _AdminFormState extends State<AdminForm> {
       backgroundColor: const Color.fromARGB(255, 0, 9, 17),
       appBar: AppBar(
         title: const Text('Admin Form'),
-        backgroundColor:  const Color.fromARGB(255, 129, 77, 139),
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Center(
         child: Padding(

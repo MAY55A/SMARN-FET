@@ -17,15 +17,17 @@ class _StudentFormState extends State<StudentForm> {
 
   Future<void> _accessClassSchedule() async {
     if (_formKey.currentState!.validate()) {
-      var studentsClass = await _classService.login(
+      var studentsClass = await _classService.getclassDetails(
         _classController.text.trim(),
         _keyController.text.trim(),
       );
       if (studentsClass != null) {
+        print(studentsClass);
         Navigator.pushReplacementNamed(context, '/class_dashboard');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Class not found. Please check your inputs.")),
+          const SnackBar(
+              content: Text("Incorrect Class or Key. Please check your inputs.")),
         );
       }
     }
@@ -36,7 +38,8 @@ class _StudentFormState extends State<StudentForm> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // AppBar color
+        backgroundColor:
+            const Color.fromARGB(255, 129, 77, 139), // AppBar color
         title: const Text('Student Form'),
       ),
       body: Center(
@@ -110,14 +113,17 @@ class _StudentFormState extends State<StudentForm> {
                     ElevatedButton(
                       onPressed: _accessClassSchedule,
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 5), // Less vertical padding
-                        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Button color
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5), // Less vertical padding
+                        backgroundColor: const Color.fromARGB(
+                            255, 129, 77, 139), // Button color
                       ),
                       child: const Text(
                         'Submit',
                         style: TextStyle(
                           fontSize: 16, // Adjust font size if needed
-                          color: Color.fromARGB(255, 255, 236, 249), // Text color set to white
+                          color: Color.fromARGB(
+                              255, 255, 236, 249), // Text color set to white
                         ),
                       ),
                     ),
