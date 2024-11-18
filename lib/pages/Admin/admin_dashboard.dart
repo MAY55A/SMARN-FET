@@ -7,7 +7,6 @@ import 'package:smarn/pages/Admin/Manage%20Tables/manage_timetables_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Time%20Constarints/time_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20requests/manage_complaints_form.dart';
-import 'package:smarn/pages/Admin/Manage%20requests/view_complaints_or_print_timetable.dart';
 import 'package:smarn/pages/widgets/AppBar.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/auth_service.dart';

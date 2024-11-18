@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
 import 'package:smarn/services/auth_service.dart';
-import 'package:smarn/services/subject_service.dart';
 
 class TeacherService {
   final AuthService _authService = AuthService();
@@ -37,7 +36,7 @@ class TeacherService {
         _authService.signOut();
         return {
           'success': false,
-          'message': "This form is only for teacher access."
+          'message': "This form in only for teacher access."
         };
       }
     } catch (e) {
@@ -47,9 +46,25 @@ class TeacherService {
       };
     }
   }
+    /// Fetches the authenticated teacher's data from Firebase or Cloud Functions.
+  Future<Teacher?> fetchTeacherData() async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        throw Exception("No authenticated user found.");
+      }
+
+      // Assuming `getTeacher` fetches teacher data based on their UID.
+      return await getTeacher(currentUser.uid);
+    } catch (e) {
+      print("Error fetching teacher data: $e");
+      return null;
+    }
+  }
 
   Future<Teacher?> getTeacher(String teacherDocId) async {
     try {
+      // Call function to get teacher details
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('getTeacher');
       final response =
@@ -68,6 +83,7 @@ class TeacherService {
           FirebaseFunctions.instance.httpsCallable('getAllTeachers');
       final response = await callable.call();
 
+      // Ensure the response contains the list of teachers
       List<Map<String, dynamic>> teachersList = [];
       for (Map<String, dynamic> t in response.data["teachers"]) {
         teachersList
@@ -80,22 +96,10 @@ class TeacherService {
     }
   }
 
-  Future<Teacher?> fetchTeacherData() async {
-    try {
-      User? currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        return await getTeacher(currentUser.uid);
-      }
-      return null;
-    } catch (e) {
-      print("Error fetching teacher data: $e");
-      return null;
-    }
-  }
-
   Future<Map<String, dynamic>> updateTeacher(
       String teacherDocId, Teacher teacher) async {
     try {
+      // Call function to update teacher
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('updateTeacherAccount');
       final response = await callable.call(<String, dynamic>{
@@ -103,70 +107,74 @@ class TeacherService {
         'updateData': teacher.toMap(),
       });
 
-      // Log the full response
-      print('Update Response: ${response.data}');
       return response.data;
     } catch (e) {
-      print("Error updating teacher: $e");
+      return {'success': false, 'message': "Error updating teacher: $e."};
+    }
+  }
+
+  /// Updates the subjects of a teacher in the database.
+  ///
+  /// This function calls the 'updateTeacherSubjects' Cloud Function to update the subjects of a teacher.
+  /// It takes two parameters:
+  /// - [teacherDocId]: A string representing the document ID of the teacher in the database.
+  /// - [newSubjects]: A list of strings representing the IDs of the new subjects to be assigned to the teacher.
+  ///
+  /// The function returns a [Map<String, dynamic>] containing the following keys:
+  /// - 'success': A boolean indicating whether the update was successful.
+  /// - 'message': A string providing a message about the outcome of the update.
+  ///
+  /// If an error occurs during the update, the function returns a map with 'success' set to false and
+  /// a descriptive 'message' indicating the error.
+  Future<Map<String, dynamic>> updateTeacherSubjects(
+      String teacherDocId, List<String> newSubjects) async {
+    try {
+      // Call function to update teacher
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('updateTeacherSubjects');
+      final response = await callable.call(<String, dynamic>{
+        'teacherDocId': teacherDocId,
+        'updatedSubjects': newSubjects,
+      });
+
+      return response.data;
+    } catch (e) {
       return {'success': false, 'message': "Error updating teacher: $e."};
     }
   }
 
   Future<Map<String, dynamic>> deleteTeacher(String teacherDocId) async {
     try {
+      // Call function to delete teacher
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('deleteTeacherAccount');
       final response =
           await callable.call(<String, dynamic>{'teacherDocId': teacherDocId});
 
-      // Log the full response
-      print('Delete Response: ${response.data}');
-
-      if (response.data != null && response.data['success'] == true) {
-        return {'success': true, 'message': 'Teacher deleted successfully.'};
-      } else {
-        return {'success': false, 'message': 'Failed to delete teacher.'};
-      }
+      return response.data;
     } catch (e) {
-      print("Error deleting teacher: $e");
       return {'success': false, 'message': "Error deleting teacher: $e."};
     }
   }
-  
-  // Fetch teachers filtered by subject name
-Future<List<Map<String, dynamic>>> getTeachersBySubject(String? subjectName) async {
-  try {
-    final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('getTeachersBySubject');
-    
-    // Fetch all subjects locally to find the subject ID matching the name
-    final allSubjects = await SubjectService().getAllSubjects(); // Assuming this method exists
-    final subject = allSubjects.firstWhere(
-      (subject) => subject.name.toLowerCase() == (subjectName?.toLowerCase() ?? ''),
-      orElse: () => Subject(id: '', name: ''), // Fallback to an empty Subject
-    );
-    // Proceed with the backend call using the matched subject ID
-    final response = await callable.call(<String, dynamic>{
-      'subjectId': subject.id, // Use the matched subject ID
-    });
 
-    // Check if the response contains the 'teachers' key and is not null
-    if (response.data != null && response.data["teachers"] != null) {
+  Future<List<Map<String, dynamic>>> getTeachersBySubject(
+      String subjectId) async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getTeachersBySubject');
+      final response =
+          await callable.call(<String, dynamic>{'subjectId': subjectId});
+
+      // Ensure the response contains the list of teachers
       List<Map<String, dynamic>> teachersList = [];
       for (Map<String, dynamic> t in response.data["teachers"]) {
-        teachersList.add({
-          "id": t["id"],
-          "teacher": Teacher.fromMap(t["teacher"]),
-        });
+        teachersList
+            .add({"id": t["id"], "teacher": Teacher.fromMap(t["teacher"])});
       }
       return teachersList;
-    } else {
-      print('No teachers data found.');
+    } catch (e) {
+      print('Error fetching teachers teaching this subject : $e');
       return [];
     }
-  } catch (e) {
-    print('Error fetching teachers by subject name: $e');
-    return [];
   }
-}
-
 }

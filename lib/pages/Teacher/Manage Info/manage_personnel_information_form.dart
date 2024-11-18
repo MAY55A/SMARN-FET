@@ -41,7 +41,11 @@ class _ManagePersonnelInformationFormState
             phoneNumber = teacher.phone ?? currentUser.phoneNumber ?? "No phone number provided";
             personnelId = teacher.id ?? currentUser.uid;
           });
+        } else {
+          throw Exception("Teacher data not found.");
         }
+      } else {
+        throw Exception("User not authenticated.");
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -84,69 +88,74 @@ class _ManagePersonnelInformationFormState
                   ),
                   padding:
                       const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      // Search Bar
-                      TextField(
-                        onChanged: (query) {
-                          setState(() {
-                            searchQuery = query;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Search Teacher',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          prefixIcon: Icon(Icons.search),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Display teacher info
-                      Text(
-                        personnelName.isEmpty ? "Loading..." : personnelName,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      _buildInfoRow(Icons.badge, personnelId),
-                      const SizedBox(height: 10),
-                      _buildInfoRow(Icons.email, email),
-                      const SizedBox(height: 10),
-                      _buildInfoRow(Icons.phone, phoneNumber),
-                      const SizedBox(height: 30),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditPersonnelInformationForm(
-                                personnelName: personnelName,
-                                personnelId: personnelId,
-                                email: email,
-                                phoneNumber: phoneNumber,
-                              ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        // Search Bar
+                        TextField(
+                          onChanged: (query) {
+                            setState(() {
+                              searchQuery = query;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Search Teacher',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            prefixIcon: const Icon(Icons.search),
                           ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 16, horizontal: 32),
                         ),
-                        child: const Text(
-                          "Change Personnel Information",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        const SizedBox(height: 20),
+                        // Display teacher info
+                        Text(
+                          personnelName.isNotEmpty
+                              ? personnelName
+                              : "Loading...",
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 20),
+                        _buildInfoRow(Icons.badge, personnelId),
+                        const SizedBox(height: 10),
+                        _buildInfoRow(Icons.email, email),
+                        const SizedBox(height: 10),
+                        _buildInfoRow(Icons.phone, phoneNumber),
+                        const SizedBox(height: 30),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    EditPersonnelInformationForm(
+                                  personnelName: personnelName,
+                                  personnelId: personnelId,
+                                  email: email,
+                                  phoneNumber: phoneNumber,
+                                ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 32),
+                          ),
+                          child: const Text(
+                            "Change Personnel Information",
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -161,9 +170,12 @@ class _ManagePersonnelInformationFormState
       children: [
         Icon(icon, color: Colors.blue),
         const SizedBox(width: 10),
-        Text(
-          text.isEmpty ? "Loading..." : text,
-          style: const TextStyle(fontSize: 16, color: Colors.black87),
+        Expanded(
+          child: Text(
+            text.isNotEmpty ? text : "Loading...",
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );

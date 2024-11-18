@@ -21,7 +21,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
   late Future<List<Subject>> _subjectsFuture;
 
   TextEditingController _searchController = TextEditingController();
-  String? _selectedSubject;
+  String? _selectedSubject; // Initialize to null
 
   List<Subject> _subjects = [];
 
@@ -45,15 +45,18 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
 
   // Get subject name by its ID
   String getSubjectNameById(String subjectId) {
-    final subject = _subjects.firstWhere((subject) => subject.id == subjectId, orElse: () => Subject(id: '', name: 'Unknown'));
+    final subject = _subjects.firstWhere(
+      (subject) => subject.id == subjectId,
+      orElse: () => Subject(id: '', name: 'Unknown'),
+    );
     return subject.name;
   }
 
   // Filter teachers based on name or subject
   Future<List<Map<String, dynamic>>> _filterTeachers() async {
-    if (_selectedSubject != null) {
+    if (_selectedSubject != null && _selectedSubject!.isNotEmpty) {
       // If a subject is selected, filter teachers by subject
-      return _teacherService.getTeachersBySubject(_selectedSubject);
+      return _teacherService.getTeachersBySubject(_selectedSubject!);
     } else {
       // Otherwise, return all teachers and apply name-based filtering
       final allTeachers = await _teacherService.getAllTeachers();

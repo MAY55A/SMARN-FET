@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/Student/class_dashboard.dart';
-import 'package:smarn/pages/widgets/canstants.dart';
+import 'package:smarn/pages/student/class_dashboard.dart';
 import 'package:smarn/services/class_service.dart';
 
 class StudentForm extends StatefulWidget {
@@ -23,11 +22,10 @@ class _StudentFormState extends State<StudentForm> {
         _keyController.text.trim(),
       );
       if (studentsClass != null) {
-        print(studentsClass);
         Navigator.pushReplacementNamed(context, '/class_dashboard');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Class not found. Please check your inputs.")),
+          const SnackBar(content: Text("Incorrect Class or Key. Please check your inputs.")),
         );
       }
     }
@@ -36,9 +34,9 @@ class _StudentFormState extends State<StudentForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor, // Dark background
+      backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
       appBar: AppBar(
-        backgroundColor: AppColors.appBarColor, // AppBar color
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // AppBar color
         title: const Text('Student Form'),
       ),
       body: Center(
@@ -46,11 +44,11 @@ class _StudentFormState extends State<StudentForm> {
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: AppColors.formColor,
+              color: const Color.fromARGB(255, 236, 248, 253),
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
-                  color: const Color.fromARGB(255, 66, 66, 66).withOpacity(0.5),
+                  color: Colors.blue.withOpacity(0.5),
                   spreadRadius: 3,
                   blurRadius: 5,
                   offset: const Offset(0, 3),
@@ -70,7 +68,6 @@ class _StudentFormState extends State<StudentForm> {
                     const Text(
                       'Student Information',
                       style: TextStyle(
-                        color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -83,7 +80,7 @@ class _StudentFormState extends State<StudentForm> {
                       controller: _classController,
                       decoration: const InputDecoration(
                         labelText: 'Class',
-                        labelStyle: TextStyle(color:Colors.white),                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -99,7 +96,6 @@ class _StudentFormState extends State<StudentForm> {
                       controller: _keyController,
                       decoration: const InputDecoration(
                         labelText: 'Key to Connect',
-                        labelStyle: TextStyle(color:Colors.white),
                         border: OutlineInputBorder(),
                       ),
                       validator: (value) {
@@ -120,14 +116,11 @@ class _StudentFormState extends State<StudentForm> {
                       child: const Text(
                         'Submit',
                         style: TextStyle(
-                          fontSize: 12, // Smaller font size
-                          color: Color.fromARGB(
-                              255, 255, 236, 249), // Text color set to white
+                          fontSize: 16, // Adjust font size if needed
+                          color: Color.fromARGB(255, 255, 236, 249), // Text color set to white
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 30),
                   ],
                 ),
               ),
