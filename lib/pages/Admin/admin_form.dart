@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/widgets/canstants.dart'; // Ensure this is properly imported
+import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/admin_service.dart';
 
 class AdminForm extends StatefulWidget {
@@ -17,15 +17,15 @@ class _AdminFormState extends State<AdminForm> {
 
   Future<void> _loginAdmin() async {
     if (_formKey.currentState!.validate()) {
-      bool success = await _adminService.login(
+      var res = await _adminService.login(
         _usernameController.text.trim(),
         _passwordController.text.trim(),
       );
-      if (success) {
+      if (res["success"]) {
         Navigator.pushReplacementNamed(context, '/admin_dashboard');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login failed. Unauthorized access.")),
+          SnackBar(content: Text(res["message"])),
         );
       }
     }
@@ -40,82 +40,85 @@ class _AdminFormState extends State<AdminForm> {
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Center(
-        child: SingleChildScrollView(  // Wrap with SingleChildScrollView
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 72, 72, 72),  // Ensure AppColors is properly defined
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 3,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.formColor, // Light gray background for the form
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 3,
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(20),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // Text color for the title
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _usernameController,
+                    style: const TextStyle(color: Colors.white), // Text color inside field
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Email',
+                      labelStyle: TextStyle(color: Colors.white), // Label color
+                      fillColor: Color.fromARGB(255, 58, 58, 58), // Background color of the text field
+                      filled: true,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your Email';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    style: const TextStyle(color: Colors.white), // Text color inside field
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Password',
+                      labelStyle: TextStyle(color: Colors.white), // Label color
+                      fillColor: Color.fromARGB(255, 58, 58, 58), // Background color of the text field
+                      filled: true,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: _loginAdmin,
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(AppColors.appBarColor), // Pink background color
+                      foregroundColor: MaterialStateProperty.all(Colors.black), // Black text color inside button
+                    ),
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)), // Text color inside button
+                    ),
                   ),
                 ],
-              ),
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Login',
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 255, 255, 255), // Ensure TextForm color is defined in AppColors
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: _usernameController,
-                      decoration: const InputDecoration(
-                        labelStyle:TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(),
-                        labelText: 'Email',
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        // Add simple email validation
-                        if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$').hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelStyle:TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(),
-                        labelText: 'Password',
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        foregroundColor: MaterialStateProperty.all(Colors.white),
-                        backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
-                      ),
-                      onPressed: _loginAdmin,
-                      child: const Text('Login'),
-                    ),
-                  ],
-                ),
               ),
             ),
           ),

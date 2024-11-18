@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/class.dart';
+import 'package:smarn/services/class_service.dart'; // Import ClassService
 import 'add_class.dart'; // Import the AddClass screen
 import 'edit_class.dart'; // Import the EditClass screen
 
@@ -11,28 +12,36 @@ class ManageClasses extends StatefulWidget {
 }
 
 class _ManageClassesState extends State<ManageClasses> {
-  // Static data (classes)
-  List<Class> classes = [
-    Class(id: '1', name: 'Class A', longName: 'Mathematics Class A', nbStudents: 30, accessKey: 'abc123'),
-    Class(id: '2', name: 'Class B', longName: 'Science Class B', nbStudents: 25, accessKey: 'xyz456'),
-    Class(id: '3', name: 'Class C', longName: 'English Class C', nbStudents: 20, accessKey: 'efg789'),
-  ];
-
-  List<Class> filteredClasses = []; // List to hold filtered classes
+  List<Class> classes = [];
+  List<Class> filteredClasses = [];
   String filterName = ''; // Filter for class name
+  final ClassService _classService = ClassService();
 
   @override
   void initState() {
     super.initState();
-    // Initially show all classes
-    filteredClasses = classes;
+    _fetchClasses(); // Fetch classes when the screen is loaded
+  }
+
+  // Fetch classes dynamically from the backend
+  Future<void> _fetchClasses() async {
+    try {
+      List<Class> fetchedClasses = await _classService.getAllclasses();
+      setState(() {
+        classes = fetchedClasses;
+        filteredClasses = classes; // Initially show all classes
+      });
+    } catch (e) {
+      print('Error fetching classes: $e');
+    }
   }
 
   // Function to filter classes based on the current filters
   void _filterClasses() {
     setState(() {
       filteredClasses = classes
-          .where((classItem) => classItem.name.toLowerCase().contains(filterName.toLowerCase()))
+          .where((classItem) =>
+              classItem.name.toLowerCase().contains(filterName.toLowerCase()))
           .toList();
     });
   }
@@ -52,17 +61,23 @@ class _ManageClassesState extends State<ManageClasses> {
         if (index != -1) {
           classes[index] = updatedClass;
         }
+        _filterClasses(); // Reapply the filter after editing
       });
     }
   }
 
   // Function to handle delete class
-  void _deleteClass(Class classItem) {
-    setState(() {
-      filteredClasses.remove(classItem);
-      classes.remove(classItem);
-    });
-    print("Deleted Class: ${classItem.name}");
+  void _deleteClass(Class classItem) async {
+    final result = await _classService.deleteClass(classItem.id!);
+    if (result['success']) {
+      setState(() {
+        filteredClasses.remove(classItem);
+        classes.remove(classItem);
+      });
+      print("Deleted Class: ${classItem.name}");
+    } else {
+      print("Error deleting class: ${result['message']}");
+    }
   }
 
   @override
@@ -105,40 +120,42 @@ class _ManageClassesState extends State<ManageClasses> {
           ),
           // List of Filtered Classes
           Expanded(
-            child: ListView.builder(
-              itemCount: filteredClasses.length,
-              itemBuilder: (context, index) {
-                final classItem = filteredClasses[index];
-                return Card(
-                  margin: const EdgeInsets.all(8.0),
-                  color: const Color.fromARGB(255, 34, 34, 34),
-                  child: ListTile(
-                    title: Text(classItem.name, style: const TextStyle(color: Colors.white)),
-                    subtitle: Text(
-                        'Students: ${classItem.nbStudents}, Access Key: ${classItem.accessKey}',
-                        style: const TextStyle(color: Colors.white)),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Edit Icon
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.white),
-                          onPressed: () => _editClass(classItem),
+            child: filteredClasses.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    itemCount: filteredClasses.length,
+                    itemBuilder: (context, index) {
+                      final classItem = filteredClasses[index];
+                      return Card(
+                        margin: const EdgeInsets.all(8.0),
+                        color: const Color.fromARGB(255, 34, 34, 34),
+                        child: ListTile(
+                          title: Text(classItem.name, style: const TextStyle(color: Colors.white)),
+                          subtitle: Text(
+                              'Students: ${classItem.nbStudents}, Access Key: ${classItem.accessKey}',
+                              style: const TextStyle(color: Colors.white)),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Edit Icon
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.white),
+                                onPressed: () => _editClass(classItem),
+                              ),
+                              // Delete Icon
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.white),
+                                onPressed: () => _deleteClass(classItem),
+                              ),
+                            ],
+                          ),
+                          onTap: () {
+                            print("Class tapped: ${classItem.name}");
+                          },
                         ),
-                        // Delete Icon
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.white),
-                          onPressed: () => _deleteClass(classItem),
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      print("Class tapped: ${classItem.name}");
+                      );
                     },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),
@@ -157,6 +174,3 @@ class _ManageClassesState extends State<ManageClasses> {
     );
   }
 }
-
-
-

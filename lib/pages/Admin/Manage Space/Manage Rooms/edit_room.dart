@@ -27,7 +27,7 @@ class _EditRoomState extends State<EditRoom> {
     description = widget.roomItem.description;
     capacity = widget.roomItem.capacity;
     type = widget.roomItem.type;
-    building = widget.roomItem.building;
+    building = widget.roomItem.building as Building;
   }
 
   @override
@@ -142,7 +142,7 @@ class _EditRoomState extends State<EditRoom> {
                         type: type,
                         description: description,
                         capacity: capacity,
-                        building: building,
+                        building: building as String,
                       );
                       Navigator.pop(context, updatedRoom); // Return the updated room
                     }

@@ -1,19 +1,15 @@
-import 'package:smarn/models/teacher.dart';
-
 class Subject {
   String? id;
   String name;
-  String longName;
-  String description;
-  List<Teacher> teachers;
+  String? longName;
+  String? description;
 
   // Constructor
   Subject({
     this.id,
     required this.name,
-    required this.longName,
-    required this.description,
-    required this.teachers,
+    this.longName,
+     this.description
   });
 
   // Convert a Subject object into a Map
@@ -22,8 +18,7 @@ class Subject {
       'id': id,
       'name': name,
       'longName': longName,
-      'description': description,
-      'teachers': teachers.map((t) => t.toMap()).toList(),
+      'description': description
     };
   }
 
@@ -33,9 +28,12 @@ class Subject {
         id: map['id'],
         name: map['name'],
         longName: map['longName'],
-        description: map['description'],
-        teachers: (map['teachers'] as List)
-            .map((teacherMap) => Teacher.fromMap(teacherMap))
-            .toList());
+        description: map['description']);
+  }
+
+  
+  @override
+  String toString() {
+    return "subject $id : \n name: $name\n long name: $longName\ndescription: $description";
   }
 }

@@ -21,21 +21,21 @@ class _ManageRoomsState extends State<ManageRooms> {
         type: RoomType.lecture,
         description: 'Large lecture room',
         capacity: 50,
-        building:  Building(name: "b1", longName: "build", description: "build1")),
+        building:  Building(name: "b1", longName: "build", description: "build1")as String),
     Room(
         id: '2',
         name: 'Room 102',
         type: RoomType.lab,
         description: 'Computer lab',
         capacity: 30,
-        building:  Building(name: "b1", longName: "build", description: "build1"),),
+        building:  Building(name: "b1", longName: "build", description: "build1")as String,),
     Room(
         id: '3',
         name: 'Room 103',
         type: RoomType.auditorium,
         description: 'Auditorium with projector',
         capacity: 100,
-        building: Building(name: "b1", longName: "build", description: "build1"),),
+        building: Building(name: "b1", longName: "build", description: "build1")as String,),
   ];
 
   List<Room> filteredRooms = []; // List to hold filtered rooms
@@ -134,7 +134,7 @@ class _ManageRoomsState extends State<ManageRooms> {
                   child: ListTile(
                     title: Text(roomItem.name, style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
-                        'Capacity: ${roomItem.capacity}, Type: ${roomItem.type.name}, Building: ${roomItem.building.name}',
+                        'Capacity: ${roomItem.capacity}, Type: ${roomItem.type.name}, Building: ${roomItem.building}',
                         style: const TextStyle(color: Colors.white)),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,

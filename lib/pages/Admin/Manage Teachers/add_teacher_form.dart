@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/models/activity.dart';
-import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
-import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/teacher_service.dart';
+import 'package:smarn/services/subject_service.dart';
+import 'package:smarn/pages/widgets/canstants.dart';
+import 'package:smarn/models/subject.dart';
 
 class AddTeacherForm extends StatefulWidget {
   final Future<void> Function() refreshTeachers;
@@ -21,11 +21,15 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nbHoursController = TextEditingController();
-  final TextEditingController _subjectController = TextEditingController();
-  final TextEditingController _activityController = TextEditingController();
 
-  List<Subject> _subjects = [];
-  List<Activity> _activities = [];
+  List<Subject> _subjectsList = [];
+  List<String> _selectedSubjects = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSubjects();
+  }
 
   @override
   void dispose() {
@@ -34,9 +38,19 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
     _phoneController.dispose();
     _passwordController.dispose();
     _nbHoursController.dispose();
-    _subjectController.dispose();
-    _activityController.dispose();
     super.dispose();
+  }
+
+  // Fetch all subjects from the database
+  Future<void> _fetchSubjects() async {
+    try {
+      List<Subject> subjects = await SubjectService().getAllSubjects();
+      setState(() {
+        _subjectsList = subjects;
+      });
+    } catch (e) {
+      print("Error fetching subjects: $e");
+    }
   }
 
   Future<void> _addTeacher() async {
@@ -47,12 +61,11 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
         email: _emailController.text,
         phone: _phoneController.text,
         nbHours: int.tryParse(_nbHoursController.text) ?? 0,
-        subjects: _subjects,
-        activities: _activities,
+        subjects: _selectedSubjects,
       );
 
       try {
-        await TeacherService().createTeacherAccount(
+        await TeacherService().createTeacher(
           _emailController.text,
           _passwordController.text,
           newTeacher,
@@ -114,47 +127,33 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
                 keyboardType: TextInputType.number,
                 style: const TextStyle(color: Colors.white),
               ),
-              TextFormField(
-                controller: _subjectController,
-                decoration: const InputDecoration(labelText: "Subjects", labelStyle: TextStyle(color: Colors.white)),
-                style: const TextStyle(color: Colors.white),
-                onFieldSubmitted: (value) {
-                  setState(() {
-                    _subjects.add(value as Subject);
-                    _subjectController.clear();
-                  });
-                },
-              ),
-              Wrap(
-                children: _subjects.map((subject) {
-                  return Chip(
-                    label: Text(subject as String, style: const TextStyle(color: Colors.white)),
-                    onDeleted: () {
-                      setState(() {
-                        _subjects.remove(subject);
-                      });
-                    },
+              const SizedBox(height: 16),
+              const Text("Select Subjects", style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(labelText: "Subjects", labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+                value: null,
+                items: _subjectsList.map((subject) {
+                  return DropdownMenuItem<String>(
+                    value: subject.id,
+                    child: Text(subject.name, style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
                   );
                 }).toList(),
-              ),
-              TextFormField(
-                controller: _activityController,
-                decoration: const InputDecoration(labelText: "Activities", labelStyle: TextStyle(color: Colors.white)),
-                style: const TextStyle(color: Colors.white),
-                onFieldSubmitted: (value) {
-                  setState(() {
-                    _activities.add(value as Activity);
-                    _activityController.clear();
-                  });
+                onChanged: (value) {
+                  if (value != null && !_selectedSubjects.contains(value)) {
+                    setState(() {
+                      _selectedSubjects.add(value);
+                    });
+                  }
                 },
               ),
               Wrap(
-                children: _activities.map((activity) {
+                children: _selectedSubjects.map((subjectId) {
+                  final subject = _subjectsList.firstWhere((subject) => subject.id == subjectId);
                   return Chip(
-                    label: Text(activity as String, style: const TextStyle(color: Colors.white)),
+                    label: Text(subject.name, style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
                     onDeleted: () {
                       setState(() {
-                        _activities.remove(activity);
+                        _selectedSubjects.remove(subjectId);
                       });
                     },
                   );
@@ -166,7 +165,7 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
                   backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
                 ),
                 onPressed: _addTeacher,
-                child: const Text("Add Teacher"),
+                child: const Text("Add Teacher" , style: TextStyle(color : Colors.black),),
               ),
             ],
           ),

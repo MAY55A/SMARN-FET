@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/teacher.dart';
+import 'package:smarn/models/subject.dart';
+import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
-
 
 class EditTeacherForm extends StatefulWidget {
   final VoidCallback refreshTeachers;
+  final Teacher teacher; // Teacher object to pass the teacher data
 
   const EditTeacherForm({
     Key? key,
-    required this.refreshTeachers, required Teacher teacher,
+    required this.refreshTeachers,
+    required this.teacher, // Add the teacher data here
   }) : super(key: key);
 
   @override
@@ -22,47 +25,71 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
   late TextEditingController _phoneController;
   late TextEditingController _nbHoursController;
   late TextEditingController _passwordController;
-  List<Map<String, String>> subjects = [];
-  List<Map<String, String>> activities = [];
+  List<Subject> allSubjects = []; // All subjects from database
+  List<Subject> selectedSubjects = []; // Subjects selected for the teacher
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController();
-    _emailController = TextEditingController();
-    _phoneController = TextEditingController();
-    _nbHoursController = TextEditingController();
+    _nameController = TextEditingController(text: widget.teacher.name);
+    _emailController = TextEditingController(text: widget.teacher.email);
+    _phoneController = TextEditingController(text: widget.teacher.phone);
+    _nbHoursController = TextEditingController(text: widget.teacher.nbHours.toString());
     _passwordController = TextEditingController();
+
+    _fetchAllSubjects();
+    _loadTeacherSubjects();
   }
 
-  void _addSubject() {
+  // Fetch all subjects from the database
+  Future<void> _fetchAllSubjects() async {
+    List<Subject> subjects = await SubjectService().getAllSubjects();
     setState(() {
-      subjects.add({'name': ''});
+      allSubjects = subjects;
     });
   }
 
-  void _addActivity() {
+  // Load teacher's assigned subjects into selectedSubjects list
+  void _loadTeacherSubjects() {
     setState(() {
-      activities.add({'name': ''});
+      selectedSubjects = allSubjects.where((subject) {
+        return widget.teacher.subjects!.contains(subject.name);
+      }).toList();
     });
   }
 
-  void _removeSubject(int index) {
+  // Method to remove subject
+  void _removeSubject(Subject subject) {
     setState(() {
-      subjects.removeAt(index);
+      selectedSubjects.remove(subject);
     });
   }
 
-  void _removeActivity(int index) {
+  // Method to add subject
+  void _addSubject(Subject subject) {
     setState(() {
-      activities.removeAt(index);
+      if (!selectedSubjects.contains(subject)) {
+        selectedSubjects.add(subject);
+      }
     });
   }
 
+  // Method to save the updated teacher
   Future<void> _editTeacher() async {
     if (_formKey.currentState!.validate()) {
-      // Logic to save updated teacher data goes here
-      widget.refreshTeachers();
+      Teacher updatedTeacher = Teacher(
+        id: widget.teacher.id, // Preserving the teacher's id for update
+        name: _nameController.text,
+        email: _emailController.text,
+        phone: _phoneController.text,
+        nbHours: int.tryParse(_nbHoursController.text) ?? 0,
+        subjects: selectedSubjects.map((e) => e.name).toList(),
+      );
+
+      // Call the update function (replace with actual service)
+      // Example: TeacherService().updateTeacher(updatedTeacher);
+
+      widget.refreshTeachers(); // Refresh teacher list after updating
       Navigator.pop(context);
     }
   }
@@ -73,7 +100,10 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
-        title: const Text("Edit Teacher"),
+        title: const Text(
+          "Edit Teacher",
+          style: TextStyle(color: Colors.white), // White text color in app bar
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -83,98 +113,88 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: "Name"),
+                decoration: const InputDecoration(
+                  labelText: "Name",
+                  labelStyle: TextStyle(color: Colors.white), // White label text
+                ),
+                style: const TextStyle(color: Colors.white), // White text in input
                 validator: (value) => value!.isEmpty ? "Name cannot be empty" : null,
               ),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: "Email"),
+                decoration: const InputDecoration(
+                  labelText: "Email",
+                  labelStyle: TextStyle(color: Colors.white), // White label text
+                ),
+                style: const TextStyle(color: Colors.white), // White text in input
                 validator: (value) =>
                     value!.isEmpty ? "Email cannot be empty" : null,
               ),
               TextFormField(
                 controller: _phoneController,
-                decoration: const InputDecoration(labelText: "Phone"),
+                decoration: const InputDecoration(
+                  labelText: "Phone",
+                  labelStyle: TextStyle(color: Colors.white), // White label text
+                ),
+                style: const TextStyle(color: Colors.white), // White text in input
                 validator: (value) =>
                     value!.isEmpty ? "Phone cannot be empty" : null,
               ),
               TextFormField(
                 controller: _nbHoursController,
-                decoration: const InputDecoration(labelText: "Number of Hours"),
+                decoration: const InputDecoration(
+                  labelText: "Number of Hours",
+                  labelStyle: TextStyle(color: Colors.white), // White label text
+                ),
                 keyboardType: TextInputType.number,
+                style: const TextStyle(color: Colors.white), // White text in input
                 validator: (value) =>
                     value!.isEmpty ? "Hours cannot be empty" : null,
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: "Password (Optional)"),
+                decoration: const InputDecoration(
+                  labelText: "Password (Optional)",
+                  labelStyle: TextStyle(color: Colors.white), // White label text
+                ),
+                style: const TextStyle(color: Colors.white), // White text in input
                 obscureText: true,
               ),
               const SizedBox(height: 20),
-              const Text("Subjects"),
-              ...subjects.asMap().entries.map((entry) {
-                int index = entry.key;
-                Map<String, String> subject = entry.value;
-                return Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        initialValue: subject['name'],
-                        decoration: const InputDecoration(labelText: "Subject Name"),
-                        onChanged: (value) {
-                          setState(() {
-                            subjects[index]['name'] = value;
-                          });
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => _removeSubject(index),
-                    ),
-                  ],
-                );
-              }),
-              ElevatedButton(
-                onPressed: _addSubject,
-                child: const Text("Add Subject"),
+              const Text(
+                "Subjects",
+                style: TextStyle(color: Colors.white), // White text for section title
               ),
-              const SizedBox(height: 20),
-              const Text("Activities"),
-              ...activities.asMap().entries.map((entry) {
-                int index = entry.key;
-                Map<String, String> activity = entry.value;
-                return Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        initialValue: activity['name'],
-                        decoration: const InputDecoration(labelText: "Activity Name"),
-                        onChanged: (value) {
-                          setState(() {
-                            activities[index]['name'] = value;
-                          });
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => _removeActivity(index),
-                    ),
-                  ],
-                );
-              }),
-              ElevatedButton(
-                onPressed: _addActivity,
-                child: const Text("Add Activity"),
-              ),
+              // Display all subjects with the option to select
+              if (allSubjects.isNotEmpty)
+                Wrap(
+                  children: allSubjects.map((subject) {
+                    return ChoiceChip(
+                      label: Text(subject.name, style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0))), // White text for chip
+                      selected: selectedSubjects.contains(subject),
+                      onSelected: (selected) {
+                        setState(() {
+                          if (selected) {
+                            _addSubject(subject);
+                          } else {
+                            _removeSubject(subject);
+                          }
+                        });
+                      },
+                      selectedColor: Colors.purple, // Selected chip color
+                    );
+                  }).toList(),
+                ),
               const SizedBox(height: 20),
               ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
                 ),
                 onPressed: _editTeacher,
-                child: const Text("Update Teacher"),
+                child: const Text(
+                  "Update Teacher",
+                  style: TextStyle(color: Colors.white), // White text on button
+                ),
               ),
             ],
           ),

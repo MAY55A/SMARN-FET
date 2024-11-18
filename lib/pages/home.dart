@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/SelectionPage.dart';
-import 'package:smarn/pages/Admin/admin_dashboard.dart'; // Import AdminDashboard page
-import 'package:smarn/pages/Teacher/teacher_dashboard.dart'; // Import TeacherDashboard page
-import 'package:smarn/services/auth_service.dart'; // Import AuthService
-import 'package:firebase_auth/firebase_auth.dart'; // Firebase for user management
+import 'package:smarn/pages/Admin/admin_dashboard.dart';
+import 'package:smarn/pages/Teacher/teacher_dashboard.dart';
+import 'package:smarn/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,34 +13,49 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _isAdmin = false;
-  bool _isTeacher = false; // Track if the user is a teacher
+  String _userRole = ''; // Tracks user role (admin, teacher, or empty if none)
   User? _currentUser;
 
   @override
   void initState() {
     super.initState();
-    _checkUserStatus();
+    _checkUserRole();
   }
 
-  Future<void> _checkUserStatus() async {
-    // Get the current user
+  Future<void> _checkUserRole() async {
     User? user = AuthService().getCurrentUser();
     if (user != null) {
-      bool isAdmin = await AuthService().isAdmin(user);
-      bool isTeacher = await AuthService().isTeacher(user); // Check if the user is a teacher
+      String? role = await AuthService().getUserRole(user);
       setState(() {
-        _isAdmin = isAdmin;
-        _isTeacher = isTeacher;
         _currentUser = user;
+        _userRole = role ?? '';
       });
+    }
+  }
+
+  void _navigateToRolePage() {
+    if (_userRole == 'admin') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AdminDashboard()),
+      );
+    } else if (_userRole == 'teacher') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TeacherDashboard()),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) =>  SelectionPage()),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2), // Light grey background
+      backgroundColor: const Color(0xFFF2F2F2),
       appBar: AppBar(
         title: const Text(
           'Smarn',
@@ -49,21 +64,19 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // AppBar color
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
         elevation: 0,
       ),
       body: Stack(
         children: [
-          // Background image
           Positioned.fill(
             child: Image.asset(
-              'assets/img/i6.jpg', // Background image
+              'assets/img/i6.jpg',
               fit: BoxFit.cover,
             ),
           ),
-          // Overlay text describing the app
           const Positioned(
-            bottom: 180, // Position text above the button
+            bottom: 180,
             left: 30,
             right: 20,
             child: Column(
@@ -72,7 +85,7 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   'Welcome to Smarn',
                   style: TextStyle(
-                    fontSize: 36, // Increased font size
+                    fontSize: 36,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -81,72 +94,45 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   'Automate your timetable generation easily with Smarn,',
                   style: TextStyle(
-                    fontSize: 20, // Increased font size
+                    fontSize: 20,
                     color: Colors.white70,
                   ),
                 ),
                 Text(
                   'the administrative app that makes scheduling a breeze!',
                   style: TextStyle(
-                    fontSize: 20, // Increased font size
+                    fontSize: 20,
                     color: Colors.white70,
                   ),
                 ),
               ],
             ),
           ),
-          // Conditional Button at the bottom of the image
           Positioned(
-            bottom: 140, // Position the button closer to the bottom
+            bottom: 140,
             right: 40,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
-                    vertical: 20, horizontal: 30), // Adjust padding
-                backgroundColor:
-                    const Color.fromARGB(255, 59, 130, 189), // Button color
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(30), // Modern rounded button
+                  vertical: 20,
+                  horizontal: 30,
                 ),
-                elevation: 5, // Shadow effect
+                backgroundColor: const Color.fromARGB(255, 59, 130, 189),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                elevation: 5,
               ),
-              // Change the button based on admin or teacher status
-              onPressed: _isAdmin
-                  ? () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminDashboard(),
-                        ),
-                      );
-                    }
-                  : _isTeacher
-                      ? () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const TeacherDashboard(),
-                            ),
-                          );
-                        }
-                      : () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SelectionPage(),
-                            ),
-                          );
-                        },
+              onPressed: _navigateToRolePage,
               child: Text(
-                _isAdmin
+                _userRole == 'admin'
                     ? 'Admin Dashboard'
-                    : _isTeacher
+                    : _userRole == 'teacher'
                         ? 'Teacher Dashboard'
                         : 'Login',
                 style: const TextStyle(
-                  fontSize: 24, // Font size
-                  color: Colors.white, // Text color
+                  fontSize: 24,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/Teacher/teacher_dashboard.dart';
+import 'package:smarn/CRUD_test.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
+import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 
 class EducatorForm extends StatefulWidget {
-  final Function onLoginSuccess; // Callback for login success
-
-  const EducatorForm({super.key, required this.onLoginSuccess});
+  const EducatorForm({super.key});
 
   @override
   _EducatorFormState createState() => _EducatorFormState();
@@ -17,21 +16,20 @@ class _EducatorFormState extends State<EducatorForm> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final TeacherService _teacherService = TeacherService();
+  final AuthService _auth = AuthService();
 
   Future<void> _loginTeacher() async {
     if (_formKey.currentState!.validate()) {
       try {
-        bool success = await _teacherService.login(
+        var res = await _teacherService.login(
           _usernameController.text.trim(),
           _passwordController.text.trim(),
         );
-        if (success) {
-          widget.onLoginSuccess(); // Trigger the callback
+        if (res['success']) {
           Navigator.pushReplacementNamed(context, '/teacher_dashboard');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text("Login failed. Please check your credentials.")),
+            SnackBar(content: Text(res['message'])),
           );
         }
       } catch (e) {
@@ -53,84 +51,89 @@ class _EducatorFormState extends State<EducatorForm> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView( // Wrap the entire form in a SingleChildScrollView
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.formColor,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color.fromARGB(255, 106, 106, 106).withOpacity(0.5),
-                    spreadRadius: 3,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(20),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 400,
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.formColor, // Light gray background for the form
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color.fromARGB(255, 43, 43, 43).withOpacity(0.3),
+                  spreadRadius: 3,
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
                 ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Login',
+              ],
+            ),
+            padding: const EdgeInsets.all(20),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 400, // Match the width of StudentForm
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white, // Text color white for title
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _usernameController,
+                      style: const TextStyle(color: Colors.white), // Text color inside field
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Email',
+                        labelStyle: TextStyle(color: Colors.white), // Label color white
+                        fillColor: Color.fromARGB(255, 58, 58, 58), // Background color of the text field
+                        filled: true,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your Email';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      style: const TextStyle(color: Colors.white), // Text color inside field
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Password',
+                        labelStyle: TextStyle(color: Colors.white), // Label color white
+                        fillColor: Color.fromARGB(255, 58, 58, 58), // Background color of the text field
+                        filled: true,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: _loginTeacher,
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(AppColors.appBarColor), // Button color pink
+                        foregroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 255, 255, 255)), // Button text color black
+                      ),
+                      child: const Text(
+                        'Submit',
                         style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 255, 255, 255),
+                          color: Color.fromARGB(255, 255, 255, 255), // Button text color black
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _usernameController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Email',
-                          labelStyle: TextStyle(color: Colors.white),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your Email';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Password',
-                          labelStyle: TextStyle(color: Colors.white),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 30),
-                      ElevatedButton(
-                        onPressed: _loginTeacher,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.appBarColor,
-                        ),
-                        child: const Text(
-                          'Submit',
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 0, 0, 0),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

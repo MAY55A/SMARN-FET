@@ -3,7 +3,7 @@ class Class {
   String name;
   String longName;
   int nbStudents;
-  String accessKey;
+  String? accessKey;
 
   // Constructor
   Class(
@@ -11,7 +11,7 @@ class Class {
       required this.name,
       required this.longName,
       required this.nbStudents,
-      required this.accessKey});
+      this.accessKey});
 
   // Convert a Class object into a Map
   Map<String, dynamic> toMap() {
@@ -33,4 +33,10 @@ class Class {
         nbStudents: map['nbStudents'],
         accessKey: map['accessKey']);
   }
+
+  @override
+  String toString() {
+    return "class $id : \n name: $name\n long name: $longName\nnbStudents: $nbStudents\n access key: $accessKey";
+  }
+
 }

@@ -128,7 +128,7 @@ class _AddRoomState extends State<AddRoom> {
                         type: type,
                         description: description,
                         capacity: capacity,
-                        building: building,
+                        building: building as String,
                       );
                       Navigator.pop(context, newRoom); // Return the new room
                     }

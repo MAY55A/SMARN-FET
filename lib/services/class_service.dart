@@ -1,83 +1,101 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:smarn/models/class.dart';
-import 'package:smarn/services/id_generator.dart';
 
 class ClassService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final useFunctionsEmulator =
+      FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
 
-  // Collection reference
-  CollectionReference get _classsCollection => _firestore.collection('classes');
+  // Add a new class
+  Future<Map<String, dynamic>> createClass(Class studentsClass) async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('addClass');
+      final response = await callable.call(<String, dynamic>{
+        'classData': studentsClass.toMap(),
+      });
 
-  // Add a new class with custom ID
-  Future<void> createClass(Class studentsClass) async {
-    String classId = await generateId('CL', 'classes');
-    Class newClass = Class(
-      id: classId,
-      name: studentsClass.name,
-      longName: studentsClass.longName,
-      nbStudents: studentsClass.nbStudents,
-      accessKey: studentsClass.accessKey,
-    );
-    await _classsCollection.doc(classId).set(newClass.toMap());
-    print("class created with custom ID: $classId");
+      return response.data;
+    } catch (e) {
+      return {'success': false, 'message': e};
+    }
   }
 
-  Future<Class?> login(String className, String classKey) async {
+  Future<Class?> getclassDetails(String className, String classKey) async {
     try {
-      QuerySnapshot query = await _firestore
-          .collection('classes')
-          .where('name', isEqualTo: className)
-          .where('accessKey', isEqualTo: classKey)
-          .limit(1)
-          .get();
+      // Call function to get class details
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getClass');
+      final response = await callable.call(
+          <String, dynamic>{'className': className, 'classKey': classKey});
 
-      if (query.docs.isNotEmpty) {
-        DocumentSnapshot classDoc = query.docs.first;
-        print("Class found with the provided key.");
-        return Class.fromMap(classDoc.data() as Map<String, dynamic>);
-      } else {
-        print("No class found with that name and key combination.");
-        return null;
-      }
+      return Class.fromMap(response.data);
     } catch (e) {
-      print("Error fetching class : $e");
+      print('Error fetching class: $e');
       return null;
     }
   }
 
-  // Retrieve a list of classs
-  Future<List<Class>> getclasses() async {
+  Future<List<Class>> getAllclasses() async {
     try {
-      final snapshot = await _classsCollection.get();
-      return snapshot.docs.map((doc) {
-        return Class.fromMap(doc.data() as Map<String, dynamic>)
-          ..id = doc.id; // Get document ID
-      }).toList();
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getAllClasses');
+      final response = await callable.call();
+
+      // Ensure the response contains the list of classes
+      List<Class> classesList = (response.data["classes"] as List<dynamic>)
+          .map((c) => Class.fromMap(c))
+          .toList();
+
+      return classesList;
     } catch (e) {
-      print("Error getting classs: $e");
-      throw e; // Propagate the error
+      print('Error fetching all classes: $e');
+      return [];
     }
   }
 
-  // Update a class's information
-  Future<void> updateclass(Class studentsClass) async {
+  Future<Map<String, dynamic>> updateClass(
+      String classId, Class studentsClass) async {
     try {
-      await _classsCollection
-          .doc(studentsClass.id)
-          .update(studentsClass.toMap());
+      // Call function to update class
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('updateClass');
+      final response = await callable.call(<String, dynamic>{
+        'classId': classId,
+        'updateData': studentsClass.toMap(),
+      });
+
+      return response.data;
     } catch (e) {
-      print("Error updating class: $e");
-      throw e; // Propagate the error
+      return {'success': false, 'message': e};
     }
   }
 
-  // Delete a class
-  Future<void> deleteclass(String classId) async {
+  Future<Map<String, dynamic>> changeClassKey(String classId) async {
     try {
-      await _classsCollection.doc(classId).delete();
+      // Call function to change class key
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('regenerateClassKey');
+      final response = await callable.call(<String, dynamic>{
+        'classId': classId,
+      });
+
+      return response.data;
     } catch (e) {
-      print("Error deleting class: $e");
-      throw e; // Propagate the error
+      return {'success': false, 'message': e};
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteClass(String classId) async {
+    try {
+      // Call function to delete class
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('deleteClass');
+      final response =
+          await callable.call(<String, dynamic>{'classId': classId});
+
+      return response.data;
+    } catch (e) {
+      return {'success': false, 'message': e};
     }
   }
 }
