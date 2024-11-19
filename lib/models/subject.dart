@@ -1,15 +1,15 @@
 class Subject {
   String? id;
   String name;
-  String longName;
-  String description;
+  String? longName;
+  String? description;
 
   // Constructor
   Subject({
     this.id,
     required this.name,
-    required this.longName,
-    required this.description
+    this.longName,
+     this.description
   });
 
   // Convert a Subject object into a Map

@@ -1,14 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:smarn/CRUD_test.dart';
-import 'package:smarn/pages/Educator_form.dart';
-import 'package:smarn/pages/admin_dashboard.dart';
-import 'package:smarn/pages/admin_form.dart';
+import 'package:smarn/pages/Admin/admin_dashboard.dart';
+import 'package:smarn/pages/Admin/admin_form.dart';
+import 'package:smarn/pages/Student/class_dashboard.dart';
+import 'package:smarn/pages/Student/student_form.dart';
+import 'package:smarn/pages/Teacher/Educator_form.dart';
+import 'package:smarn/pages/Teacher/teacher_dashboard.dart';
 import 'package:smarn/pages/home.dart';
 import 'package:smarn/firebase_options.dart';
-import 'package:smarn/pages/class_dashboard.dart';
-import 'package:smarn/pages/student_form.dart';
-import 'package:smarn/pages/teacher_dashboard.dart';
 
 //Firebase configuration
 void main() async {
@@ -38,7 +37,8 @@ class MyApp extends StatelessWidget {
         '/admin_login': (context) => AdminForm(), // Admin login form
         '/class_access': (context) =>
             StudentForm(), // Student class access form
-        '/teacher_login': (context) => EducatorForm(), // Teacher login form
+        '/teacher_login': (context) =>
+            const EducatorForm(), // Teacher login form
         '/admin_dashboard': (context) => AdminDashboard(), // Admin dashboard
         '/class_dashboard': (context) =>
             ClassDashboard(), // Class schedule screen

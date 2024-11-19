@@ -101,12 +101,12 @@ void subjectCrud() async {
     print(s);
   }
 }
-
+/*
 void updateQualifiedSubjects(String teacherDocId) async {
   List<String> subjects = ["SUB001", "SUB002", "SUB003"];
   var res = await teacherService.updateTeacherSubjects(teacherDocId, subjects);
   print(res["message"]);
-}
+}*/
 
 void buildingCrud() async {
   // Example of CRUD operations on buildings
@@ -174,4 +174,19 @@ void teacherCrud() async{
   print(await teacherService.getTeachersBySubject("SUB001"));
 
   print(await teacherService.deleteTeacher("or4OKe8jyDMWpUGsrL9AqaoChL83"));
+
 }
+void deleteTeacherTest1() async {
+  // Test: Deleting teacher with ID drM5ToiveZd2M7CwN0gsn5yfv913
+  String teacherId = "drM5ToiveZd2M7CwN0gsn5yfv913";
+  var res = await teacherService.deleteTeacher(teacherId);
+  print("Delete result for teacher $teacherId: ${res['message']}");
+}
+/*
+void deleteTeacherTest2() async {
+  // Test: Deleting teacher with ID rLN8KY5YaLfsmArRRtGeEfmgAg03
+  String teacherId = "rLN8KY5YaLfsmArRRtGeEfmgAg03";
+  var res = await teacherService.deleteTeacher(teacherId);
+  print("Delete result for teacher $teacherId: ${res['message']}");
+}
+*/
