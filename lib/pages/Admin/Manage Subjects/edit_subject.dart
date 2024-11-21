@@ -39,7 +39,6 @@ class _EditSubjectFormState extends State<EditSubjectForm> {
       name: _nameController.text,
       longName: _longNameController.text,
       description: _descriptionController.text,
-       
     );
 
     Navigator.pop(context, updatedSubject);
@@ -110,7 +109,6 @@ class _EditSubjectFormState extends State<EditSubjectForm> {
             ),
             const SizedBox(height: 16),
 
-            // Removed Teacher Selection (no longer needed)
             const SizedBox(height: 24),
 
             // Save Button

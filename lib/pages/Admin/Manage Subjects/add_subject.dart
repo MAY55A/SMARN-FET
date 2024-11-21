@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/models/subject.dart';
+import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
+import 'package:smarn/pages/widgets/canstants.dart';
 
 class AddSubject extends StatefulWidget {
   const AddSubject({Key? key}) : super(key: key);
@@ -14,6 +16,13 @@ class _AddSubjectState extends State<AddSubject> {
   final TextEditingController _longNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final List<Teacher> availableTeachers = [
+    Teacher(name: 'Mr. John'),
+    Teacher(name: 'Ms. Emily'),
+    Teacher(name: 'Mrs. Smith')
+  ];
+  final List<Teacher> selectedTeachers = [];
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +107,39 @@ class _AddSubjectState extends State<AddSubject> {
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: 16),
+
+                // Teacher Selection CheckboxListTiles
+                const Text(
+                  "Select Teachers",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                ListView(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  children: availableTeachers.map((teacher) {
+                    return Theme(
+                      data: ThemeData(unselectedWidgetColor: Colors.white),
+                      child: CheckboxListTile(
+                        title: Text(
+                          teacher.name,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        activeColor: AppColors.appBarColor,
+                        value: selectedTeachers.contains(teacher),
+                        onChanged: (bool? selected) {
+                          setState(() {
+                            if (selected == true) {
+                              selectedTeachers.add(teacher);
+                            } else {
+                              selectedTeachers.remove(teacher);
+                            }
+                          });
+                        },
+                      ),
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 16),
 

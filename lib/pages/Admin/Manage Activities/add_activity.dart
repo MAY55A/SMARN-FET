@@ -8,6 +8,7 @@ import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/services/activity_service.dart';
 import 'package:smarn/services/room_service.dart';
 import 'package:smarn/models/room.dart';
+import 'package:smarn/pages/widgets/canstants.dart';
 
 class AddActivity extends StatefulWidget {
   const AddActivity({Key? key}) : super(key: key);
@@ -136,10 +137,10 @@ Future<void> _fetchClasses() async {
               TextField(
                 controller: _nameController,
                 style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Activity Name',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(color: Colors.white),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),

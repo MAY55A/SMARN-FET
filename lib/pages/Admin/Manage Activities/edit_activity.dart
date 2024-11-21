@@ -7,6 +7,8 @@ import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/room_service.dart';
 import 'package:smarn/models/room.dart';
 
+import 'package:smarn/pages/widgets/canstants.dart';
+
 class EditActivity extends StatefulWidget {
   final Map<String, dynamic> activity;
 
@@ -147,7 +149,7 @@ class _EditActivityState extends State<EditActivity> {
         int.tryParse(_durationController.text) != null &&
         int.parse(_durationController.text) >= 60;
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -230,7 +232,6 @@ class _EditActivityState extends State<EditActivity> {
                 dropdownColor: Colors.black,
               ),
               const SizedBox(height: 16),
-
               // Duration TextField
               TextField(
                 controller: _durationController,

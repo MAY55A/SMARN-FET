@@ -184,8 +184,8 @@ void teacherCrud() async {
   print(await teacherService.getTeachersBySubject("SUB001"));
 
   print(await teacherService.deleteTeacher("or4OKe8jyDMWpUGsrL9AqaoChL83"));
-}
 
+}
 void deleteTeacherTest1() async {
   // Test: Deleting teacher with ID drM5ToiveZd2M7CwN0gsn5yfv913
   String teacherId = "drM5ToiveZd2M7CwN0gsn5yfv913";

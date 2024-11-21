@@ -91,7 +91,6 @@ class _ManageClassesState extends State<ManageClasses> {
       ),
     );
   }
-
   // Function to handle delete class
   void _deleteClass(Class classItem) async {
     final result = await _classService.deleteClass(classItem.id!);
