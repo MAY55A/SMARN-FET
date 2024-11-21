@@ -1,15 +1,15 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions/v2";
-import { generateId } from "../helpers/id_generator";
-import { deleteRoomAndUpdateActivities } from "./room_functions";
-import { Building } from "../models";
-import { documentExists } from "../helpers/check_existence";
+import {generateId} from "../helpers/id_generator";
+import {deleteRoomAndUpdateActivities} from "./room_functions";
+import {Building} from "../models";
+import {documentExists} from "../helpers/check_existence";
 
 const db = admin.firestore();
 
 // function to add a building
 export const addBuilding = functions.https.onCall(async (request) => {
-  const { buildingData } = request.data;
+  const {buildingData} = request.data;
 
   // Ensure only an admin can call this function
   if (request.auth?.token.role !== "admin") {
@@ -36,7 +36,6 @@ export const addBuilding = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Generate a unique building ID
     const buildingId = await generateId("BLD", "buildings");
 
@@ -65,7 +64,7 @@ export const addBuilding = functions.https.onCall(async (request) => {
 });
 
 export const getBuilding = functions.https.onCall(async (request) => {
-  const { buildingId } = request.data;
+  const {buildingId} = request.data;
 
   // Ensure only an admin can call this function
   if (request.auth?.token.role !== "admin") {
@@ -94,7 +93,6 @@ export const getBuilding = functions.https.onCall(async (request) => {
   }
 
   return buildingDoc.data();
-
 });
 
 export const getAllBuildings = functions.https.onCall(async (request) => {
@@ -118,7 +116,7 @@ export const getAllBuildings = functions.https.onCall(async (request) => {
       buildingsList.push(doc.data());
     });
 
-    return { buildings: buildingsList };
+    return {buildings: buildingsList};
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -129,7 +127,7 @@ export const getAllBuildings = functions.https.onCall(async (request) => {
 });
 
 export const updateBuilding = functions.https.onCall(async (request) => {
-  const { buildingId, updateData } = request.data;
+  const {buildingId, updateData} = request.data;
 
   // Ensure the function is called by an admin user
   if (request.auth?.token.role !== "admin") {
@@ -155,11 +153,10 @@ export const updateBuilding = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Use the updateData directly from the request
     await buildingRef.update(updateData);
 
-    return { message: "building updated successfully!", success: true };
+    return {message: "building updated successfully!", success: true};
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -170,7 +167,7 @@ export const updateBuilding = functions.https.onCall(async (request) => {
 });
 
 export const deleteBuilding = functions.https.onCall(async (request) => {
-  const { buildingId } = request.data;
+  const {buildingId} = request.data;
 
   // Ensure the function is called by an admin user
   if (request.auth?.token.role !== "admin") {
@@ -208,11 +205,11 @@ export const deleteBuilding = functions.https.onCall(async (request) => {
     // delete each room
     for (const roomDoc of roomsSnapshot.docs) {
       await deleteRoomAndUpdateActivities(roomDoc);
-    };
+    }
 
     // Delete the room document
     transaction.delete(buildingRef);
   });
 
-  return { message: "Building deleted successfully.", success: true };
+  return {message: "Building deleted successfully.", success: true};
 });

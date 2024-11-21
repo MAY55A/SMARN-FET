@@ -1,14 +1,14 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions/v2";
-import { generateId } from "../helpers/id_generator";
-import { Room, RoomType } from "../models";
-import { documentExists } from "../helpers/check_existence";
+import {generateId} from "../helpers/id_generator";
+import {Room, RoomType} from "../models";
+import {documentExists} from "../helpers/check_existence";
 
 const db = admin.firestore();
 
 // function to add a room
 export const addRoom = functions.https.onCall(async (request) => {
-  const { roomData } = request.data;
+  const {roomData} = request.data;
 
   // Ensure only an admin can call this function
   if (request.auth?.token.role !== "admin") {
@@ -58,8 +58,6 @@ export const addRoom = functions.https.onCall(async (request) => {
   }
 
   try {
-
-
     // Generate a unique room ID
     const roomId = await generateId("RM", "rooms");
 
@@ -90,7 +88,7 @@ export const addRoom = functions.https.onCall(async (request) => {
 });
 
 export const getRoom = functions.https.onCall(async (request) => {
-  const { roomId } = request.data;
+  const {roomId} = request.data;
 
   // Ensure only an admin can call this function
   if (request.auth?.token.role !== "admin") {
@@ -142,7 +140,7 @@ export const getAllRooms = functions.https.onCall(async (request) => {
       roomsList.push(doc.data());
     });
 
-    return { rooms: roomsList };
+    return {rooms: roomsList};
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -153,7 +151,7 @@ export const getAllRooms = functions.https.onCall(async (request) => {
 });
 
 export const updateRoom = functions.https.onCall(async (request) => {
-  const { roomId, updateData } = request.data;
+  const {roomId, updateData} = request.data;
 
   // Ensure the function is called by an admin user
   if (request.auth?.token.role !== "admin") {
@@ -179,11 +177,10 @@ export const updateRoom = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Use the updateData directly from the request
     await roomRef.update(updateData);
 
-    return { message: "room updated successfully!", success: true };
+    return {message: "room updated successfully!", success: true};
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -194,7 +191,7 @@ export const updateRoom = functions.https.onCall(async (request) => {
 });
 
 export const deleteRoom = functions.https.onCall(async (request) => {
-  const { roomId } = request.data;
+  const {roomId} = request.data;
 
   // Ensure the function is called by an admin user
   if (request.auth?.token.role !== "admin") {
@@ -219,10 +216,8 @@ export const deleteRoom = functions.https.onCall(async (request) => {
   }
 
   try {
-
-    await deleteRoomAndUpdateActivities(roomDoc)
-    return { message: "Room deleted successfully.", success: true };
-
+    await deleteRoomAndUpdateActivities(roomDoc);
+    return {message: "Room deleted successfully.", success: true};
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -233,7 +228,7 @@ export const deleteRoom = functions.https.onCall(async (request) => {
 });
 
 export const getRoomsByBuilding = functions.https.onCall(async (request) => {
-  const { buildingId } = request.data;
+  const {buildingId} = request.data;
 
   // Ensure only admin can view them
   if (request.auth?.token.role !== "admin") {
@@ -244,7 +239,6 @@ export const getRoomsByBuilding = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Fetch provided building's rooms from Firestore
     const roomsSnapshot = await db
       .collection("rooms")
@@ -257,7 +251,7 @@ export const getRoomsByBuilding = functions.https.onCall(async (request) => {
       roomsList.push(doc.data());
     });
 
-    return { rooms: roomsList };
+    return {rooms: roomsList};
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -267,13 +261,14 @@ export const getRoomsByBuilding = functions.https.onCall(async (request) => {
   }
 });
 
-export async function deleteRoomAndUpdateActivities(roomDoc: admin.firestore.DocumentSnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>): Promise<void> {
+export async function deleteRoomAndUpdateActivities(
+  roomDoc: admin.firestore.DocumentSnapshot<admin.firestore.DocumentData,
+  admin.firestore.DocumentData>):
 
+  Promise<void> {
   const activitiesRef = db.collection("activities");
 
   await db.runTransaction(async (transaction) => {
-
-
     // Find all activities with the room reference
     const activitiesSnapshot = await activitiesRef
       .where("room", "==", roomDoc.data()?.id)
@@ -281,7 +276,7 @@ export async function deleteRoomAndUpdateActivities(roomDoc: admin.firestore.Doc
 
     // Update each activity to set roomId to null
     activitiesSnapshot.forEach((activityDoc) => {
-      transaction.update(activityDoc.ref, { room: null });
+      transaction.update(activityDoc.ref, {room: null});
     });
 
     // Delete the room document
@@ -291,13 +286,13 @@ export async function deleteRoomAndUpdateActivities(roomDoc: admin.firestore.Doc
 
 export function getBasicRoomDetails(id: string) {
   const teacherDoc = db.collection("rooms").doc(id);
-  return teacherDoc.get().then(doc => {
+  return teacherDoc.get().then((doc) => {
     if (!doc.exists) {
-      throw new Error('Room not found');
+      throw new Error("Room not found");
     }
     return {
       id: doc.data()?.id, name: doc.data()?.name,
-      type: doc.data()?.type, building: doc.data()?.building
+      type: doc.data()?.type, building: doc.data()?.building,
     };
   });
 }

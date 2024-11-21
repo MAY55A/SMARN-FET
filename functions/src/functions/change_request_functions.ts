@@ -26,7 +26,6 @@ export const createChangeRequest = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Generate a unique changeRequest ID
     const changeRequestId = await generateId("CHRQ", "requests");
 
@@ -66,33 +65,34 @@ export const getChangeRequest = functions.https.onCall(async (request) => {
     );
   }
 
-const changeRequestRef = db.collection("changeRequests").doc(changeRequestId);
-const changeRequestDoc = await changeRequestRef.get();
+  const changeRequestRef = db.collection("changeRequests").doc(changeRequestId);
+  const changeRequestDoc = await changeRequestRef.get();
 
-if (!changeRequestDoc.exists) {
-  throw new functions.https.HttpsError("not-found", "change request not found");
-}
+  if (!changeRequestDoc.exists) {
+    throw new functions.https.HttpsError("not-found", "change request not found");
+  }
 
-// Ensure only admins and teachers can view the change request
-if (request.auth?.token.role !== "admin" && request.auth?.token.role !== "teacher") {
-  throw new functions.https.HttpsError(
+  // Ensure only admins and teachers can view the change request
+  if (request.auth?.token.role !== "admin" && request.auth?.token.role !== "teacher") {
+    throw new functions.https.HttpsError(
       "permission-denied",
       "You do not have permission to view change requests."
     );
   }
 
-// Ensure if not admin only the changeRequest's creator can view the request
-if (request.auth?.token.role !== "admin") {
-  const currentTeacherRef = db.collection("teachers").doc(request.auth?.token.uid);
-  const currentTeacherId = (await currentTeacherRef.get()).data()?.id;
+  // Ensure if not admin only the changeRequest's creator can view the request
+  if (request.auth?.token.role !== "admin") {
+    const currentTeacherRef = db.collection("teachers").doc(request.auth?.token.uid);
+    const currentTeacherId = (await currentTeacherRef.get()).data()?.id;
 
-  if (currentTeacherId !== changeRequestDoc.data()?.teacher)
-  throw new functions.https.HttpsError(
-      "permission-denied",
-      "Only this change request's creator can view its content."
-    );
+    if (currentTeacherId !== changeRequestDoc.data()?.teacher) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Only this change request's creator can view its content."
+      );
+    }
   }
-  
+
   return changeRequestDoc.data();
 });
 
@@ -148,22 +148,23 @@ export const updateChangeRequest = functions.https.onCall(async (request) => {
   // Ensure only admins and teachers can update change requests
   if (request.auth?.token.role !== "admin" && request.auth?.token.role !== "teacher") {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You do not have permission to update change requests."
-      );
-    }
+      "permission-denied",
+      "You do not have permission to update change requests."
+    );
+  }
 
   // Ensure if not admin only the changeRequest's creator can update the request
   if (request.auth?.token.role !== "admin") {
     const currentTeacherRef = db.collection("teachers").doc(request.auth?.token.uid);
     const currentTeacherId = (await currentTeacherRef.get()).data()?.id;
 
-    if (currentTeacherId !== changeRequestDoc.data()?.teacher)
-    throw new functions.https.HttpsError(
+    if (currentTeacherId !== changeRequestDoc.data()?.teacher) {
+      throw new functions.https.HttpsError(
         "permission-denied",
         "Only this change request's creator can update its content."
       );
     }
+  }
 
   try {
     // Use the updateData directly from the request
@@ -200,22 +201,23 @@ export const deleteChangeRequest = functions.https.onCall(async (request) => {
   // Ensure only admins and teachers can delete change requests
   if (request.auth?.token.role !== "admin" && request.auth?.token.role !== "teacher") {
     throw new functions.https.HttpsError(
-        "permission-denied",
-        "You do not have permission to delete change requests."
-      );
-    }
+      "permission-denied",
+      "You do not have permission to delete change requests."
+    );
+  }
 
   // Ensure if not admin only the changeRequest's creator can delete the request
   if (request.auth?.token.role !== "admin") {
     const currentTeacherRef = db.collection("teachers").doc(request.auth?.token.uid);
     const currentTeacherId = (await currentTeacherRef.get()).data()?.id;
 
-    if (currentTeacherId !== changeRequestDoc.data()?.teacher)
-    throw new functions.https.HttpsError(
+    if (currentTeacherId !== changeRequestDoc.data()?.teacher) {
+      throw new functions.https.HttpsError(
         "permission-denied",
         "Only this change request's creator can delete it."
       );
     }
+  }
 
   try {
     // Delete the changeRequest's Firestore document
@@ -233,14 +235,14 @@ export const deleteChangeRequest = functions.https.onCall(async (request) => {
 
 export const getChangeRequestsByTeacher = functions.https.onCall(async (request) => {
   const {teacherDocId} = request.data;
-  
+
   // Ensure only an admin or the changeRequests' creator can view them
-    if (request.auth?.token.role !== "admin" && request.auth?.token.uid !== teacherDocId) {
-      throw new functions.https.HttpsError(
-          "permission-denied",
-          "You do not have permission to view the provided teacher's change requests."
-        );
-    }
+  if (request.auth?.token.role !== "admin" && request.auth?.token.uid !== teacherDocId) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You do not have permission to view the provided teacher's change requests."
+    );
+  }
 
   try {
     // Fetch current teacher's id from Firestore
