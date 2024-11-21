@@ -30,17 +30,24 @@ class Teacher {
     };
   }
 
+ 
   // Create a Teacher object from a Map
   factory Teacher.fromMap(Map<String, dynamic> map) {
     return Teacher(
-        id: map['id'],
-        name: map['name'],
-        email: map['email'],
-        phone: map['phone'],
-        picture: map['picture'],
-        nbHours: map['nbHours'],
-        subjects: List<String>.from(map['subjects']));
+      id: map['id'] ?? '', // Provide default if null
+      name: map['name'] ?? '', // Provide default if null
+      email: map['email'] ?? '', // Provide default if null
+      phone: map['phone'] ?? '', // Provide default if null
+      picture: map['picture'], // This can be null
+      nbHours: map['nbHours'] ?? 0, // Default to 0 if null
+      subjects: map['subjects'] != null
+          ? List<String>.from(map['subjects']) // Ensure it is a list of Strings
+          : [], // Provide an empty list if subjects is null
+    );
   }
+ 
+ 
+ 
 
   @override
   String toString() {

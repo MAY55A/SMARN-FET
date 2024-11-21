@@ -40,14 +40,20 @@ class Activity {
   // Create a Activity object from a Map
   factory Activity.fromMap(Map<String, dynamic> map) {
     return Activity(
-        id: map['id'],
-        subject: map['subject'],
-        teacher: map['teacher'],
-        studentsClass: map['class'],
-        tag: ActivityTag.values.firstWhere((e) => e.name == map['tag']),
-        isActive: map['isActive'],
-        duration: map['duration'],
-        room: map['room']);
+      id: map['id'],
+      subject: map['subject'] ?? '', // Default to empty string if null
+      teacher: map['teacher'] ?? '', // Default to empty string if null
+      studentsClass: map['class'] ?? '', // Default to empty string if null
+      tag: map['tag'] != null
+          ? ActivityTag.values.firstWhere(
+              (e) => e.name == map['tag'],
+              orElse: () => ActivityTag.lecture, // Default to 'lecture' if invalid tag
+            )
+          : ActivityTag.lecture, // Default to 'lecture' if null
+      isActive: map['isActive'] ?? true, // Default to true if null
+      duration: map['duration'] ?? 0, // Default to 0 if null
+      room: map['room'] ?? '', // Default to empty string if null
+    );
   }
 
   @override

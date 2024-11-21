@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/models/activity.dart';
+import 'package:smarn/models/activity_tag.dart';
+import 'package:smarn/models/class.dart';
+import 'package:smarn/services/class_service.dart';
+import 'package:smarn/services/teacher_service.dart';
+import 'package:smarn/services/subject_service.dart';
+import 'package:smarn/services/activity_service.dart';
+import 'package:smarn/services/room_service.dart';
+import 'package:smarn/models/room.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 
 class AddActivity extends StatefulWidget {
@@ -9,52 +18,115 @@ class AddActivity extends StatefulWidget {
 }
 
 class _AddActivityState extends State<AddActivity> {
-  // Controllers for the text fields
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _subjectController = TextEditingController();
-  final TextEditingController _teacherController = TextEditingController();
-  final TextEditingController _roomController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
 
-  // Selected values for dropdowns
   String? _selectedClass;
   String? _selectedTag;
+  String? _selectedTeacher;
+  String? _selectedSubject;
+  String? _selectedRoom;
 
-  // List of available classes and tags for dropdowns
-  final List<String> _classes = ['Class A', 'Class B', 'Class C'];
-  final List<String> _tags = [ 'lecture', 'lab', 'seminar', 'workshop', 'exam', 'other'];
+  List<String> _classes = [];
+  List<String> _tags = ['lecture', 'lab', 'seminar', 'workshop', 'exam', 'other'];
+  List<dynamic> _teachers = [];
+  List<String> _subjects = [];
+  List<Room> _rooms = [];
 
-  // Function to handle the save button press
+  final TeacherService _teacherService = TeacherService();
+  final SubjectService _subjectService = SubjectService();
+  final RoomService _roomService = RoomService();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    await Future.wait([
+      _fetchTeachers(),
+      _fetchSubjects(),
+      _fetchRooms(),
+      _fetchClasses(), // Add dynamic class fetching if applicable
+    ]);
+  }
+
+  Future<void> _fetchTeachers() async {
+    final teachersList = await _teacherService.getAllTeachers();
+    setState(() {
+      _teachers = teachersList.map((teacher) => teacher['teacher'].name).toList();
+    });
+  }
+
+  Future<void> _fetchSubjects() async {
+    final subjectsList = await _subjectService.getAllSubjects();
+    setState(() {
+      _subjects = subjectsList.map((subject) => subject.name).toList();
+    });
+  }
+
+  Future<void> _fetchRooms() async {
+    final roomsList = await _roomService.getAllRooms();
+    setState(() {
+      _rooms = roomsList;
+    });
+  }
+  //methode to get all classes
+Future<void> _fetchClasses() async {
+  try {
+    final List<Class> fetchedClasses = await ClassService().getAllclasses();
+
+    setState(() {
+      _classes = fetchedClasses.map((c) => c.name).toList(); // Extract the name property
+    });
+  } catch (e) {
+    print('Error fetching classes: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Failed to fetch classes')),
+    );
+  }
+}
+
   void _saveActivity() {
-    if (_nameController.text.isNotEmpty &&
-        _subjectController.text.isNotEmpty &&
-        _teacherController.text.isNotEmpty &&
-        _selectedClass != null &&
-        _selectedTag != null &&
-        _roomController.text.isNotEmpty &&
-        _durationController.text.isNotEmpty) {
-      // Here, you would add the new activity to your list
-      // For example:
-      print('New Activity Added: ${_nameController.text}');
-
-      // Go back to the previous screen (ManageActivitiesForm)
+    if (_formIsValid()) {
+      final activity = Activity(
+        subject: _selectedSubject!,
+        teacher: _selectedTeacher!,
+        studentsClass: _selectedClass!,
+        duration: int.parse(_durationController.text),
+        tag: ActivityTag.values.firstWhere((e) => e.name == _selectedTag),
+        room: _selectedRoom!,
+      );
+      ActivityService().addActivity(activity);
       Navigator.pop(context);
     } else {
-      // Show an error message if any field is empty
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill out all fields')),
+        const SnackBar(content: Text('Please fill out all fields and ensure the duration is at least 60 minutes.')),
       );
     }
+  }
+
+  bool _formIsValid() {
+    return _nameController.text.isNotEmpty &&
+        _selectedSubject != null &&
+        _selectedTeacher != null &&
+        _selectedClass != null &&
+        _selectedTag != null &&
+        _selectedRoom != null &&
+        _durationController.text.isNotEmpty &&
+        int.tryParse(_durationController.text) != null &&
+        int.parse(_durationController.text) >= 60;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Background color
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Add New Activity'),
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Purple background
-        foregroundColor: Colors.white, // White text
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -73,27 +145,41 @@ class _AddActivityState extends State<AddActivity> {
               ),
               const SizedBox(height: 16),
 
-              // Subject
-              TextField(
-                controller: _subjectController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Subject',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
-                ),
+              // Subject Dropdown
+              DropdownButton<String>(
+                hint: const Text("Select Subject", style: TextStyle(color: Colors.white)),
+                value: _selectedSubject,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedSubject = newValue;
+                  });
+                },
+                items: _subjects.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value, style: const TextStyle(color: Colors.white)),
+                  );
+                }).toList(),
+                dropdownColor: Colors.black,
               ),
               const SizedBox(height: 16),
 
-              // Teacher
-              TextField(
-                controller: _teacherController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Teacher',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
-                ),
+              // Teacher Dropdown
+              DropdownButton<String>(
+                hint: const Text("Select Teacher", style: TextStyle(color: Colors.white)),
+                value: _selectedTeacher,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedTeacher = newValue;
+                  });
+                },
+                items: _teachers.map<DropdownMenuItem<String>>((dynamic value) {
+                  return DropdownMenuItem<String>(
+                    value: value as String,
+                    child: Text(value, style: const TextStyle(color: Colors.white)),
+                  );
+                }).toList(),
+                dropdownColor: Colors.black,
               ),
               const SizedBox(height: 16),
 
@@ -112,7 +198,7 @@ class _AddActivityState extends State<AddActivity> {
                     child: Text(value, style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
-                dropdownColor: Colors.black, // Set dropdown background to black
+                dropdownColor: Colors.black,
               ),
               const SizedBox(height: 16),
 
@@ -121,10 +207,10 @@ class _AddActivityState extends State<AddActivity> {
                 controller: _durationController,
                 style: const TextStyle(color: Colors.white),
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Duration (Minutes)',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
@@ -144,19 +230,26 @@ class _AddActivityState extends State<AddActivity> {
                     child: Text(value, style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
-                dropdownColor: Colors.black, // Set dropdown background to black
+                dropdownColor: Colors.black,
               ),
               const SizedBox(height: 16),
 
-              // Room Number
-              TextField(
-                controller: _roomController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Room Number',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
-                ),
+              // Room Dropdown
+              DropdownButton<String>(
+                hint: const Text("Select Room", style: TextStyle(color: Colors.white)),
+                value: _selectedRoom,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedRoom = newValue;
+                  });
+                },
+                items: _rooms.map<DropdownMenuItem<String>>((Room room) {
+                  return DropdownMenuItem<String>(
+                    value: room.name,
+                    child: Text(room.name, style: const TextStyle(color: Colors.white)),
+                  );
+                }).toList(),
+                dropdownColor: Colors.black,
               ),
               const SizedBox(height: 16),
 
@@ -166,9 +259,8 @@ class _AddActivityState extends State<AddActivity> {
                 child: const Text('Save Activity'),
                 style: ButtonStyle(
                   foregroundColor: MaterialStateProperty.all(Colors.black),
-                  backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
-                )  // Purple color
-                
+                  backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 129, 77, 139)),
+                ),
               ),
             ],
           ),

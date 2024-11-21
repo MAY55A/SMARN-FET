@@ -16,7 +16,7 @@ module.exports = {
   parserOptions: {
     project: ["tsconfig.json", "tsconfig.dev.json"],
     sourceType: "module",
-    tsconfigRootDir: "C:/Users/mayss/Desktop/Projects/FET/smarn/functions",
+    tsconfigRootDir: "C:/Users/sarra/OneDrive/Desktop/Smarn Project/SMARN-FET/functions",
   },
   ignorePatterns: [
     "/lib/**/*", // Ignore built files.

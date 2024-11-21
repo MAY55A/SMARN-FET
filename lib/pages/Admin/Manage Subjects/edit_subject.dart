@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
+import 'package:smarn/models/subject.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
-
 
 class EditSubjectForm extends StatefulWidget {
   final Subject subject;
@@ -16,7 +15,6 @@ class _EditSubjectFormState extends State<EditSubjectForm> {
   late TextEditingController _nameController;
   late TextEditingController _longNameController;
   late TextEditingController _descriptionController;
-  List<String> selectedTeachers = [];
 
   @override
   void initState() {
@@ -24,7 +22,6 @@ class _EditSubjectFormState extends State<EditSubjectForm> {
     _nameController = TextEditingController(text: widget.subject.name);
     _longNameController = TextEditingController(text: widget.subject.longName);
     _descriptionController = TextEditingController(text: widget.subject.description);
-    selectedTeachers = widget.subject.teachers.map((teacher) => teacher.name).toList();
   }
 
   @override
@@ -42,7 +39,6 @@ class _EditSubjectFormState extends State<EditSubjectForm> {
       name: _nameController.text,
       longName: _longNameController.text,
       description: _descriptionController.text,
-      teachers: selectedTeachers.map((name) => Teacher(name: name)).toList(),
     );
 
     Navigator.pop(context, updatedSubject);
@@ -113,32 +109,6 @@ class _EditSubjectFormState extends State<EditSubjectForm> {
             ),
             const SizedBox(height: 16),
 
-            // Teacher Selection (Multi-select)
-            const Text("Select Teachers", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            Wrap(
-              spacing: 8.0,
-              children: ['Mr. John', 'Mrs. Smith', 'Ms. Emily'].map((teacherName) {
-                return FilterChip(
-                  label: Text(
-                    teacherName,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  selected: selectedTeachers.contains(teacherName),
-                  onSelected: (selected) {
-                    setState(() {
-                      if (selected) {
-                        selectedTeachers.add(teacherName);
-                      } else {
-                        selectedTeachers.remove(teacherName);
-                      }
-                    });
-                  },
-                  selectedColor: AppColors.appBarColor.withOpacity(0.4),
-                  backgroundColor: Colors.grey[800],
-                  checkmarkColor: Colors.white,
-                );
-              }).toList(),
-            ),
             const SizedBox(height: 24),
 
             // Save Button

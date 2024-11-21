@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/widgets/canstants.dart';
+import 'package:smarn/models/subject.dart';
 import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 
@@ -154,7 +156,7 @@ class _AddSubjectState extends State<AddSubject> {
                             name: _nameController.text,
                             longName: _longNameController.text,
                             description: _descriptionController.text,
-                            teachers: selectedTeachers,
+                           // No teachers selected
                           ),
                         );
                       }

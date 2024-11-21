@@ -3,8 +3,8 @@ import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/subject_service.dart';
-import 'add_teacher_form.dart'; // Assuming you have this file
-import 'edit_teacher_form.dart'; // Assuming you have this file
+import 'add_teacher_form.dart';
+import 'edit_teacher_form.dart';
 
 class ManageTeachersForm extends StatefulWidget {
   const ManageTeachersForm({Key? key}) : super(key: key);
@@ -21,15 +21,15 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
   late Future<List<Subject>> _subjectsFuture;
 
   TextEditingController _searchController = TextEditingController();
-  String? _selectedSubject; // Initialize to null
+  String? _selectedSubject;
 
   List<Subject> _subjects = [];
 
   @override
   void initState() {
     super.initState();
-    _teachersFuture = _teacherService.getAllTeachers(); // Fetch teachers
-    _subjectsFuture = _subjectService.getAllSubjects(); // Fetch subjects
+    _teachersFuture = _teacherService.getAllTeachers();
+    _subjectsFuture = _subjectService.getAllSubjects();
     _subjectsFuture.then((subjects) {
       setState(() {
         _subjects = subjects;
@@ -39,11 +39,10 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
 
   Future<void> _refreshTeachers() async {
     setState(() {
-      _teachersFuture = _teacherService.getAllTeachers(); // Refresh teacher list
+      _teachersFuture = _teacherService.getAllTeachers();
     });
   }
 
-  // Get subject name by its ID
   String getSubjectNameById(String subjectId) {
     final subject = _subjects.firstWhere(
       (subject) => subject.id == subjectId,
@@ -52,21 +51,54 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
     return subject.name;
   }
 
-  // Filter teachers based on name or subject
   Future<List<Map<String, dynamic>>> _filterTeachers() async {
     if (_selectedSubject != null && _selectedSubject!.isNotEmpty) {
-      // If a subject is selected, filter teachers by subject
       return _teacherService.getTeachersBySubject(_selectedSubject!);
     } else {
-      // Otherwise, return all teachers and apply name-based filtering
       final allTeachers = await _teacherService.getAllTeachers();
       final searchTerm = _searchController.text.toLowerCase();
 
       return allTeachers.where((teacherData) {
         final teacher = teacherData['teacher'] as Teacher;
-        final teacherName = teacher.name?.toLowerCase() ?? '';
-        return teacherName.contains(searchTerm); // Only filter by name if no subject is selected
+        final teacherName = teacher.name.toLowerCase() ?? '';
+        return teacherName.contains(searchTerm);
       }).toList();
+    }
+  }
+
+  Future<void> _confirmDeleteTeacher(String teacherId, String teacherName) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Confirm Deletion"),
+          content: Text("Are you sure you want to delete $teacherName?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete ?? false) {
+      final result = await _teacherService.deleteTeacher(teacherId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor: result['success'] ? Colors.green : Colors.red,
+        ),
+      );
+
+      if (result['success']) {
+        _refreshTeachers();
+      }
     }
   }
 
@@ -119,7 +151,6 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                       }
 
                       final subjects = snapshot.data!;
-
                       return DropdownButton<String>(
                         value: _selectedSubject,
                         onChanged: (newValue) {
@@ -134,7 +165,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                         items: subjects
                             .map<DropdownMenuItem<String>>(
                               (subject) => DropdownMenuItem<String>(
-                                value: subject.id, // Assuming each subject has an id
+                                value: subject.id,
                                 child: Text(
                                   subject.name,
                                   style: const TextStyle(color: Colors.white),
@@ -162,7 +193,6 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                   }
 
                   final teachersList = snapshot.data!;
-
                   return ListView.builder(
                     itemCount: teachersList.length,
                     itemBuilder: (context, index) {
@@ -205,9 +235,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.delete, color: Colors.white),
-                                onPressed: () async {
-                                  // Implement delete teacher logic
-                                },
+                                onPressed: () => _confirmDeleteTeacher(teacher.id!, teacherName),
                               ),
                             ],
                           ),
@@ -221,10 +249,8 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
           ],
         ),
       ),
-      // Floating Action Button to Add a Teacher
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigate to Add Teacher Form
           Navigator.push(
             context,
             MaterialPageRoute(

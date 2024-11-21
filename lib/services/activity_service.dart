@@ -35,24 +35,31 @@ class ActivityService {
     }
   }
 
-  Future<List<Activity>> getAllActivities() async {
-    try {
-      final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('getAllActivities');
-      final response = await callable.call();
+Future<List<Activity>> getAllActivities() async {
+  try {
+    final HttpsCallable callable =
+        FirebaseFunctions.instance.httpsCallable('getAllActivities');
+    final response = await callable.call();
 
-      // Ensure the response contains the list of activityes
+    // Ensure the response contains the list of activities
+    if (response.data["activities"] != null) {
       List<Activity> activitiesList =
           (response.data["activities"] as List<dynamic>)
-              .map((r) => Activity.fromMap(r))
+              .map((r) => Activity.fromMap(r ?? {})) // Handle possible null entries
               .toList();
-
       return activitiesList;
-    } catch (e) {
-      print('Error fetching all activities: $e');
+    } else {
       return [];
     }
+  } catch (e) {
+    print('Error fetching all activities: $e');
+    return [];
   }
+}
+
+
+
+
 
   Future<Map<String, dynamic>> updateActivity(
       String activityId, Activity activity) async {

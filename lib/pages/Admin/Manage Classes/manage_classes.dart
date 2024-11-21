@@ -66,6 +66,31 @@ class _ManageClassesState extends State<ManageClasses> {
     }
   }
 
+  // Function to handle delete class with a confirmation dialog
+  void _confirmDelete(Class classItem) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Class'),
+        content: Text('Are you sure you want to delete the class "${classItem.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Close the dialog
+              _deleteClass(classItem); // Proceed with deletion
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
   // Function to handle delete class
   void _deleteClass(Class classItem) async {
     final result = await _classService.deleteClass(classItem.id!);
@@ -74,9 +99,13 @@ class _ManageClassesState extends State<ManageClasses> {
         filteredClasses.remove(classItem);
         classes.remove(classItem);
       });
-      print("Deleted Class: ${classItem.name}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Class "${classItem.name}" deleted successfully.')),
+      );
     } else {
-      print("Error deleting class: ${result['message']}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting class: ${result['message']}')),
+      );
     }
   }
 
@@ -142,10 +171,10 @@ class _ManageClassesState extends State<ManageClasses> {
                                 icon: const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () => _editClass(classItem),
                               ),
-                              // Delete Icon
+                              // Delete Icon with Confirmation
                               IconButton(
                                 icon: const Icon(Icons.delete, color: Colors.white),
-                                onPressed: () => _deleteClass(classItem),
+                                onPressed: () => _confirmDelete(classItem),
                               ),
                             ],
                           ),
