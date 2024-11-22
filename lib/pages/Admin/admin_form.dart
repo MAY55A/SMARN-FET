@@ -23,9 +23,6 @@ class _AdminFormState extends State<AdminForm> {
       );
 
       if (res["success"]) {
-        //test
-       // addTeacher();
-        
         Navigator.pushReplacementNamed(context, '/admin_dashboard');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

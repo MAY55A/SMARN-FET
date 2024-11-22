@@ -53,7 +53,8 @@ class _SelectSubjectScreenState extends State<SelectSubjectScreen> {
       );
 
       if (result['success']) {
-        Navigator.pop(context, _selectedSubjects); // Return the selected subject IDs
+        Navigator.pop(
+            context, _selectedSubjects); // Return the selected subject IDs
       } else {
         throw Exception("Failed to update teacher's subjects.");
       }
@@ -86,7 +87,8 @@ class _SelectSubjectScreenState extends State<SelectSubjectScreen> {
               },
               child: const Text(
                 "Cancel",
-                style: TextStyle(color: Colors.white), // White text for the button
+                style:
+                    TextStyle(color: Colors.white), // White text for the button
               ),
             ),
             TextButton(
@@ -96,7 +98,8 @@ class _SelectSubjectScreenState extends State<SelectSubjectScreen> {
               },
               child: const Text(
                 "Confirm",
-                style: TextStyle(color: Colors.white), // White text for the button
+                style:
+                    TextStyle(color: Colors.white), // White text for the button
               ),
             ),
           ],
@@ -112,7 +115,8 @@ class _SelectSubjectScreenState extends State<SelectSubjectScreen> {
         title: const Text("Select Subjects"),
         backgroundColor: Colors.blue, // Blue app bar
       ),
-      backgroundColor:  const Color.fromARGB(255, 30, 30, 30), // Black background for the body
+      backgroundColor: const Color.fromARGB(
+          255, 30, 30, 30), // Black background for the body
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
@@ -127,7 +131,8 @@ class _SelectSubjectScreenState extends State<SelectSubjectScreen> {
                   ),
                   subtitle: Text(
                     "Code: ${subject.name}",
-                    style: const TextStyle(color: Colors.white70), // White text with less opacity
+                    style: const TextStyle(
+                        color: Colors.white70), // White text with less opacity
                   ),
                   trailing: Checkbox(
                     value: isSelected,
@@ -136,7 +141,8 @@ class _SelectSubjectScreenState extends State<SelectSubjectScreen> {
                         if (value == true) {
                           _selectedSubjects.add(subject.id!); // Add subject ID
                         } else {
-                          _selectedSubjects.remove(subject.id!); // Remove subject ID
+                          _selectedSubjects
+                              .remove(subject.id!); // Remove subject ID
                         }
                       });
                     },

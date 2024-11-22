@@ -7,8 +7,10 @@ import 'package:smarn/pages/Admin/Manage%20Tables/manage_timetables_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Time%20Constarints/time_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20requests/manage_complaints_form.dart';
+import 'package:smarn/pages/home.dart';
 import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
+
 
 class AdminMenu extends StatefulWidget {
   const AdminMenu({super.key});
@@ -59,13 +61,21 @@ class _AdminMenuState extends State<AdminMenu> {
                 color: AppColors.appBarColor,
               ),
             ),
+            // Home Menu Item
+            _buildMenuItem(context, Icons.home, 'Home', HomePage()),
+
+            // Other Menu Items
             _buildMenuItem(context, Icons.person_outline, 'Manage Teachers',
                 const ManageTeachersForm()),
             _buildMenuItem(context, Icons.schedule, 'Manage Tables',
                 const ManageTimetablesForm()),
             _buildMenuItem(context, Icons.report_problem_outlined,
                 'Manage Requests', const ManageComplaintsForm()),
-            SizedBox(height :300),
+
+            // Spacer for alignment
+            const Spacer(),
+
+            // Logout Menu Item
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.white),
               title:
@@ -85,7 +95,7 @@ class _AdminMenuState extends State<AdminMenu> {
       BuildContext context, IconData icon, String title, Widget page) {
     return ListTile(
       leading: Icon(icon, color: Colors.white),
-      title: Text(title, style: TextStyle(color: Colors.white)),
+      title: Text(title, style: const TextStyle(color: Colors.white)),
       onTap: () {
         Navigator.push(
             context,

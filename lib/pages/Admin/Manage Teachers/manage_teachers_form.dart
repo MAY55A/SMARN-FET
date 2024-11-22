@@ -117,6 +117,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
+                  // Search bar
                   Expanded(
                     child: TextField(
                       controller: _searchController,
@@ -137,6 +138,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                     ),
                   ),
                   const SizedBox(width: 10),
+                  // Subject Dropdown
                   FutureBuilder<List<Subject>>(
                     future: _subjectsFuture,
                     builder: (context, snapshot) {
@@ -179,7 +181,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
               ),
             ),
             Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
+              child: FutureBuilder<List<Map<String, dynamic>>>( // Fetch filtered teachers
                 future: _filterTeachers(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

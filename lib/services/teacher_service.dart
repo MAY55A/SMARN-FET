@@ -56,8 +56,7 @@ class TeacherService {
       };
     }
   }
-
-  /// Fetches the authenticated teacher's data from Firebase or Cloud Functions.
+    /// Fetches the authenticated teacher's data from Firebase or Cloud Functions.
   Future<Teacher?> fetchTeacherData() async {
     try {
       User? currentUser = FirebaseAuth.instance.currentUser;
@@ -72,6 +71,22 @@ class TeacherService {
       return null;
     }
   }
+
+ /* /// Fetches the authenticated teacher's data from Firebase or Cloud Functions.
+  Future<Teacher?> fetchTeacherData() async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        throw Exception("No authenticated user found.");
+      }
+
+      // Assuming `getTeacher` fetches teacher data based on their UID.
+      return await getTeacher(currentUser.uid);
+    } catch (e) {
+      print("Error fetching teacher data: $e");
+      return null;
+    }
+  }*/
 
   Future<Teacher?> getTeacher(String teacherDocId) async {
     try {

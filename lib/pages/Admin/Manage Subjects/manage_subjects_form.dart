@@ -79,7 +79,7 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
     final updatedSubject = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditSubjectForm(subject: subject),
+        builder: (context) => EditSubjectForm(subjectId: subject.id!),
       ),
     );
 
