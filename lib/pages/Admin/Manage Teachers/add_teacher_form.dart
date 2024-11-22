@@ -25,6 +25,8 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
 
   List<Subject> _subjectsList = [];
   List<String> _selectedSubjects = [];
+  
+  bool _isPasswordVisible = false;
 
   @override
   void initState() {
@@ -167,11 +169,24 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: "Password",
-                  labelStyle: TextStyle(color: Colors.white),
+                  labelStyle: const TextStyle(color: Colors.white),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
                 ),
-                obscureText: true,
+                obscureText: !_isPasswordVisible,
                 style: const TextStyle(color: Colors.white),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -205,52 +220,6 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
                 },
               ),
               const SizedBox(height: 16),
-              /*
-              const Text(
-                "Select Subjects",
-                style: TextStyle(color: Colors.white),
-              ),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: "Subjects",
-                  labelStyle: TextStyle(color: Colors.black),
-                ),
-                value: null,
-                items: _subjectsList.map((subject) {
-                  return DropdownMenuItem<String>(
-                    value: subject.id,
-                    child: Text(
-                      subject.name,
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null && !_selectedSubjects.contains(value)) {
-                    setState(() {
-                      _selectedSubjects.add(value);
-                    });
-                  }
-                },
-              ),
-              Wrap(
-                children: _selectedSubjects.map((subjectId) {
-                  final subject =
-                      _subjectsList.firstWhere((subject) => subject.id == subjectId);
-                  return Chip(
-                    label: Text(
-                      subject.name,
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                    onDeleted: () {
-                      setState(() {
-                        _selectedSubjects.remove(subjectId);
-                      });
-                    },
-                  );
-                }).toList(),
-              ),*/
-              const SizedBox(height: 20),
               ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor:

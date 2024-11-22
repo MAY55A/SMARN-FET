@@ -29,7 +29,7 @@ class _SelectionPageState extends State<SelectionPage> {
       body: Stack(
         children: [
           SizedBox(
-            height: 30,
+            height: 70,
           ),
           // Background image
           Positioned.fill(
@@ -49,7 +49,7 @@ class _SelectionPageState extends State<SelectionPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height:40),
+                  SizedBox(height:110),
                   const Text(
                     'Login as:',
                     textAlign: TextAlign.center,
@@ -109,7 +109,7 @@ class _SelectionPageState extends State<SelectionPage> {
                           .transparent, // Transparent color for invisibility
                     ),
                   ),
-                  SizedBox(height: 20),
+                 
                   if (_isButtonVisible)
                     ElevatedButton(
                       style: ButtonStyle(

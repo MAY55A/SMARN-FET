@@ -11,7 +11,6 @@ import 'package:smarn/pages/home.dart';
 import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 
-
 class AdminMenu extends StatefulWidget {
   const AdminMenu({super.key});
 
@@ -38,7 +37,7 @@ class _AdminMenuState extends State<AdminMenu> {
         userName = user.displayName ?? 'Admin';
         userEmail = user.email ?? 'No Email';
         userImageUrl = user.photoURL ??
-            '/assets/teachers/pfp.jpg'; // Placeholder image if no photo
+            '/teachers/pfp.jpg'; // Placeholder image if no photo
       });
     }
   }
@@ -54,8 +53,7 @@ class _AdminMenuState extends State<AdminMenu> {
               accountName: Text(userName ?? 'Loading...'),
               accountEmail: Text(userEmail ?? 'Loading...'),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage(
-                    userImageUrl ?? 'https://via.placeholder.com/150'),
+                backgroundImage: AssetImage(userImageUrl!),
               ),
               decoration: BoxDecoration(
                 color: AppColors.appBarColor,

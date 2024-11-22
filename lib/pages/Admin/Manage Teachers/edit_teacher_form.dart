@@ -26,6 +26,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
   late TextEditingController _phoneController;
   late TextEditingController _nbHoursController;
   late TextEditingController _passwordController;
+  bool _obscurePassword = true; // To toggle password visibility
   List<Subject> allSubjects = [];
   List<Subject> selectedSubjects = [];
 
@@ -184,12 +185,23 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: "Password",
-                  labelStyle: TextStyle(color: Colors.white),
+                  labelStyle: const TextStyle(color: Colors.white),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
                 ),
                 style: const TextStyle(color: Colors.white),
-                obscureText: true,
+                obscureText: _obscurePassword,
                 validator: (value) {
                   if (value != null && value.isNotEmpty) {
                     if (value.length < 6) return "Password must be at least 6 characters.";
@@ -200,28 +212,6 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   return null;
                 },
               ),
-              /*
-              const SizedBox(height: 20),
-              const Text(
-                "Subjects",
-                style: TextStyle(color: Colors.white),
-              ),
-              Wrap(
-                children: allSubjects.map((subject) {
-                  return ChoiceChip(
-                    label: Text(subject.name, style: const TextStyle(color: Colors.black)),
-                    selected: selectedSubjects.contains(subject),
-                    onSelected: (selected) {
-                      if (selected) {
-                        _addSubject(subject);
-                      } else {
-                        _removeSubject(subject);
-                      }
-                    },
-                    selectedColor: Colors.purple,
-                  );
-                }).toList(),
-              ),*/ // ADMIN CANT ADD SUBJECTS AT THE MOMENT
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
