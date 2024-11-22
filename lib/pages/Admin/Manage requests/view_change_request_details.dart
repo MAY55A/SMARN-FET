@@ -55,6 +55,120 @@ class _ViewChangeRequestDetailsState extends State<ViewChangeRequestDetails> {
     }
   }
 
+  /// Show an alert dialog for confirmation before approval or rejection.
+  Future<void> showConfirmationDialog(String action) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black,
+          title: Text(
+            action == 'approve'
+                ? 'Approve Request?'
+                : 'Reject Request?',
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: Text(
+            action == 'approve'
+                ? 'Are you sure you want to approve this change request?'
+                : 'Are you sure you want to reject this change request?',
+            style: const TextStyle(color: Colors.white),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Yes',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () async {
+                // Handle approval or rejection based on the action
+                if (action == 'approve') {
+                  final updatedRequest = ChangeRequest(
+                    id: widget.request.id,
+                    newTimeSlot: widget.request.newTimeSlot,
+                    newRoom: widget.request.newRoom,
+                    activity: widget.request.activity,
+                    reason: widget.request.reason,
+                    content: widget.request.content,
+                    teacher: widget.request.teacher,
+                    submissionDate: widget.request.submissionDate,
+                    status: ChangeRequestStatus.approved,
+                  );
+
+                  await ChangeRequestService().updateChangeRequest(
+                      widget.request.id!, updatedRequest);
+                  Navigator.pop(context); // Close the confirmation dialog
+                  Navigator.pop(context); // Close the details screen
+                  _showResultDialog('approved'); // Show success alert
+                } else if (action == 'reject') {
+                  final updatedRequest = ChangeRequest(
+                    id: widget.request.id,
+                    newTimeSlot: widget.request.newTimeSlot,
+                    newRoom: widget.request.newRoom,
+                    activity: widget.request.activity,
+                    reason: widget.request.reason,
+                    content: widget.request.content,
+                    teacher: widget.request.teacher,
+                    submissionDate: widget.request.submissionDate,
+                    status: ChangeRequestStatus.rejected,
+                  );
+
+                  await ChangeRequestService().updateChangeRequest(
+                      widget.request.id!, updatedRequest);
+                  Navigator.pop(context); // Close the confirmation dialog
+                  Navigator.pop(context); // Close the details screen
+                  _showResultDialog('rejected'); // Show success alert
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Show an alert dialog indicating the result of the action (approve/reject).
+  Future<void> _showResultDialog(String action) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black,
+          title: Text(
+            action == 'approved' ? 'Request Approved' : 'Request Rejected',
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: Text(
+            action == 'approved'
+                ? 'The change request has been approved.'
+                : 'The change request has been rejected.',
+            style: const TextStyle(color: Colors.white),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,23 +261,8 @@ class _ViewChangeRequestDetailsState extends State<ViewChangeRequestDetails> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () async {
-                    // Approve request
-                    final updatedRequest = ChangeRequest(
-                      id: widget.request.id,
-                      newTimeSlot: widget.request.newTimeSlot,
-                      newRoom: widget.request.newRoom,
-                      activity: widget.request.activity,
-                      reason: widget.request.reason,
-                      content: widget.request.content,
-                      teacher: widget.request.teacher,
-                      submissionDate: widget.request.submissionDate,
-                      status: ChangeRequestStatus.approved,
-                    );
-
-                    await ChangeRequestService().updateChangeRequest(
-                        widget.request.id!, updatedRequest);
-                    Navigator.pop(context);
+                  onPressed: () {
+                    showConfirmationDialog('approve'); // Show confirmation dialog for approval
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
@@ -171,23 +270,8 @@ class _ViewChangeRequestDetailsState extends State<ViewChangeRequestDetails> {
                   child: const Text('Approve'),
                 ),
                 ElevatedButton(
-                  onPressed: () async {
-                    // Reject request
-                    final updatedRequest = ChangeRequest(
-                      id: widget.request.id,
-                      newTimeSlot: widget.request.newTimeSlot,
-                      newRoom: widget.request.newRoom,
-                      activity: widget.request.activity,
-                      reason: widget.request.reason,
-                      content: widget.request.content,
-                      teacher: widget.request.teacher,
-                      submissionDate: widget.request.submissionDate,
-                      status: ChangeRequestStatus.rejected,
-                    );
-
-                    await ChangeRequestService().updateChangeRequest(
-                        widget.request.id!, updatedRequest);
-                    Navigator.pop(context);
+                  onPressed: () {
+                    showConfirmationDialog('reject'); // Show confirmation dialog for rejection
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,

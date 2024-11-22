@@ -20,9 +20,6 @@ class _ManagePersonnelInformationFormState
   String phoneNumber = "";
   bool loading = true;
 
-  // Search bar query state
-  String searchQuery = "";
-
   // Teacher data
   Teacher? currentTeacher;
 
@@ -36,9 +33,11 @@ class _ManagePersonnelInformationFormState
         if (teacher != null) {
           setState(() {
             currentTeacher = teacher;
-            personnelName = teacher.name ?? currentUser.displayName ?? "Unknown";
+            personnelName =
+                teacher.name ?? currentUser.displayName ?? "Unknown";
             email = currentUser.email ?? "No email provided";
-            phoneNumber = teacher.phone ?? currentUser.phoneNumber ?? "No phone number provided";
+            phoneNumber = teacher.phone ??
+                currentUser.phoneNumber ?? "No phone number provided";
             personnelId = teacher.id ?? currentUser.uid;
           });
         } else {
@@ -69,7 +68,7 @@ class _ManagePersonnelInformationFormState
     return Scaffold(
       appBar: AppBar(
         title: const Text("Manage Personnel Information"),
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        backgroundColor: Colors.blue,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -92,21 +91,19 @@ class _ManagePersonnelInformationFormState
                     child: Column(
                       children: [
                         const SizedBox(height: 20),
-                        // Search Bar
-                        TextField(
-                          onChanged: (query) {
-                            setState(() {
-                              searchQuery = query;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Search Teacher',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            prefixIcon: const Icon(Icons.search),
-                          ),
-                        ),
+                        // Display current image from assets
+                        currentTeacher?.picture != null
+                            ? CircleAvatar(
+                                radius: 50,
+                                backgroundImage: AssetImage(
+                                                          '${currentTeacher!.picture}', // Assuming picture stores a file name like 'default.jpg'
+                                ),
+                              )
+                            : const Icon(
+                                Icons.account_circle,
+                                size: 100,
+                                color: Colors.blue,
+                              ),
                         const SizedBox(height: 20),
                         // Display teacher info
                         Text(

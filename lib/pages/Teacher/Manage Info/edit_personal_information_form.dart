@@ -1,4 +1,3 @@
-// Form to Edit Personnel Information
 import 'package:flutter/material.dart';
 
 class EditPersonnelInformationForm extends StatefulWidget {
@@ -36,12 +35,47 @@ class _EditPersonnelInformationFormState
     _phoneController = TextEditingController(text: widget.phoneNumber);
   }
 
+  // Function to show the confirmation dialog
+  Future<void> _showConfirmationDialog() async {
+    bool? isConfirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Changes"),
+          content: const Text("Are you sure you want to save changes?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false); // No button
+              },
+              child: const Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true); // Yes button
+              },
+              child: const Text("Yes"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (isConfirmed == true) {
+      // Perform the save operation if the user confirmed
+      setState(() {
+        // Update the data, save changes, etc.
+        Navigator.pop(context);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Personnel Information"),
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Same color
+        backgroundColor:  Colors.blue,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -56,8 +90,7 @@ class _EditPersonnelInformationFormState
             padding: const EdgeInsets.all(16.0),
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(
-                    0xFFE0F7FA), // Light blue background for the form
+                color: const Color(0xFFE0F7FA), // Light blue background for the form
                 borderRadius: BorderRadius.circular(20), // Rounded corners
               ),
               padding: const EdgeInsets.all(20.0),
@@ -104,13 +137,7 @@ class _EditPersonnelInformationFormState
 
                   // Save button
                   ElevatedButton(
-                    onPressed: () {
-                      // Update the information and navigate back
-                      setState(() {
-                        // Pass the updated data back to the previous page if needed
-                        Navigator.pop(context);
-                      });
-                    },
+                    onPressed: _showConfirmationDialog,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(

@@ -28,6 +28,9 @@ class _SelectionPageState extends State<SelectionPage> {
       ),
       body: Stack(
         children: [
+          SizedBox(
+            height: 30,
+          ),
           // Background image
           Positioned.fill(
             child: Image.asset(
@@ -46,6 +49,7 @@ class _SelectionPageState extends State<SelectionPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(height:40),
                   const Text(
                     'Login as:',
                     textAlign: TextAlign.center,
@@ -55,7 +59,7 @@ class _SelectionPageState extends State<SelectionPage> {
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 70),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -65,7 +69,8 @@ class _SelectionPageState extends State<SelectionPage> {
                         icon: Icons.school,
                         label: ' Student ',
                         onTap: () {
-                          Navigator.pushReplacementNamed(context, '/class_access');
+                          Navigator.pushReplacementNamed(
+                              context, '/class_access');
                         },
                       ),
                       const SizedBox(width: 30), // Space between buttons
@@ -75,12 +80,13 @@ class _SelectionPageState extends State<SelectionPage> {
                         icon: Icons.people,
                         label: 'Educator',
                         onTap: () {
-                          Navigator.pushReplacementNamed(context, '/teacher_login');
+                          Navigator.pushReplacementNamed(
+                              context, '/teacher_login');
                         },
                       ),
                     ],
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 60),
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -99,20 +105,25 @@ class _SelectionPageState extends State<SelectionPage> {
                     child: Container(
                       width: 200, // Set a width for the hidden area
                       height: 200, // Set a height for the hidden area
-                      color: Colors.transparent, // Transparent color for invisibility
+                      color: Colors
+                          .transparent, // Transparent color for invisibility
                     ),
                   ),
                   SizedBox(height: 20),
                   if (_isButtonVisible)
                     ElevatedButton(
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(AppColors.appBarColor), 
+                        backgroundColor:
+                            MaterialStateProperty.all(AppColors.appBarColor),
                       ),
                       onPressed: () {
                         // Navigate to Admin Login Form
                         Navigator.pushReplacementNamed(context, '/admin_login');
                       },
-                      child: Text("Go to Admin Login" ,style: TextStyle(color: Colors.white),),
+                      child: Text(
+                        "Go to Admin Login",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                 ],
               ),
