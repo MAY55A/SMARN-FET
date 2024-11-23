@@ -212,6 +212,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   return null;
                 },
               ),
+              /*
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

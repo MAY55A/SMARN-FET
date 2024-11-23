@@ -41,7 +41,6 @@ Future<List<Activity>> getAllActivities() async {
         FirebaseFunctions.instance.httpsCallable('getAllActivities');
     final response = await callable.call();
 
-    
     if (response.data["activities"] != null) {
       List<Activity> activitiesList =
           (response.data["activities"] as List<dynamic>)
