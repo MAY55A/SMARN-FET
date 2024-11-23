@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/Teacher/Manage%20qualified%20subjects/manage_qualified_subjects_form.dart';
 import 'package:smarn/pages/Teacher/Manage%20Info/manage_personnel_information_form.dart';
-import 'package:smarn/pages/Admin/Manage%20requests/view_complaints_or_print_timetable.dart';
+import 'package:smarn/pages/Teacher/timetable/view_complaints_or_print_timetable.dart';
 
 class ClassDashboard extends StatelessWidget {
   const ClassDashboard({super.key});
@@ -28,13 +28,13 @@ class ClassDashboard extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Button for Manage Qualified Subjects
-              ElevatedButton(
+          /*    ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const ManageQualifiedSubjectsForm()),
+                             ManageQualifiedSubjectsForm()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -42,7 +42,7 @@ class ClassDashboard extends StatelessWidget {
                   foregroundColor: Colors.white,
                 ),
                 child: const Text("Manage Qualified Subjects"),
-              ),
+              ),*/
               const SizedBox(height: 20),
 
               // Button for Manage Personal Information

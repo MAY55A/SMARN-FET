@@ -22,7 +22,7 @@ class ActivityService {
 
   Future<Map<String, dynamic>?> getActivityDetails(String activityId) async {
     try {
-      // Call function to get activity details
+    
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('getActivity');
       final response =
@@ -41,11 +41,10 @@ Future<List<Activity>> getAllActivities() async {
         FirebaseFunctions.instance.httpsCallable('getAllActivities');
     final response = await callable.call();
 
-    // Ensure the response contains the list of activities
     if (response.data["activities"] != null) {
       List<Activity> activitiesList =
           (response.data["activities"] as List<dynamic>)
-              .map((r) => Activity.fromMap(r ?? {})) // Handle possible null entries
+              .map((r) => Activity.fromMap(r ?? {})) // Handle possible null 
               .toList();
       return activitiesList;
     } else {
