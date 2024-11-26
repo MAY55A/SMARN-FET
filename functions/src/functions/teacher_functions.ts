@@ -66,11 +66,25 @@ export const createTeacherAccount = functions.https.onCall(async (request) => {
       success: true,
       teacherId,
     };
-  } catch (error) {
+  } catch (error: any) {
+    let errorMessage = "Error creating teacher account.";
+    let errorCode: functions.https.FunctionsErrorCode = "internal"; // Default to 'internal'
+
+    // Map Firebase Auth errors to readable messages
+    if (error.code === "auth/invalid-email") {
+      errorMessage = "Invalid email format.";
+      errorCode = "invalid-argument";
+    } else if (error.code === "auth/weak-password") {
+      errorMessage = "Password is too weak.";
+      errorCode = "invalid-argument";
+    } else if (error.code === "auth/email-already-exists") {
+      errorMessage = "This email is already in use.";
+      errorCode = "already-exists";
+    }
+
     throw new functions.https.HttpsError(
-      "internal",
-      "Error creating teacher account",
-      error
+      errorCode,
+      errorMessage
     );
   }
 });
@@ -174,7 +188,6 @@ export const updateTeacherAccount = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Use the updateData directly from the request
     await teacherRef.update(updateData);
 
@@ -213,17 +226,16 @@ export const deleteTeacherAccount = functions.https.onCall(async (request) => {
     const activitiesRef = db.collection("activities");
 
     await db.runTransaction(async (transaction) => {
-
       // Find all activities with the teacher reference
       const activitiesSnapshot = await activitiesRef
         .where("teacher", "==", teacherId)
         .get();
-  
+
       // delete the activities
       activitiesSnapshot.forEach((activityDoc) => {
         transaction.delete(activityDoc.ref);
       });
-  
+
       // Delete the teacher's Firestore document
       transaction.delete(teacherRef);
       // Delete the teacher's Firebase Auth account
@@ -242,17 +254,16 @@ export const deleteTeacherAccount = functions.https.onCall(async (request) => {
 
 export const getTeachersBySubject = functions.https.onCall(async (request) => {
   const {subjectId} = request.data;
-  
+
   // Ensure only admin can view them
-    if (request.auth?.token.role !== "admin") {
-      throw new functions.https.HttpsError(
-          "permission-denied",
-          "You do not have permission to view the provided subject's qualified teachers."
-        );
-    }
+  if (request.auth?.token.role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You do not have permission to view the provided subject's qualified teachers."
+    );
+  }
 
   try {
-
     // Fetch provided subject's teachers from Firestore
     const teachersSnapshot = await db
       .collection("teachers")
@@ -313,7 +324,6 @@ export const updateTeacherSubjects = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Use the updatedSubjects directly from the request
     await teacherRef.update({subjects: updatedSubjects});
 

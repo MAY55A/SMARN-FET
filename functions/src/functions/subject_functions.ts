@@ -35,7 +35,6 @@ export const addSubject = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Generate a unique subject ID
     const subjectId = await generateId("SUB", "subjects");
 
@@ -73,14 +72,14 @@ export const getSubject = functions.https.onCall(async (request) => {
       "Missing required parameters: subjectId"
     );
   }
-    // Fetch subject data from Firestore
-    const subjectDoc = await db.collection("subjects").doc(subjectId).get();
+  // Fetch subject data from Firestore
+  const subjectDoc = await db.collection("subjects").doc(subjectId).get();
 
-    if (!subjectDoc.exists) {
-      throw new functions.https.HttpsError("not-found", "Subject not found");
-    }
+  if (!subjectDoc.exists) {
+    throw new functions.https.HttpsError("not-found", "Subject not found");
+  }
 
-    return subjectDoc.data();
+  return subjectDoc.data();
 });
 
 export const getAllSubjects = functions.https.onCall(async (request) => {
@@ -130,7 +129,6 @@ export const updateSubject = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Use the updateData directly from the request
     await subjectRef.update(updateData);
 
@@ -169,12 +167,11 @@ export const deleteSubject = functions.https.onCall(async (request) => {
     const teachersRef = db.collection("teachers");
 
     await db.runTransaction(async (transaction) => {
-
       // Find all activities with the subject reference
       const activitiesSnapshot = await activitiesRef
         .where("subject", "==", subjectId)
         .get();
-  
+
       // delete the activities
       activitiesSnapshot.forEach((activityDoc) => {
         transaction.delete(activityDoc.ref);
@@ -184,14 +181,14 @@ export const deleteSubject = functions.https.onCall(async (request) => {
       const teachersSnapshot = await teachersRef
         .where("subjects", "array-contains", subjectId)
         .get();
-  
+
       // Update each teacher's subjects array by deleting the subject from it
       teachersSnapshot.forEach((teacherDoc) => {
         transaction.update(teacherDoc.ref, {
-          subjects: admin.firestore.FieldValue.arrayRemove(subjectId)
+          subjects: admin.firestore.FieldValue.arrayRemove(subjectId),
         });
       });
-  
+
       // Delete the subject's Firestore document
       transaction.delete(subjectRef);
     });
@@ -208,9 +205,9 @@ export const deleteSubject = functions.https.onCall(async (request) => {
 
 export function getBasicSubjectDetails(id: string) {
   const teacherDoc = db.collection("subjects").doc(id);
-  return teacherDoc.get().then(doc => {
+  return teacherDoc.get().then((doc) => {
     if (!doc.exists) {
-      throw new Error('Subject not found');
+      throw new Error("Subject not found");
     }
     return {id: doc.data()?.id, name: doc.data()?.name,
       longName: doc.data()?.longName};

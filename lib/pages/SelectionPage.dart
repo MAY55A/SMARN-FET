@@ -27,6 +27,9 @@ class _SelectionPageState extends State<SelectionPage> {
       ),
       body: Stack(
         children: [
+          SizedBox(
+            height: 70,
+          ),
           // Background image
           Positioned.fill(
             child: Image.asset(
@@ -45,6 +48,7 @@ class _SelectionPageState extends State<SelectionPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(height:110),
                   const Text(
                     'Login as:',
                     textAlign: TextAlign.center,
@@ -54,7 +58,7 @@ class _SelectionPageState extends State<SelectionPage> {
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 70),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -81,7 +85,7 @@ class _SelectionPageState extends State<SelectionPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 60),
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -104,18 +108,30 @@ class _SelectionPageState extends State<SelectionPage> {
                           .transparent, // Transparent color for invisibility
                     ),
                   ),
+<<<<<<< HEAD
                   const SizedBox(height: 20),
+=======
+                 
+>>>>>>> ffb639349ab96e8f4b6bef92ef03bacc9b62cf81
                   if (_isButtonVisible)
                     ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor:
+<<<<<<< HEAD
                             WidgetStateProperty.all(AppColors.appBarColor),
+=======
+                            MaterialStateProperty.all(AppColors.appBarColor),
+>>>>>>> ffb639349ab96e8f4b6bef92ef03bacc9b62cf81
                       ),
                       onPressed: () {
                         // Navigate to Admin Login Form
                         Navigator.pushReplacementNamed(context, '/admin_login');
                       },
+<<<<<<< HEAD
                       child: const Text(
+=======
+                      child: Text(
+>>>>>>> ffb639349ab96e8f4b6bef92ef03bacc9b62cf81
                         "Go to Admin Login",
                         style: TextStyle(color: Colors.white),
                       ),

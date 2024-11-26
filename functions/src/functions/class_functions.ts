@@ -1,15 +1,15 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions/v2";
-import { generateId } from "../helpers/id_generator";
-import { Class } from "../models";
-import { documentExists } from "../helpers/check_existence";
-import { generateAccessKey } from "../helpers/key_generator";
+import {generateId} from "../helpers/id_generator";
+import {Class} from "../models";
+import {documentExists} from "../helpers/check_existence";
+import {generateAccessKey} from "../helpers/key_generator";
 
 const db = admin.firestore();
 
 // function to add a class
 export const addClass = functions.https.onCall(async (request) => {
-  const { classData } = request.data;
+  const {classData} = request.data;
 
   // Ensure only an admin can call this function
   if (request.auth?.token.role !== "admin") {
@@ -37,7 +37,6 @@ export const addClass = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Generate a unique class ID
     const classId = await generateId("CLA", "classes");
     const classKey = generateAccessKey();
@@ -68,7 +67,7 @@ export const addClass = functions.https.onCall(async (request) => {
 });
 
 export const getClass = functions.https.onCall(async (request) => {
-  const { className, classKey } = request.data;
+  const {className, classKey} = request.data;
 
   // Check if the class id and class key are provided
   if (!className || !classKey) {
@@ -114,7 +113,7 @@ export const getAllClasses = functions.https.onCall(async (request) => {
       classesList.push(doc.data());
     });
 
-    return { classes: classesList };
+    return {classes: classesList};
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -125,7 +124,7 @@ export const getAllClasses = functions.https.onCall(async (request) => {
 });
 
 export const updateClass = functions.https.onCall(async (request) => {
-  const { classId, updateData } = request.data;
+  const {classId, updateData} = request.data;
 
   // Ensure the function is called by an admin user
   if (request.auth?.token.role !== "admin") {
@@ -150,11 +149,10 @@ export const updateClass = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // Use the updateData directly from the request
     await classRef.update(updateData);
 
-    return { message: "class updated successfully!", success: true };
+    return {message: "class updated successfully!", success: true};
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -165,7 +163,7 @@ export const updateClass = functions.https.onCall(async (request) => {
 });
 
 export const regenerateClassKey = functions.https.onCall(async (request) => {
-  const { classId } = request.data;
+  const {classId} = request.data;
 
   // Ensure the function is called by an admin user
   if (request.auth?.token.role !== "admin") {
@@ -190,14 +188,13 @@ export const regenerateClassKey = functions.https.onCall(async (request) => {
   }
 
   try {
-
     // generate a new class key
     const newKey = generateAccessKey();
 
     // Use the class with the new key
-    await classRef.update({ accessKey: newKey });
+    await classRef.update({accessKey: newKey});
 
-    return { message: "class key changed successfully ! new key : " + newKey, success: true };
+    return {message: "class key changed successfully ! new key : " + newKey, success: true};
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -208,7 +205,7 @@ export const regenerateClassKey = functions.https.onCall(async (request) => {
 });
 
 export const deleteClass = functions.https.onCall(async (request) => {
-  const { classId } = request.data;
+  const {classId} = request.data;
 
   // Ensure the function is called by an admin user
   if (request.auth?.token.role !== "admin") {
@@ -231,7 +228,6 @@ export const deleteClass = functions.https.onCall(async (request) => {
     const activitiesRef = db.collection("activities");
 
     await db.runTransaction(async (transaction) => {
-
       // Find all activities with the class reference
       const activitiesSnapshot = await activitiesRef
         .where("studentsClass", "==", classId)
@@ -246,7 +242,7 @@ export const deleteClass = functions.https.onCall(async (request) => {
       transaction.delete(classRef);
     });
 
-    return { message: "class deleted successfully!", success: true };
+    return {message: "class deleted successfully!", success: true};
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -258,13 +254,13 @@ export const deleteClass = functions.https.onCall(async (request) => {
 
 export function getBasicClassDetails(id: string) {
   const teacherDoc = db.collection("classes").doc(id);
-  return teacherDoc.get().then(doc => {
+  return teacherDoc.get().then((doc) => {
     if (!doc.exists) {
-      throw new Error('Class not found');
+      throw new Error("Class not found");
     }
     return {
       id: doc.data()?.id, name: doc.data()?.name,
-      longName: doc.data()?.longName
+      longName: doc.data()?.longName,
     };
   });
 }

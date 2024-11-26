@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/building.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
+import 'package:smarn/services/building_service.dart';
 
 class AddBuilding extends StatelessWidget {
   const AddBuilding({super.key});
@@ -10,19 +11,20 @@ class AddBuilding extends StatelessWidget {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController longNameController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
+    final BuildingService buildingService = BuildingService();
 
     return Scaffold(
       appBar: AppBar(
-        
-        title: const Text('Add Building',style: TextStyle(color:Colors.white),),
-        backgroundColor: AppColors.appBarColor      ),
+        title: const Text('Add Building', style: TextStyle(color: Colors.white)),
+        backgroundColor: AppColors.appBarColor,
+      ),
       body: Container(
         color: Colors.black, // Black background color
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height:20.0),
+            const SizedBox(height: 20.0),
             // Form fields
             _buildTextField(
               controller: nameController,
@@ -42,22 +44,47 @@ class AddBuilding extends StatelessWidget {
             // Save Button
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(
-                    context,
-                    Building(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      name: nameController.text,
-                      longName: longNameController.text,
-                      description: descriptionController.text,
-                    ),
+                onPressed: () async {
+                  // Validate inputs
+                  if (nameController.text.isEmpty ||
+                      longNameController.text.isEmpty ||
+                      descriptionController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please fill in all fields')),
+                    );
+                    return;
+                  }
+
+                  // Create building object
+                  Building newBuilding = Building(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                    name: nameController.text,
+                    longName: longNameController.text,
+                    description: descriptionController.text,
                   );
+
+                  // Call the service to add the building
+                  final result = await buildingService.addBuilding(newBuilding);
+
+                  if (result['success'] == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Building added successfully!')),
+                    );
+                    Navigator.pop(context, newBuilding); // Return the new building to the previous screen
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: ${result['message']}')),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 129, 77, 139),
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                 ),
-                child: const Text('Save', style: TextStyle(fontSize: 16.0,color:Colors.black)),
+                child: const Text(
+                  'Save',
+                  style: TextStyle(fontSize: 16.0, color: Colors.black),
+                ),
               ),
             ),
           ],

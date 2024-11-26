@@ -9,21 +9,31 @@ class TeacherService {
       FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
 
   // Add a new teacher
-  Future<dynamic> createTeacher(
-      String email, String password, Teacher teacher) async {
-    try {
-      final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('createTeacherAccount');
-      final response = await callable.call(<String, dynamic>{
-        'email': email,
-        'password': password,
-        'teacher': teacher.toMap(),
-      });
-      return response.data;
-    } catch (e) {
-      return 'Error creating teacher: $e';
+ 
+ 
+ Future<Map<String, dynamic>> createTeacher(
+    String email, String password, Teacher teacher) async {
+  try {
+    final HttpsCallable callable =
+        FirebaseFunctions.instance.httpsCallable('createTeacherAccount');
+    final response = await callable.call(<String, dynamic>{
+      'email': email,
+      'password': password,
+      'teacher': teacher.toMap(),
+    });
+    return response.data;
+  } catch (e) {
+    if (e is FirebaseFunctionsException) {
+      // Log Firebase-specific errors
+      print('FirebaseFunctionsException: ${e.code}, ${e.message}');
+      return {'success': false, 'message': e.message ?? 'An error occurred'};
     }
+    // Log any other unexpected errors
+    print('Unexpected error: $e');
+    return {'success': false, 'message': e.toString()};
   }
+}
+
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
@@ -76,6 +86,7 @@ class TeacherService {
       return null;
     }
   }
+
 
   Future<List<Map<String, dynamic>>> getAllTeachers() async {
     try {

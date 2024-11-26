@@ -35,6 +35,15 @@ void addTeacher() async {
   await teacherService.createTeacher("ahlem@gmail.com", "Ahlem1234", teacher);
 }
 
+void addTeacher2() async {
+  // Example of adding a teacher
+  Teacher teacher = Teacher(
+      name: 'sarra ammar', phone: '11 222 333', nbHours: 11, subjects: []);
+  var res = await teacherService.createTeacher(
+      "sarra@gmail.com", "Sarra1234", teacher);
+  print(res['message']);
+}
+
 void setAdmin() async {
   await adminService.setAdminRole("ZuNO578VqtedTtPpv7wZRCgZSeK2");
 }
@@ -111,13 +120,14 @@ void updateQualifiedSubjects(String teacherDocId) async {
 void buildingCrud() async {
   // Example of CRUD operations on buildings
   Building b = Building(
-    name: 'LI',
-    longName: "Laboratoires d'Info",
+    name: 'GI',
+    longName: "Gestion d'Info",
     description: "lorem ipsum",
   );
   var res = await buildingService.addBuilding(b);
   print(res["message"]);
-  print(await buildingService.getBuildingDetails("BLD001"));
+
+  print(await buildingService.getAllBuildings());
 }
 
 void roomCrud() async {
@@ -170,7 +180,7 @@ void requestCrud() async {
   print(await changeRequestService.getChangeRequestDetails("CHRQ001"));
 }
 
-void teacherCrud() async{
+void teacherCrud() async {
   print(await teacherService.getTeachersBySubject("SUB001"));
 
   print(await teacherService.deleteTeacher("or4OKe8jyDMWpUGsrL9AqaoChL83"));

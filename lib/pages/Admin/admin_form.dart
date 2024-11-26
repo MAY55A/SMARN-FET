@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
+=======
+import 'package:smarn/CRUD_test.dart';
+import 'package:smarn/services/admin_service.dart';
+>>>>>>> ffb639349ab96e8f4b6bef92ef03bacc9b62cf81
 
 class AdminForm extends StatefulWidget {
   const AdminForm({super.key});
@@ -15,8 +20,25 @@ class _AdminFormState extends State<AdminForm> {
 
   Future<void> _loginAdmin() async {
     if (_formKey.currentState!.validate()) {
+<<<<<<< HEAD
       // Simulate login logic
       Navigator.pushReplacementNamed(context, '/admin_dashboard');
+=======
+      var res = await _adminService.login(
+        _usernameController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      if (res["success"]) {
+        Navigator.pushReplacementNamed(context, '/admin_dashboard');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(res["message"] ?? "Login failed. Unauthorized access.")),
+        );
+      }
+>>>>>>> ffb639349ab96e8f4b6bef92ef03bacc9b62cf81
     }
   }
 
@@ -47,6 +69,7 @@ class _AdminFormState extends State<AdminForm> {
               ],
             ),
             padding: const EdgeInsets.all(20),
+<<<<<<< HEAD
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 maxWidth: 400, // Center and limit width for responsiveness
@@ -58,6 +81,59 @@ class _AdminFormState extends State<AdminForm> {
                   children: [
                     const Text(
                       'Admin Login',
+=======
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Email',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your Email';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Password',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: _loginAdmin,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(
+                          255, 129, 77, 139), // Button color
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    ),
+                    child: const Text(
+                      'Login',
+>>>>>>> ffb639349ab96e8f4b6bef92ef03bacc9b62cf81
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
