@@ -78,15 +78,16 @@ class _AddClassState extends State<AddClass> {
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 16),
-                    buildTextField('Access Key (Optional)', _accessKeyController),
+                    buildTextField(
+                        'Access Key (Optional)', _accessKeyController),
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: _addClass,
-                      child: const Text('Add Class'),
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            AppColors.appBarColor),
+                        backgroundColor:
+                            WidgetStateProperty.all(AppColors.appBarColor),
                       ),
+                      child: const Text('Add Class'),
                     ),
                   ],
                 ),

@@ -21,21 +21,26 @@ class _ManageRoomsState extends State<ManageRooms> {
         type: RoomType.lecture,
         description: 'Large lecture room',
         capacity: 50,
-        building:  Building(name: "b1", longName: "build", description: "build1")as String),
+        building: Building(name: "b1", longName: "build", description: "build1")
+            as String),
     Room(
-        id: '2',
-        name: 'Room 102',
-        type: RoomType.lab,
-        description: 'Computer lab',
-        capacity: 30,
-        building:  Building(name: "b1", longName: "build", description: "build1")as String,),
+      id: '2',
+      name: 'Room 102',
+      type: RoomType.lab,
+      description: 'Computer lab',
+      capacity: 30,
+      building: Building(name: "b1", longName: "build", description: "build1")
+          as String,
+    ),
     Room(
-        id: '3',
-        name: 'Room 103',
-        type: RoomType.auditorium,
-        description: 'Auditorium with projector',
-        capacity: 100,
-        building: Building(name: "b1", longName: "build", description: "build1")as String,),
+      id: '3',
+      name: 'Room 103',
+      type: RoomType.auditorium,
+      description: 'Auditorium with projector',
+      capacity: 100,
+      building: Building(name: "b1", longName: "build", description: "build1")
+          as String,
+    ),
   ];
 
   List<Room> filteredRooms = []; // List to hold filtered rooms
@@ -52,7 +57,8 @@ class _ManageRoomsState extends State<ManageRooms> {
   void _filterRooms() {
     setState(() {
       filteredRooms = rooms
-          .where((roomItem) => roomItem.name.toLowerCase().contains(filterName.toLowerCase()))
+          .where((roomItem) =>
+              roomItem.name.toLowerCase().contains(filterName.toLowerCase()))
           .toList();
     });
   }
@@ -132,7 +138,8 @@ class _ManageRoomsState extends State<ManageRooms> {
                   margin: const EdgeInsets.all(8.0),
                   color: const Color.fromARGB(255, 34, 34, 34),
                   child: ListTile(
-                    title: Text(roomItem.name, style: const TextStyle(color: Colors.white)),
+                    title: Text(roomItem.name,
+                        style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                         'Capacity: ${roomItem.capacity}, Type: ${roomItem.type.name}, Building: ${roomItem.building}',
                         style: const TextStyle(color: Colors.white)),
@@ -167,8 +174,8 @@ class _ManageRoomsState extends State<ManageRooms> {
             MaterialPageRoute(builder: (context) => const AddRoom()),
           );
         },
-        child: const Icon(Icons.add),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        child: const Icon(Icons.add),
       ),
     );
   }

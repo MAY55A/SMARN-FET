@@ -4,7 +4,7 @@ import 'add_subject.dart';
 import 'edit_subject.dart';
 
 class ManageSubjectsForm extends StatefulWidget {
-  const ManageSubjectsForm({Key? key}) : super(key: key);
+  const ManageSubjectsForm({super.key});
 
   @override
   _ManageSubjectsFormState createState() => _ManageSubjectsFormState();
@@ -100,7 +100,8 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Manage Subjects" ,style: TextStyle(color:Colors.white)),
+        title: const Text("Manage Subjects",
+            style: TextStyle(color: Colors.white)),
         backgroundColor: AppColors.appBarColor,
       ),
       body: Container(
@@ -114,8 +115,8 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'Search subjects...',
-                  hintStyle: TextStyle(color:Colors.white),
-                  prefixIcon: const Icon(Icons.search, color:Colors.white),
+                  hintStyle: const TextStyle(color: Colors.white),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white),
                   filled: true,
                   fillColor: Colors.grey[800],
                   border: OutlineInputBorder(

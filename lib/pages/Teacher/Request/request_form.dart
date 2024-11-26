@@ -5,7 +5,7 @@ class RequestForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _controller = TextEditingController();
+    final TextEditingController controller = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +42,7 @@ class RequestForm extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   TextField(
-                    controller: _controller,
+                    controller: controller,
                     maxLines: 5,
                     decoration: InputDecoration(
                       hintText: 'Enter your description here',
@@ -59,13 +59,14 @@ class RequestForm extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       // Handle submit logic here
-                      String requestDescription = _controller.text;
+                      String requestDescription = controller.text;
                       // You can do something with the description, e.g., send it to a server
                       Navigator.pop(context); // Go back after submission
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[700],
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 20),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

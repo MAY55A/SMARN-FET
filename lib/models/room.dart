@@ -1,4 +1,3 @@
-import 'package:smarn/models/building.dart';
 import 'package:smarn/models/room_type.dart';
 
 class Room {

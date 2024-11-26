@@ -77,7 +77,8 @@ class TeacherDashboard extends StatelessWidget {
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0), // Corrected padding line
+                    padding:
+                        const EdgeInsets.all(16.0), // Corrected padding line
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -92,18 +93,20 @@ class TeacherDashboard extends StatelessWidget {
                         width: 120,
                         decoration: BoxDecoration(
                           color: Colors.grey[700],
-                          borderRadius: BorderRadius.circular(12), // Fixed border radius
+                          borderRadius:
+                              BorderRadius.circular(12), // Fixed border radius
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center, // Fixed alignment
+                        child: const Column(
+                          mainAxisAlignment:
+                              MainAxisAlignment.center, // Fixed alignment
                           children: <Widget>[
-                            const Icon(
+                            Icon(
                               Icons.schedule,
                               size: 50,
                               color: Colors.blue,
                             ),
-                            const SizedBox(height: 10),
-                            const Text(
+                            SizedBox(height: 10),
+                            Text(
                               'Timetable',
                               style: TextStyle(
                                 color: Colors.blue,
@@ -129,10 +132,12 @@ class TeacherDashboard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: ListTile(
-        leading: const Icon(Icons.logout, color: Colors.redAccent, size: 20), // Logout icon
+        leading: const Icon(Icons.logout,
+            color: Colors.redAccent, size: 20), // Logout icon
         title: const Text(
           'Logout',
-          style: TextStyle(color: Colors.redAccent, fontSize: 12), // Logout text style
+          style: TextStyle(
+              color: Colors.redAccent, fontSize: 12), // Logout text style
         ),
         tileColor: Colors.transparent,
         onTap: () async {

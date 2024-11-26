@@ -24,9 +24,9 @@ class _ManageQualifiedSubjectsFormState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Subjects"),
-        backgroundColor: AppColors.appBarColor // Keeping the blue theme color
-      ),
+          title: const Text("Subjects"),
+          backgroundColor: AppColors.appBarColor // Keeping the blue theme color
+          ),
       body: Container(
         color: AppColors.backgroundColor, // Light gray background
         child: Padding(
@@ -36,10 +36,9 @@ class _ManageQualifiedSubjectsFormState
               const Text(
                 "Qualified Subjects",
                 style: TextStyle(
-                  fontSize: 20,
-                  color : Color.fromARGB(255, 255, 255, 255)
-                       // Dark blue text color
-                ),
+                    fontSize: 20, color: Color.fromARGB(255, 255, 255, 255)
+                    // Dark blue text color
+                    ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -47,19 +46,18 @@ class _ManageQualifiedSubjectsFormState
               // Display the list of subjects using ListView.builder
               Expanded(
                 child: ListView.builder(
-                  
                   itemCount: _qualifiedSubjects.length,
                   itemBuilder: (context, index) {
                     final subject = _qualifiedSubjects[index];
                     return Card(
-                      color :AppColors.formColor,
+                      color: AppColors.formColor,
                       margin: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                       elevation: 4,
                       child: ListTile(
-                        leading: Icon(
+                        leading: const Icon(
                           Icons.book,
                           color: Colors.blue, // Icon color to match theme
                         ),
@@ -67,15 +65,16 @@ class _ManageQualifiedSubjectsFormState
                           subject['name'] ?? '',
                           style: const TextStyle(
                             fontSize: 18,
-                            color: Color.fromARGB(255, 255, 255, 255), // Text color
+                            color: Color.fromARGB(
+                                255, 255, 255, 255), // Text color
                           ),
                         ),
                         subtitle: Text(
                           "Code: ${subject['code'] ?? ''}",
                           style: const TextStyle(
                             fontSize: 16,
-                            color:
-                                Color.fromARGB(221, 184, 220, 240), // Slightly lighter text color
+                            color: Color.fromARGB(221, 184, 220,
+                                240), // Slightly lighter text color
                           ),
                         ),
                       ),

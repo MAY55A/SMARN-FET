@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/CRUD_test.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/teacher_service.dart';
@@ -85,12 +84,15 @@ class _EducatorFormState extends State<EducatorForm> {
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: _usernameController,
-                      style: const TextStyle(color: Colors.white), // Text color inside field
+                      style: const TextStyle(
+                          color: Colors.white), // Text color inside field
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Email',
-                        labelStyle: TextStyle(color: Colors.white), // Label color white
-                        fillColor: Color.fromARGB(255, 58, 58, 58), // Background color of the text field
+                        labelStyle:
+                            TextStyle(color: Colors.white), // Label color white
+                        fillColor: Color.fromARGB(255, 58, 58,
+                            58), // Background color of the text field
                         filled: true,
                       ),
                       validator: (value) {
@@ -104,12 +106,15 @@ class _EducatorFormState extends State<EducatorForm> {
                     TextFormField(
                       controller: _passwordController,
                       obscureText: true,
-                      style: const TextStyle(color: Colors.white), // Text color inside field
+                      style: const TextStyle(
+                          color: Colors.white), // Text color inside field
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Password',
-                        labelStyle: TextStyle(color: Colors.white), // Label color white
-                        fillColor: Color.fromARGB(255, 58, 58, 58), // Background color of the text field
+                        labelStyle:
+                            TextStyle(color: Colors.white), // Label color white
+                        fillColor: Color.fromARGB(255, 58, 58,
+                            58), // Background color of the text field
                         filled: true,
                       ),
                       validator: (value) {
@@ -120,16 +125,25 @@ class _EducatorFormState extends State<EducatorForm> {
                       },
                     ),
                     const SizedBox(height: 30),
+                    // Updated Submit Button
                     ElevatedButton(
                       onPressed: _loginTeacher,
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(AppColors.appBarColor), // Button color pink
-                        foregroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 255, 255, 255)), // Button text color black
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(
+                            255, 129, 77, 139), // Purple button color
+                        padding: const EdgeInsets.symmetric(vertical: 15.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(30), // Rounded button
+                        ),
+                        elevation: 5,
                       ),
                       child: const Text(
                         'Submit',
                         style: TextStyle(
-                          color: Color.fromARGB(255, 255, 255, 255), // Button text color black
+                          fontSize: 20,
+                          color: Colors.white, // White text on button
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

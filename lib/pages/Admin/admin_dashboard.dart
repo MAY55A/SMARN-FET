@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:smarn/pages/Admin/Manage%20Activities/manage_activities_form.dart'; // Import the Manage Activities form
 import 'package:smarn/pages/Admin/Manage%20Classes/manage_classes.dart';
 import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Tables/manage_timetable.dart';
 import 'package:smarn/pages/Admin/Manage%20Teachers/manage_teachers_form.dart';
-import 'package:smarn/pages/Admin/Manage%20Tables/manage_timetables_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Time%20Constarints/time_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20requests/manage_complaints_form.dart';
@@ -39,7 +39,7 @@ class AdminDashboard extends StatelessWidget {
                       _buildSidebarItem(context, Icons.person_outline,
                           'Manage Teachers', const ManageTeachersForm()),
                       _buildSidebarItem(context, Icons.schedule,
-                          'Manage Tables', const ManageTimetablesForm()),
+                          'Manage Tables', const ManageTimetable()),
                       _buildSidebarItem(context, Icons.report_problem_outlined,
                           'Manage Requests', const ManageComplaintsForm()),
                       // New sidebar item
@@ -81,33 +81,31 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 
-
   // Sidebar item with hover effect and icon
-Widget _buildSidebarItem(
-    BuildContext context, IconData icon, String title, Widget page) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 10), // Reduced vertical margin
-    child: ListTile(
-      leading: Icon(icon, color: Colors.white, size: 20), // Reduced icon size
-      title: Text(
-        title,
-        style: const TextStyle(
-            color: Colors.white, fontSize: 12), // Smaller font size
+  Widget _buildSidebarItem(
+      BuildContext context, IconData icon, String title, Widget page) {
+    return Padding(
+      padding:
+          const EdgeInsets.symmetric(vertical: 10), // Reduced vertical margin
+      child: ListTile(
+        leading: Icon(icon, color: Colors.white, size: 20), // Reduced icon size
+        title: Text(
+          title,
+          style: const TextStyle(
+              color: Colors.white, fontSize: 12), // Smaller font size
+        ),
+        tileColor: Colors.transparent,
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      page)); // Navigate to the specified page
+        },
+        hoverColor: Colors.white24,
       ),
-      tileColor: Colors.transparent,
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    page)); // Navigate to the specified page
-      },
-      hoverColor: Colors.white24,
-    ),
-  );
-}
-
-  
+    );
+  }
 
   // Dashboard card with 3D effect, shadow, and hover animation
   Widget _buildAnimatedDashboardCard(
@@ -134,8 +132,8 @@ Widget _buildSidebarItem(
           ],
         ),
         child: InkWell(
-          splashColor: Color.fromARGB(255, 56, 56, 56),
-               // Splash effect
+          splashColor: const Color.fromARGB(255, 56, 56, 56),
+          // Splash effect
           borderRadius: BorderRadius.circular(15),
           child: Padding(
             padding: const EdgeInsets.all(12.0), // Adjusted padding
@@ -143,14 +141,16 @@ Widget _buildSidebarItem(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(icon,
-                    size: 36, color:AppColors.appBarColor ), // Further reduced icon size
+                    size: 36,
+                    color: AppColors.appBarColor), // Further reduced icon size
                 const SizedBox(height: 8), // Reduced spacing
                 Text(
                   title,
                   style: const TextStyle(
                     fontSize: 12, // Smaller font size
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 254, 254, 254), // Same as sidebar for uniformity
+                    color: Color.fromARGB(
+                        255, 254, 254, 254), // Same as sidebar for uniformity
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -186,5 +186,3 @@ Widget _buildSidebarItem(
     );
   }
 }
-
-

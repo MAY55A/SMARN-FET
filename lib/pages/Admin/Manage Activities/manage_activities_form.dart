@@ -3,7 +3,7 @@ import 'add_activity.dart'; // Import the AddActivity screen
 import 'edit_activity.dart'; // Import the EditActivity screen
 
 class ManageActivitiesForm extends StatefulWidget {
-  const ManageActivitiesForm({Key? key}) : super(key: key);
+  const ManageActivitiesForm({super.key});
 
   @override
   _ManageActivitiesFormState createState() => _ManageActivitiesFormState();
@@ -48,7 +48,8 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
     // More activities...
   ];
 
-  List<Map<String, dynamic>> filteredActivities = []; // List to hold filtered activities
+  List<Map<String, dynamic>> filteredActivities =
+      []; // List to hold filtered activities
   String filterName = ''; // Filter for name
   String? filterClass; // Filter for class
   String? filterTeacher; // Filter for teacher
@@ -64,17 +65,20 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
   // Function to filter activities based on the current filters
   void _filterActivities() {
     setState(() {
-      filteredActivities = activities
-          .where((activity) {
-            bool matchesName = activity['name']
-                .toLowerCase()
-                .contains(filterName.toLowerCase());
-            bool matchesClass = filterClass == null || filterClass == 'All' || activity['className'] == filterClass;
-            bool matchesTeacher = filterTeacher == null || filterTeacher == 'All' || activity['teacher'] == filterTeacher;
-            bool matchesTag = filterTag == null || filterTag == 'All' || activity['tag'] == filterTag;
-            return matchesName && matchesClass && matchesTeacher && matchesTag;
-          })
-          .toList();
+      filteredActivities = activities.where((activity) {
+        bool matchesName =
+            activity['name'].toLowerCase().contains(filterName.toLowerCase());
+        bool matchesClass = filterClass == null ||
+            filterClass == 'All' ||
+            activity['className'] == filterClass;
+        bool matchesTeacher = filterTeacher == null ||
+            filterTeacher == 'All' ||
+            activity['teacher'] == filterTeacher;
+        bool matchesTag = filterTag == null ||
+            filterTag == 'All' ||
+            activity['tag'] == filterTag;
+        return matchesName && matchesClass && matchesTeacher && matchesTag;
+      }).toList();
     });
   }
 
@@ -89,7 +93,8 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
 
     if (updatedActivity != null) {
       setState(() {
-        int index = activities.indexWhere((a) => a['id'] == updatedActivity['id']);
+        int index =
+            activities.indexWhere((a) => a['id'] == updatedActivity['id']);
         if (index != -1) {
           activities[index] = updatedActivity;
         }
@@ -139,7 +144,8 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                     ),
                   ),
                 ),
-                SizedBox(width: 5), // Space between search bar and filter dropdowns
+                const SizedBox(
+                    width: 5), // Space between search bar and filter dropdowns
               ],
             ),
           ),
@@ -150,7 +156,8 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
               children: [
                 Expanded(
                   child: DropdownButton<String>(
-                    hint: const Text("Class", style: TextStyle(color: Colors.white)),
+                    hint: const Text("Class",
+                        style: TextStyle(color: Colors.white)),
                     value: filterClass,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -162,16 +169,18 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value, style: const TextStyle(color: Colors.white)),
+                        child: Text(value,
+                            style: const TextStyle(color: Colors.white)),
                       );
                     }).toList(),
                     dropdownColor: Colors.black,
                   ),
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
                 Expanded(
                   child: DropdownButton<String>(
-                    hint: const Text("Teacher", style: TextStyle(color: Colors.white)),
+                    hint: const Text("Teacher",
+                        style: TextStyle(color: Colors.white)),
                     value: filterTeacher,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -183,16 +192,18 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value, style: const TextStyle(color: Colors.white)),
+                        child: Text(value,
+                            style: const TextStyle(color: Colors.white)),
                       );
                     }).toList(),
                     dropdownColor: Colors.black,
                   ),
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
                 Expanded(
                   child: DropdownButton<String>(
-                    hint: const Text("Tag", style: TextStyle(color: Colors.white)),
+                    hint: const Text("Tag",
+                        style: TextStyle(color: Colors.white)),
                     value: filterTag,
                     onChanged: (String? newValue) {
                       setState(() {
@@ -200,11 +211,19 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                         _filterActivities(); // Apply the tag filter
                       });
                     },
-                    items: ['All', 'lecture', 'lab', 'seminar', 'workshop', 'exam', 'other']
-                        .map<DropdownMenuItem<String>>((String value) {
+                    items: [
+                      'All',
+                      'lecture',
+                      'lab',
+                      'seminar',
+                      'workshop',
+                      'exam',
+                      'other'
+                    ].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value, style: const TextStyle(color: Colors.white)),
+                        child: Text(value,
+                            style: const TextStyle(color: Colors.white)),
                       );
                     }).toList(),
                     dropdownColor: Colors.black,
@@ -223,7 +242,8 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                   margin: const EdgeInsets.all(8.0),
                   color: const Color.fromARGB(255, 34, 34, 34),
                   child: ListTile(
-                    title: Text(activity['name'], style: const TextStyle(color: Colors.white)),
+                    title: Text(activity['name'],
+                        style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                         'Teacher: ${activity['teacher']}, Class: ${activity['className']}',
                         style: const TextStyle(color: Colors.white)),
@@ -261,8 +281,8 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
             MaterialPageRoute(builder: (context) => const AddActivity()),
           );
         },
-        child: const Icon(Icons.add),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        child: const Icon(Icons.add),
       ),
     );
   }

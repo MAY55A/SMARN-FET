@@ -9,21 +9,20 @@ class ManageComplaintsForm extends StatefulWidget {
 }
 
 class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-  appBar: AppBar(
-    title: const Text("Manage Requests"),
-    backgroundColor: AppColors.appBarColor,
-  ),
-  body: Container(
-    color: AppColors.backgroundColor,
-    child: Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-    ),
-  ),
-));
+        appBar: AppBar(
+          title: const Text("Manage Requests"),
+          backgroundColor: AppColors.appBarColor,
+        ),
+        body: Container(
+          color: AppColors.backgroundColor,
+          child: const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+            ),
+          ),
+        ));
   }
 }

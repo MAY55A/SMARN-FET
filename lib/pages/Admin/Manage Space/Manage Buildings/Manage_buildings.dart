@@ -46,7 +46,8 @@ class _ManageBuildingsState extends State<ManageBuildings> {
   void _filterBuildings() {
     setState(() {
       filteredBuildings = buildings
-          .where((building) => building.name.toLowerCase().contains(filterName.toLowerCase()))
+          .where((building) =>
+              building.name.toLowerCase().contains(filterName.toLowerCase()))
           .toList();
     });
   }
@@ -126,7 +127,8 @@ class _ManageBuildingsState extends State<ManageBuildings> {
                   margin: const EdgeInsets.all(8.0),
                   color: const Color.fromARGB(255, 34, 34, 34),
                   child: ListTile(
-                    title: Text(building.name, style: const TextStyle(color: Colors.white)),
+                    title: Text(building.name,
+                        style: const TextStyle(color: Colors.white)),
                     subtitle: Text(
                         '${building.longName}: ${building.description}',
                         style: const TextStyle(color: Colors.white)),
@@ -161,8 +163,8 @@ class _ManageBuildingsState extends State<ManageBuildings> {
             MaterialPageRoute(builder: (context) => const AddBuilding()),
           );
         },
-        child: const Icon(Icons.add),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        child: const Icon(Icons.add),
       ),
     );
   }

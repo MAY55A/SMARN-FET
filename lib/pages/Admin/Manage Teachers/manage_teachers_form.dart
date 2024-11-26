@@ -7,7 +7,7 @@ import 'add_teacher_form.dart'; // Assuming you have this file
 import 'edit_teacher_form.dart'; // Assuming you have this file
 
 class ManageTeachersForm extends StatefulWidget {
-  const ManageTeachersForm({Key? key}) : super(key: key);
+  const ManageTeachersForm({super.key});
 
   @override
   _ManageTeachersFormState createState() => _ManageTeachersFormState();
@@ -20,7 +20,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
   late Future<List<Map<String, dynamic>>> _teachersFuture;
   late Future<List<Subject>> _subjectsFuture;
 
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   String? _selectedSubject; // Initialize to null
 
   List<Subject> _subjects = [];
@@ -39,7 +39,8 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
 
   Future<void> _refreshTeachers() async {
     setState(() {
-      _teachersFuture = _teacherService.getAllTeachers(); // Refresh teacher list
+      _teachersFuture =
+          _teacherService.getAllTeachers(); // Refresh teacher list
     });
   }
 
@@ -64,8 +65,9 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
 
       return allTeachers.where((teacherData) {
         final teacher = teacherData['teacher'] as Teacher;
-        final teacherName = teacher.name?.toLowerCase() ?? '';
-        return teacherName.contains(searchTerm); // Only filter by name if no subject is selected
+        final teacherName = teacher.name.toLowerCase() ?? '';
+        return teacherName.contains(
+            searchTerm); // Only filter by name if no subject is selected
       }).toList();
     }
   }
@@ -134,7 +136,8 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                         items: subjects
                             .map<DropdownMenuItem<String>>(
                               (subject) => DropdownMenuItem<String>(
-                                value: subject.id, // Assuming each subject has an id
+                                value: subject
+                                    .id, // Assuming each subject has an id
                                 child: Text(
                                   subject.name,
                                   style: const TextStyle(color: Colors.white),
@@ -150,7 +153,8 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
               ),
             ),
             Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>( // Fetch filtered teachers
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                // Fetch filtered teachers
                 future: _filterTeachers(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -172,39 +176,50 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                       final teacherName = teacher.name ?? 'No name provided';
                       final teacherEmail = teacher.email ?? 'No email provided';
                       final teacherPhone = teacher.phone ?? 'Not provided';
-                      final teacherSubjects = teacher.subjects?.isNotEmpty == true
-                          ? teacher.subjects!.map((subjectId) => getSubjectNameById(subjectId)).join(', ')
+                      final teacherSubjects = teacher.subjects.isNotEmpty ==
+                              true
+                          ? teacher.subjects
+                              .map((subjectId) => getSubjectNameById(subjectId))
+                              .join(', ')
                           : 'No subjects available';
 
                       return Card(
                         color: Colors.grey[850],
                         margin: const EdgeInsets.all(8.0),
                         child: ListTile(
-                          title: Text(teacherName, style: const TextStyle(color: Colors.white)),
+                          title: Text(teacherName,
+                              style: const TextStyle(color: Colors.white)),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Email: $teacherEmail", style: const TextStyle(color: Colors.white)),
-                              Text("Phone: $teacherPhone", style: const TextStyle(color: Colors.white)),
-                              Text("Subjects: $teacherSubjects", style: const TextStyle(color: Colors.white)),
+                              Text("Email: $teacherEmail",
+                                  style: const TextStyle(color: Colors.white)),
+                              Text("Phone: $teacherPhone",
+                                  style: const TextStyle(color: Colors.white)),
+                              Text("Subjects: $teacherSubjects",
+                                  style: const TextStyle(color: Colors.white)),
                             ],
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => EditTeacherForm(teacher: teacher, refreshTeachers: _refreshTeachers),
+                                      builder: (context) => EditTeacherForm(
+                                          teacher: teacher,
+                                          refreshTeachers: _refreshTeachers),
                                     ),
                                   );
                                 },
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.white),
+                                icon: const Icon(Icons.delete,
+                                    color: Colors.white),
                                 onPressed: () async {
                                   // Implement delete teacher logic
                                 },
@@ -228,7 +243,8 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddTeacherForm(refreshTeachers: _refreshTeachers),
+              builder: (context) =>
+                  AddTeacherForm(refreshTeachers: _refreshTeachers),
             ),
           );
         },

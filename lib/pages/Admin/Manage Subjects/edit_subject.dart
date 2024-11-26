@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 
-
 class EditSubjectForm extends StatefulWidget {
   final Subject subject;
 
-  const EditSubjectForm({Key? key, required this.subject}) : super(key: key);
+  const EditSubjectForm({super.key, required this.subject});
 
   @override
   _EditSubjectFormState createState() => _EditSubjectFormState();
@@ -23,8 +22,10 @@ class _EditSubjectFormState extends State<EditSubjectForm> {
     super.initState();
     _nameController = TextEditingController(text: widget.subject.name);
     _longNameController = TextEditingController(text: widget.subject.longName);
-    _descriptionController = TextEditingController(text: widget.subject.description);
-    selectedTeachers = widget.subject.teachers.map((teacher) => teacher.name).toList();
+    _descriptionController =
+        TextEditingController(text: widget.subject.description);
+    selectedTeachers =
+        widget.subject.teachers.map((teacher) => teacher.name).toList();
   }
 
   @override
@@ -114,10 +115,13 @@ class _EditSubjectFormState extends State<EditSubjectForm> {
             const SizedBox(height: 16),
 
             // Teacher Selection (Multi-select)
-            const Text("Select Teachers", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            const Text("Select Teachers",
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
             Wrap(
               spacing: 8.0,
-              children: ['Mr. John', 'Mrs. Smith', 'Ms. Emily'].map((teacherName) {
+              children:
+                  ['Mr. John', 'Mrs. Smith', 'Ms. Emily'].map((teacherName) {
                 return FilterChip(
                   label: Text(
                     teacherName,

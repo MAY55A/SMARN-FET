@@ -4,7 +4,7 @@ import 'package:smarn/pages/widgets/canstants.dart';
 class EditActivity extends StatefulWidget {
   final Map<String, dynamic> activity;
 
-  const EditActivity({Key? key, required this.activity}) : super(key: key);
+  const EditActivity({super.key, required this.activity});
 
   @override
   _EditActivityState createState() => _EditActivityState();
@@ -80,36 +80,37 @@ class _EditActivityState extends State<EditActivity> {
               TextField(
                 controller: _nameController,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Activity Name',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _subjectController,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Subject',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _teacherController,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Teacher',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
               DropdownButton<String>(
                 value: _selectedClass,
-                hint: const Text("Select Class", style: TextStyle(color: Colors.white)),
+                hint: const Text("Select Class",
+                    style: TextStyle(color: Colors.white)),
                 onChanged: (String? newValue) {
                   setState(() {
                     _selectedClass = newValue;
@@ -118,7 +119,8 @@ class _EditActivityState extends State<EditActivity> {
                 items: _classes.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
+                    child: Text(value,
+                        style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
                 dropdownColor: Colors.black,
@@ -128,16 +130,17 @@ class _EditActivityState extends State<EditActivity> {
                 controller: _durationController,
                 style: const TextStyle(color: Colors.white),
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Duration (Minutes)',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
               DropdownButton<String>(
                 value: _selectedTag,
-                hint: const Text("Select Tag", style: TextStyle(color: Colors.white)),
+                hint: const Text("Select Tag",
+                    style: TextStyle(color: Colors.white)),
                 onChanged: (String? newValue) {
                   setState(() {
                     _selectedTag = newValue;
@@ -146,7 +149,8 @@ class _EditActivityState extends State<EditActivity> {
                 items: _tags.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
+                    child: Text(value,
+                        style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
                 dropdownColor: Colors.black,
@@ -155,20 +159,21 @@ class _EditActivityState extends State<EditActivity> {
               TextField(
                 controller: _roomController,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Room Number',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _saveActivity,
-                child: const Text('Save Activity'),
                 style: ButtonStyle(
-                   foregroundColor: MaterialStateProperty.all(Colors.black),
-                   backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
+                  foregroundColor: WidgetStateProperty.all(Colors.black),
+                  backgroundColor:
+                      WidgetStateProperty.all(AppColors.appBarColor),
                 ),
+                child: const Text('Save Activity'),
               ),
             ],
           ),

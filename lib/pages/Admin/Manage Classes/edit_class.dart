@@ -47,8 +47,8 @@ class _EditClassState extends State<EditClass> {
         accessKey: _accessKeyController.text,
       );
 
-      final response = await _classService.updateClass(
-          widget.classItem.id!, updatedClass);
+      final response =
+          await _classService.updateClass(widget.classItem.id!, updatedClass);
 
       setState(() => _isLoading = false);
 
@@ -95,11 +95,11 @@ class _EditClassState extends State<EditClass> {
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: _saveChanges,
-                      child: const Text('Save Changes'),
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            AppColors.appBarColor),
+                        backgroundColor:
+                            WidgetStateProperty.all(AppColors.appBarColor),
                       ),
+                      child: const Text('Save Changes'),
                     ),
                   ],
                 ),

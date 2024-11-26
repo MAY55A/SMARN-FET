@@ -3,7 +3,7 @@ import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 
 class AddSubject extends StatefulWidget {
-  const AddSubject({Key? key}) : super(key: key);
+  const AddSubject({super.key});
 
   @override
   _AddSubjectState createState() => _AddSubjectState();
@@ -111,11 +111,12 @@ class _AddSubjectState extends State<AddSubject> {
                 // Teacher Selection CheckboxListTiles
                 const Text(
                   "Select Teachers",
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
                 ListView(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   children: availableTeachers.map((teacher) {
                     return Theme(
                       data: ThemeData(unselectedWidgetColor: Colors.white),
@@ -150,7 +151,9 @@ class _AddSubjectState extends State<AddSubject> {
                         Navigator.pop(
                           context,
                           Subject(
-                            id: DateTime.now().millisecondsSinceEpoch.toString(),
+                            id: DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString(),
                             name: _nameController.text,
                             longName: _longNameController.text,
                             description: _descriptionController.text,

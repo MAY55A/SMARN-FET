@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:smarn/models/building.dart';
 import 'package:smarn/models/room.dart';
 import 'package:smarn/models/room_type.dart';
-import 'package:smarn/pages/widgets/canstants.dart';
 
 class EditRoom extends StatefulWidget {
   final Room roomItem;
@@ -38,12 +37,13 @@ class _EditRoomState extends State<EditRoom> {
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
         foregroundColor: Colors.white,
       ),
-      backgroundColor: Colors.black,  // Set background color to black
+      backgroundColor: Colors.black, // Set background color to black
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: SingleChildScrollView( // Allows scrolling when keyboard is open
+          child: SingleChildScrollView(
+            // Allows scrolling when keyboard is open
             child: Column(
               children: [
                 // Room Name field
@@ -51,12 +51,15 @@ class _EditRoomState extends State<EditRoom> {
                   initialValue: name,
                   decoration: const InputDecoration(
                     labelText: 'Room Name',
-                    labelStyle: TextStyle(color: Colors.white),  // White label text
+                    labelStyle:
+                        TextStyle(color: Colors.white), // White label text
                     focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),  // White underline on focus
+                      borderSide: BorderSide(
+                          color: Colors.white), // White underline on focus
                     ),
                   ),
-                  style: const TextStyle(color: Colors.white),  // White text color
+                  style:
+                      const TextStyle(color: Colors.white), // White text color
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter room name';
@@ -116,8 +119,10 @@ class _EditRoomState extends State<EditRoom> {
                       borderSide: BorderSide(color: Colors.white),
                     ),
                   ),
-                  dropdownColor: Colors.black,  // Black background for the dropdown
-                  style: const TextStyle(color: Colors.white),  // White text color
+                  dropdownColor:
+                      Colors.black, // Black background for the dropdown
+                  style:
+                      const TextStyle(color: Colors.white), // White text color
                   value: type,
                   onChanged: (value) {
                     setState(() {
@@ -144,20 +149,21 @@ class _EditRoomState extends State<EditRoom> {
                         capacity: capacity,
                         building: building as String,
                       );
-                      Navigator.pop(context, updatedRoom); // Return the updated room
+                      Navigator.pop(
+                          context, updatedRoom); // Return the updated room
                     }
                   },
-                  child: const Text('Save Changes'),
                   style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.all(Colors.black),
-                    backgroundColor: MaterialStateProperty.all(
+                    foregroundColor: WidgetStateProperty.all(Colors.black),
+                    backgroundColor: WidgetStateProperty.all(
                         const Color.fromARGB(255, 129, 77, 139)),
-                    padding: MaterialStateProperty.all(
-                        const EdgeInsets.symmetric(vertical: 16, horizontal: 32)),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    padding: WidgetStateProperty.all(const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 32)),
+                    shape: WidgetStateProperty.all(RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     )),
                   ),
+                  child: const Text('Save Changes'),
                 ),
               ],
             ),

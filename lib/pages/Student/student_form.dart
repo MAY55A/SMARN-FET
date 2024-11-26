@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/student/class_dashboard.dart';
 import 'package:smarn/services/class_service.dart';
 
 class StudentForm extends StatefulWidget {
@@ -25,7 +24,9 @@ class _StudentFormState extends State<StudentForm> {
         Navigator.pushReplacementNamed(context, '/class_dashboard');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Incorrect Class or Key. Please check your inputs.")),
+          const SnackBar(
+            content: Text("Incorrect Class or Key. Please check your inputs."),
+          ),
         );
       }
     }
@@ -36,19 +37,21 @@ class _StudentFormState extends State<StudentForm> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // AppBar color
         title: const Text('Student Form'),
+        backgroundColor:
+            const Color.fromARGB(255, 129, 77, 139), // Purple theme
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 236, 248, 253),
+              color:
+                  const Color.fromARGB(255, 43, 43, 43), // Form container color
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.blue.withOpacity(0.5),
+                  color: const Color.fromARGB(255, 58, 58, 58).withOpacity(0.3),
                   spreadRadius: 3,
                   blurRadius: 5,
                   offset: const Offset(0, 3),
@@ -56,31 +59,37 @@ class _StudentFormState extends State<StudentForm> {
               ],
             ),
             padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 400, // Limits the form width for larger screens
-                ),
-                child: ListView(
-                  shrinkWrap: true, // Makes the ListView fit its content
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 400, // Center and limit width for responsiveness
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
-                      'Student Information',
+                      'Student Login',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white, // White text for title
                       ),
-                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
-
-                    // Class Field
+                    // Class Input Field
                     TextFormField(
                       controller: _classController,
+                      style: const TextStyle(
+                          color: Colors.white), // White text inside field
                       decoration: const InputDecoration(
-                        labelText: 'Class',
                         border: OutlineInputBorder(),
+                        labelText: 'Class',
+                        labelStyle:
+                            TextStyle(color: Colors.white), // White label
+                        fillColor: Color.fromARGB(
+                            255, 58, 58, 58), // Darker field background
+                        filled: true,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -90,13 +99,19 @@ class _StudentFormState extends State<StudentForm> {
                       },
                     ),
                     const SizedBox(height: 20),
-
-                    // Key Field
+                    // Key Input Field
                     TextFormField(
                       controller: _keyController,
+                      style: const TextStyle(
+                          color: Colors.white), // White text inside field
                       decoration: const InputDecoration(
-                        labelText: 'Key to Connect',
                         border: OutlineInputBorder(),
+                        labelText: 'Key to Connect',
+                        labelStyle:
+                            TextStyle(color: Colors.white), // White label
+                        fillColor: Color.fromARGB(
+                            255, 58, 58, 58), // Darker field background
+                        filled: true,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -106,18 +121,29 @@ class _StudentFormState extends State<StudentForm> {
                       },
                     ),
                     const SizedBox(height: 30),
-
+                    // Submit Button
                     ElevatedButton(
                       onPressed: _accessClassSchedule,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 5), // Less vertical padding
-                        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Button color
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          const Color.fromARGB(
+                              255, 129, 77, 139), // Purple button color
+                        ),
+                        padding: MaterialStateProperty.all(
+                          const EdgeInsets.symmetric(vertical: 15.0),
+                        ),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
                       ),
                       child: const Text(
                         'Submit',
                         style: TextStyle(
-                          fontSize: 16, // Adjust font size if needed
-                          color: Color.fromARGB(255, 255, 236, 249), // Text color set to white
+                          fontSize: 20,
+                          color: Colors.white, // White text on button
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

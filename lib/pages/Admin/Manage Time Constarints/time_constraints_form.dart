@@ -9,22 +9,20 @@ class TimeConstraintsForm extends StatefulWidget {
 }
 
 class _TimeConstraintsFormState extends State<TimeConstraintsForm> {
- 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Manage Time Constraints"),
-        backgroundColor: AppColors.appBarColor,
-      ),
-      body: Container(
-        color: AppColors.backgroundColor,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+        appBar: AppBar(
+          title: const Text("Manage Time Constraints"),
+          backgroundColor: AppColors.appBarColor,
         ),
-      ),
-    ));
+        body: Container(
+          color: AppColors.backgroundColor,
+          child: const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+            ),
+          ),
+        ));
   }
-
 }

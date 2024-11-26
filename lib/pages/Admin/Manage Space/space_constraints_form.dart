@@ -37,7 +37,8 @@ class _SpaceConstraintsFormState extends State<SpaceConstraintsForm> {
                       // Navigate to ManageRooms screen
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ManageRooms()),
+                        MaterialPageRoute(
+                            builder: (context) => const ManageRooms()),
                       );
                     },
                     child: AnimatedContainer(
@@ -62,9 +63,9 @@ class _SpaceConstraintsFormState extends State<SpaceConstraintsForm> {
                       ),
                       padding: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 25),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        children: [
                           Icon(Icons.meeting_room, color: Colors.white),
                           SizedBox(width: 10),
                           Text(
@@ -87,7 +88,8 @@ class _SpaceConstraintsFormState extends State<SpaceConstraintsForm> {
                       // Navigate to ManageBuildings screen
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ManageBuildings()),
+                        MaterialPageRoute(
+                            builder: (context) => const ManageBuildings()),
                       );
                     },
                     child: AnimatedContainer(
@@ -114,7 +116,7 @@ class _SpaceConstraintsFormState extends State<SpaceConstraintsForm> {
                           vertical: 15, horizontal: 25),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
-                        children:  [
+                        children: [
                           Icon(Icons.apartment, color: Colors.white),
                           SizedBox(width: 10),
                           Text(
@@ -138,25 +140,3 @@ class _SpaceConstraintsFormState extends State<SpaceConstraintsForm> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

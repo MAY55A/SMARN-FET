@@ -9,10 +9,10 @@ class EditTeacherForm extends StatefulWidget {
   final Teacher teacher; // Teacher object to pass the teacher data
 
   const EditTeacherForm({
-    Key? key,
+    super.key,
     required this.refreshTeachers,
     required this.teacher, // Add the teacher data here
-  }) : super(key: key);
+  });
 
   @override
   _EditTeacherFormState createState() => _EditTeacherFormState();
@@ -34,7 +34,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
     _nameController = TextEditingController(text: widget.teacher.name);
     _emailController = TextEditingController(text: widget.teacher.email);
     _phoneController = TextEditingController(text: widget.teacher.phone);
-    _nbHoursController = TextEditingController(text: widget.teacher.nbHours.toString());
+    _nbHoursController =
+        TextEditingController(text: widget.teacher.nbHours.toString());
     _passwordController = TextEditingController();
 
     _fetchAllSubjects();
@@ -53,7 +54,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
   void _loadTeacherSubjects() {
     setState(() {
       selectedSubjects = allSubjects.where((subject) {
-        return widget.teacher.subjects!.contains(subject.name);
+        return widget.teacher.subjects.contains(subject.name);
       }).toList();
     });
   }
@@ -115,18 +116,23 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                 controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: "Name",
-                  labelStyle: TextStyle(color: Colors.white), // White label text
+                  labelStyle:
+                      TextStyle(color: Colors.white), // White label text
                 ),
-                style: const TextStyle(color: Colors.white), // White text in input
-                validator: (value) => value!.isEmpty ? "Name cannot be empty" : null,
+                style:
+                    const TextStyle(color: Colors.white), // White text in input
+                validator: (value) =>
+                    value!.isEmpty ? "Name cannot be empty" : null,
               ),
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: "Email",
-                  labelStyle: TextStyle(color: Colors.white), // White label text
+                  labelStyle:
+                      TextStyle(color: Colors.white), // White label text
                 ),
-                style: const TextStyle(color: Colors.white), // White text in input
+                style:
+                    const TextStyle(color: Colors.white), // White text in input
                 validator: (value) =>
                     value!.isEmpty ? "Email cannot be empty" : null,
               ),
@@ -134,9 +140,11 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                 controller: _phoneController,
                 decoration: const InputDecoration(
                   labelText: "Phone",
-                  labelStyle: TextStyle(color: Colors.white), // White label text
+                  labelStyle:
+                      TextStyle(color: Colors.white), // White label text
                 ),
-                style: const TextStyle(color: Colors.white), // White text in input
+                style:
+                    const TextStyle(color: Colors.white), // White text in input
                 validator: (value) =>
                     value!.isEmpty ? "Phone cannot be empty" : null,
               ),
@@ -144,10 +152,12 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                 controller: _nbHoursController,
                 decoration: const InputDecoration(
                   labelText: "Number of Hours",
-                  labelStyle: TextStyle(color: Colors.white), // White label text
+                  labelStyle:
+                      TextStyle(color: Colors.white), // White label text
                 ),
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white), // White text in input
+                style:
+                    const TextStyle(color: Colors.white), // White text in input
                 validator: (value) =>
                     value!.isEmpty ? "Hours cannot be empty" : null,
               ),
@@ -155,22 +165,28 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                 controller: _passwordController,
                 decoration: const InputDecoration(
                   labelText: "Password (Optional)",
-                  labelStyle: TextStyle(color: Colors.white), // White label text
+                  labelStyle:
+                      TextStyle(color: Colors.white), // White label text
                 ),
-                style: const TextStyle(color: Colors.white), // White text in input
+                style:
+                    const TextStyle(color: Colors.white), // White text in input
                 obscureText: true,
               ),
               const SizedBox(height: 20),
               const Text(
                 "Subjects",
-                style: TextStyle(color: Colors.white), // White text for section title
+                style: TextStyle(
+                    color: Colors.white), // White text for section title
               ),
               // Display all subjects with the option to select
               if (allSubjects.isNotEmpty)
                 Wrap(
                   children: allSubjects.map((subject) {
                     return ChoiceChip(
-                      label: Text(subject.name, style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0))), // White text for chip
+                      label: Text(subject.name,
+                          style: const TextStyle(
+                              color: Color.fromARGB(
+                                  255, 0, 0, 0))), // White text for chip
                       selected: selectedSubjects.contains(subject),
                       onSelected: (selected) {
                         setState(() {
@@ -188,7 +204,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
               const SizedBox(height: 20),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
+                  backgroundColor:
+                      WidgetStateProperty.all(AppColors.appBarColor),
                 ),
                 onPressed: _editTeacher,
                 child: const Text(

@@ -8,7 +8,7 @@ import 'package:smarn/models/subject.dart';
 class AddTeacherForm extends StatefulWidget {
   final Future<void> Function() refreshTeachers;
 
-  const AddTeacherForm({Key? key, required this.refreshTeachers}) : super(key: key);
+  const AddTeacherForm({super.key, required this.refreshTeachers});
 
   @override
   _AddTeacherFormState createState() => _AddTeacherFormState();
@@ -23,7 +23,7 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
   final TextEditingController _nbHoursController = TextEditingController();
 
   List<Subject> _subjectsList = [];
-  List<String> _selectedSubjects = [];
+  final List<String> _selectedSubjects = [];
 
   @override
   void initState() {
@@ -72,13 +72,17 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
         );
         await widget.refreshTeachers();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Teacher created successfully!'), backgroundColor: Colors.green),
+          const SnackBar(
+              content: Text('Teacher created successfully!'),
+              backgroundColor: Colors.green),
         );
         Navigator.pop(context);
       } catch (e) {
         print("Error creating teacher account: $e");
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error creating teacher. Please try again.'), backgroundColor: Colors.red),
+          const SnackBar(
+              content: Text('Error creating teacher. Please try again.'),
+              backgroundColor: Colors.red),
         );
       }
     }
@@ -100,42 +104,57 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: "Name", labelStyle: TextStyle(color: Colors.white)),
+                decoration: const InputDecoration(
+                    labelText: "Name",
+                    labelStyle: TextStyle(color: Colors.white)),
                 style: const TextStyle(color: Colors.white),
               ),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: "Email", labelStyle: TextStyle(color: Colors.white)),
+                decoration: const InputDecoration(
+                    labelText: "Email",
+                    labelStyle: TextStyle(color: Colors.white)),
                 keyboardType: TextInputType.emailAddress,
                 style: const TextStyle(color: Colors.white),
               ),
               TextFormField(
                 controller: _phoneController,
-                decoration: const InputDecoration(labelText: "Phone", labelStyle: TextStyle(color: Colors.white)),
+                decoration: const InputDecoration(
+                    labelText: "Phone",
+                    labelStyle: TextStyle(color: Colors.white)),
                 keyboardType: TextInputType.phone,
                 style: const TextStyle(color: Colors.white),
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: "Password", labelStyle: TextStyle(color: Colors.white)),
+                decoration: const InputDecoration(
+                    labelText: "Password",
+                    labelStyle: TextStyle(color: Colors.white)),
                 obscureText: true,
                 style: const TextStyle(color: Colors.white),
               ),
               TextFormField(
                 controller: _nbHoursController,
-                decoration: const InputDecoration(labelText: "Number of Hours", labelStyle: TextStyle(color: Colors.white)),
+                decoration: const InputDecoration(
+                    labelText: "Number of Hours",
+                    labelStyle: TextStyle(color: Colors.white)),
                 keyboardType: TextInputType.number,
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 16),
-              const Text("Select Subjects", style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+              const Text("Select Subjects",
+                  style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
               DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: "Subjects", labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+                decoration: const InputDecoration(
+                    labelText: "Subjects",
+                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
                 value: null,
                 items: _subjectsList.map((subject) {
                   return DropdownMenuItem<String>(
                     value: subject.id,
-                    child: Text(subject.name, style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+                    child: Text(subject.name,
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 0, 0, 0))),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -148,9 +167,12 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
               ),
               Wrap(
                 children: _selectedSubjects.map((subjectId) {
-                  final subject = _subjectsList.firstWhere((subject) => subject.id == subjectId);
+                  final subject = _subjectsList
+                      .firstWhere((subject) => subject.id == subjectId);
                   return Chip(
-                    label: Text(subject.name, style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0))),
+                    label: Text(subject.name,
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 0, 0, 0))),
                     onDeleted: () {
                       setState(() {
                         _selectedSubjects.remove(subjectId);
@@ -162,10 +184,14 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
               const SizedBox(height: 20),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
+                  backgroundColor:
+                      WidgetStateProperty.all(AppColors.appBarColor),
                 ),
                 onPressed: _addTeacher,
-                child: const Text("Add Teacher" , style: TextStyle(color : Colors.black),),
+                child: const Text(
+                  "Add Teacher",
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
             ],
           ),

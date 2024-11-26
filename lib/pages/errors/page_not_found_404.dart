@@ -13,10 +13,10 @@ class PageNotFound extends StatelessWidget {
       ),
       body: Container(
         color: AppColors.backgroundColor, // Black background
-        child: Center(
+        child: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               Icon(
                 Icons.error_outline,
                 color: Colors.red,

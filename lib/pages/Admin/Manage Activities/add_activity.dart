@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 
 class AddActivity extends StatefulWidget {
-  const AddActivity({Key? key}) : super(key: key);
+  const AddActivity({super.key});
 
   @override
   _AddActivityState createState() => _AddActivityState();
@@ -22,7 +22,14 @@ class _AddActivityState extends State<AddActivity> {
 
   // List of available classes and tags for dropdowns
   final List<String> _classes = ['Class A', 'Class B', 'Class C'];
-  final List<String> _tags = [ 'lecture', 'lab', 'seminar', 'workshop', 'exam', 'other'];
+  final List<String> _tags = [
+    'lecture',
+    'lab',
+    'seminar',
+    'workshop',
+    'exam',
+    'other'
+  ];
 
   // Function to handle the save button press
   void _saveActivity() {
@@ -53,7 +60,8 @@ class _AddActivityState extends State<AddActivity> {
       backgroundColor: Colors.black, // Background color
       appBar: AppBar(
         title: const Text('Add New Activity'),
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139), // Purple background
+        backgroundColor:
+            const Color.fromARGB(255, 129, 77, 139), // Purple background
         foregroundColor: Colors.white, // White text
       ),
       body: Padding(
@@ -65,10 +73,10 @@ class _AddActivityState extends State<AddActivity> {
               TextField(
                 controller: _nameController,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Activity Name',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
@@ -77,10 +85,10 @@ class _AddActivityState extends State<AddActivity> {
               TextField(
                 controller: _subjectController,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Subject',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
@@ -89,17 +97,18 @@ class _AddActivityState extends State<AddActivity> {
               TextField(
                 controller: _teacherController,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Teacher',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
 
               // Class Dropdown
               DropdownButton<String>(
-                hint: const Text("Select Class", style: TextStyle(color: Colors.white)),
+                hint: const Text("Select Class",
+                    style: TextStyle(color: Colors.white)),
                 value: _selectedClass,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -109,7 +118,8 @@ class _AddActivityState extends State<AddActivity> {
                 items: _classes.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
+                    child: Text(value,
+                        style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
                 dropdownColor: Colors.black, // Set dropdown background to black
@@ -121,17 +131,18 @@ class _AddActivityState extends State<AddActivity> {
                 controller: _durationController,
                 style: const TextStyle(color: Colors.white),
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Duration (Minutes)',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
 
               // Tag Dropdown
               DropdownButton<String>(
-                hint: const Text("Select Tag", style: TextStyle(color: Colors.white)),
+                hint: const Text("Select Tag",
+                    style: TextStyle(color: Colors.white)),
                 value: _selectedTag,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -141,7 +152,8 @@ class _AddActivityState extends State<AddActivity> {
                 items: _tags.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
+                    child: Text(value,
+                        style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
                 dropdownColor: Colors.black, // Set dropdown background to black
@@ -152,24 +164,25 @@ class _AddActivityState extends State<AddActivity> {
               TextField(
                 controller: _roomController,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Room Number',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
 
               // Save Button
               ElevatedButton(
-                onPressed: _saveActivity,
-                child: const Text('Save Activity'),
-                style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all(Colors.black),
-                  backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
-                )  // Purple color
-                
-              ),
+                  onPressed: _saveActivity,
+                  style: ButtonStyle(
+                    foregroundColor: WidgetStateProperty.all(Colors.black),
+                    backgroundColor:
+                        WidgetStateProperty.all(AppColors.appBarColor),
+                  ),
+                  child: const Text('Save Activity') // Purple color
+
+                  ),
             ],
           ),
         ),

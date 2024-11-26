@@ -1,6 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
 import 'package:smarn/services/auth_service.dart';
 
@@ -46,7 +45,8 @@ class TeacherService {
       };
     }
   }
-    /// Fetches the authenticated teacher's data from Firebase or Cloud Functions.
+
+  /// Fetches the authenticated teacher's data from Firebase or Cloud Functions.
   Future<Teacher?> fetchTeacherData() async {
     try {
       User? currentUser = FirebaseAuth.instance.currentUser;

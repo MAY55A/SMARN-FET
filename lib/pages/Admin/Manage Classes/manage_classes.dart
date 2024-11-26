@@ -114,7 +114,8 @@ class _ManageClassesState extends State<ManageClasses> {
                     ),
                   ),
                 ),
-                SizedBox(width: 5), // Space between search bar and filter dropdowns
+                const SizedBox(
+                    width: 5), // Space between search bar and filter dropdowns
               ],
             ),
           ),
@@ -130,7 +131,8 @@ class _ManageClassesState extends State<ManageClasses> {
                         margin: const EdgeInsets.all(8.0),
                         color: const Color.fromARGB(255, 34, 34, 34),
                         child: ListTile(
-                          title: Text(classItem.name, style: const TextStyle(color: Colors.white)),
+                          title: Text(classItem.name,
+                              style: const TextStyle(color: Colors.white)),
                           subtitle: Text(
                               'Students: ${classItem.nbStudents}, Access Key: ${classItem.accessKey}',
                               style: const TextStyle(color: Colors.white)),
@@ -139,12 +141,14 @@ class _ManageClassesState extends State<ManageClasses> {
                             children: [
                               // Edit Icon
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () => _editClass(classItem),
                               ),
                               // Delete Icon
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.white),
+                                icon: const Icon(Icons.delete,
+                                    color: Colors.white),
                                 onPressed: () => _deleteClass(classItem),
                               ),
                             ],
@@ -168,8 +172,8 @@ class _ManageClassesState extends State<ManageClasses> {
             MaterialPageRoute(builder: (context) => const AddClass()),
           );
         },
-        child: const Icon(Icons.add),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        child: const Icon(Icons.add),
       ),
     );
   }

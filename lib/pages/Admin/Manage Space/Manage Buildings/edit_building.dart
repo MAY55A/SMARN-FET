@@ -9,23 +9,28 @@ class EditBuilding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController nameController = TextEditingController(text: building.name);
-    final TextEditingController longNameController = TextEditingController(text: building.longName);
-    final TextEditingController descriptionController = TextEditingController(text: building.description);
+    final TextEditingController nameController =
+        TextEditingController(text: building.name);
+    final TextEditingController longNameController =
+        TextEditingController(text: building.longName);
+    final TextEditingController descriptionController =
+        TextEditingController(text: building.description);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Building',style: TextStyle(color:Colors.white),),
+        title: const Text(
+          'Edit Building',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: AppColors.appBarColor,
       ),
       body: Container(
-        
         color: Colors.black, // Black background color
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height:20.0),
+            const SizedBox(height: 20.0),
             // Form fields
             _buildTextField(
               controller: nameController,
@@ -58,9 +63,11 @@ class EditBuilding extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 129, 77, 139),
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                 ),
-                child: const Text('Save', style: TextStyle(fontSize: 16.0,color:Colors.black)),
+                child: const Text('Save',
+                    style: TextStyle(fontSize: 16.0, color: Colors.black)),
               ),
             ),
           ],
@@ -89,7 +96,8 @@ class EditBuilding extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(8.0)),
         ),
         filled: true,
-        fillColor: Colors.grey[850], // Slightly lighter black for field background
+        fillColor:
+            Colors.grey[850], // Slightly lighter black for field background
       ),
     );
   }

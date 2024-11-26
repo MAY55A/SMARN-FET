@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/Admin/admin_form.dart';
-import 'package:smarn/pages/Student/student_form.dart';
-import 'package:smarn/pages/Teacher/Educator_form.dart';
 import 'package:smarn/pages/widgets/canstants.dart'; // Import the AdminForm widget
 
 class SelectionPage extends StatefulWidget {
+  const SelectionPage({super.key});
+
   @override
   _SelectionPageState createState() => _SelectionPageState();
 }
@@ -65,7 +64,8 @@ class _SelectionPageState extends State<SelectionPage> {
                         icon: Icons.school,
                         label: ' Student ',
                         onTap: () {
-                          Navigator.pushReplacementNamed(context, '/class_access');
+                          Navigator.pushReplacementNamed(
+                              context, '/class_access');
                         },
                       ),
                       const SizedBox(width: 30), // Space between buttons
@@ -75,7 +75,8 @@ class _SelectionPageState extends State<SelectionPage> {
                         icon: Icons.people,
                         label: 'Educator',
                         onTap: () {
-                          Navigator.pushReplacementNamed(context, '/teacher_login');
+                          Navigator.pushReplacementNamed(
+                              context, '/teacher_login');
                         },
                       ),
                     ],
@@ -99,20 +100,25 @@ class _SelectionPageState extends State<SelectionPage> {
                     child: Container(
                       width: 200, // Set a width for the hidden area
                       height: 200, // Set a height for the hidden area
-                      color: Colors.transparent, // Transparent color for invisibility
+                      color: Colors
+                          .transparent, // Transparent color for invisibility
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   if (_isButtonVisible)
                     ElevatedButton(
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(AppColors.appBarColor), 
+                        backgroundColor:
+                            WidgetStateProperty.all(AppColors.appBarColor),
                       ),
                       onPressed: () {
                         // Navigate to Admin Login Form
                         Navigator.pushReplacementNamed(context, '/admin_login');
                       },
-                      child: Text("Go to Admin Login" ,style: TextStyle(color: Colors.white),),
+                      child: const Text(
+                        "Go to Admin Login",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                 ],
               ),

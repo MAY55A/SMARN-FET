@@ -47,13 +47,16 @@ class _HomePageState extends State<HomePage> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) =>  SelectionPage()),
+        MaterialPageRoute(builder: (context) => const SelectionPage()),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Définir la couleur de l'AppBar
+    Color appBarColor = const Color.fromARGB(255, 129, 77, 139);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF2F2F2),
       appBar: AppBar(
@@ -64,7 +67,7 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        backgroundColor: appBarColor,
         elevation: 0,
       ),
       body: Stack(
@@ -117,7 +120,8 @@ class _HomePageState extends State<HomePage> {
                   vertical: 20,
                   horizontal: 30,
                 ),
-                backgroundColor: const Color.fromARGB(255, 59, 130, 189),
+                backgroundColor:
+                    appBarColor, // Utilisation de la couleur de l'AppBar
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -132,7 +136,8 @@ class _HomePageState extends State<HomePage> {
                         : 'Login',
                 style: const TextStyle(
                   fontSize: 24,
-                  color: Colors.white,
+                  color: Colors
+                      .white, // Texte en blanc pour contraster avec le bouton
                   fontWeight: FontWeight.bold,
                 ),
               ),
