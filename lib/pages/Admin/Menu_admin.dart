@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:smarn/pages/Admin/Manage%20Activities/manage_activities_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Classes/manage_classes.dart';
 import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Tables/manage_timetable.dart';
 import 'package:smarn/pages/Admin/Manage%20Teachers/manage_teachers_form.dart';
-import 'package:smarn/pages/Admin/Manage%20Tables/manage_timetables_form.dart';
+
 import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Time%20Constarints/time_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20requests/manage_complaints_form.dart';
@@ -66,7 +67,7 @@ class _AdminMenuState extends State<AdminMenu> {
             _buildMenuItem(context, Icons.person_outline, 'Manage Teachers',
                 const ManageTeachersForm()),
             _buildMenuItem(context, Icons.schedule, 'Manage Tables',
-                const ManageTimetablesForm()),
+                 ManageTimetable()),
             _buildMenuItem(context, Icons.report_problem_outlined,
                 'Manage Requests', const ManageComplaintsForm()),
 
