@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:smarn/models/class.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
@@ -19,6 +21,19 @@ class _AddClassState extends State<AddClass> {
   final ClassService _classService = ClassService();
 
   bool _isLoading = false;
+
+  // Function to generate a random key
+  String _generateAccessKey() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    final random = Random();
+    return List.generate(8, (index) => chars[random.nextInt(chars.length)]).join();
+  }
+
+  void _resetAccessKey() {
+    setState(() {
+      _accessKeyController.text = _generateAccessKey();
+    });
+  }
 
   void _addClass() async {
     if (_nameController.text.isNotEmpty &&
@@ -78,14 +93,23 @@ class _AddClassState extends State<AddClass> {
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 16),
-                    buildTextField('Access Key (Optional)', _accessKeyController),
+                    buildTextField('Access Key ', _accessKeyController),
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      onPressed: _resetAccessKey,
+                      icon: const Icon(Icons.refresh, color: Colors.white),
+                      label: const Text('Generate Key', style: TextStyle(color: Colors.white)),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.purple),
+                      ),
+                    ),
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: _addClass,
                       child: const Text('Add Class'),
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            AppColors.appBarColor),
+                        backgroundColor: MaterialStateProperty.all( AppColors.appBarColor),
+                        foregroundColor: MaterialStateProperty.all( const Color.fromARGB(255, 255, 255, 255)),
                       ),
                     ),
                   ],
@@ -111,7 +135,7 @@ class _AddClassState extends State<AddClass> {
           borderSide: BorderSide(color: Colors.white),
         ),
         focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.purple),
+          borderSide: BorderSide(color: Color.fromARGB(255, 110, 57, 119)),
         ),
       ),
     );
