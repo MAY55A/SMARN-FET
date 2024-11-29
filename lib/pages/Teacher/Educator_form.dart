@@ -17,6 +17,8 @@ class _EducatorFormState extends State<EducatorForm> {
   final _passwordController = TextEditingController();
   final TeacherService _teacherService = TeacherService();
   final AuthService _auth = AuthService();
+  
+  bool _isPasswordVisible = false; // Track password visibility
 
   Future<void> _loginTeacher() async {
     if (_formKey.currentState!.validate()) {
@@ -103,14 +105,25 @@ class _EducatorFormState extends State<EducatorForm> {
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: _passwordController,
-                      obscureText: true,
+                      obscureText: !_isPasswordVisible, // Toggle visibility
                       style: const TextStyle(color: Colors.white), // Text color inside field
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
                         labelText: 'Password',
-                        labelStyle: TextStyle(color: Colors.white), // Label color white
-                        fillColor: Color.fromARGB(255, 58, 58, 58), // Background color of the text field
+                        labelStyle: const TextStyle(color: Colors.white), // Label color white
+                        fillColor: const Color.fromARGB(255, 58, 58, 58), // Background color of the text field
                         filled: true,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            color: Colors.white, // Icon color white
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {

@@ -66,6 +66,29 @@ class _EditClassState extends State<EditClass> {
     }
   }
 
+  Future<void> _resetKey() async {
+    if (widget.classItem.id == null) return;
+
+    setState(() => _isLoading = true);
+    final response = await _classService.changeClassKey(widget.classItem.id!);
+
+    setState(() => _isLoading = false);
+
+    if (response['success'] && response['newKey'] != null) {
+      setState(() {
+        _accessKeyController.text = response['newKey'];
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Access key reset successfully!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${response['message']}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,7 +114,12 @@ class _EditClassState extends State<EditClass> {
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 16),
-                    buildTextField('Access Key', _accessKeyController),
+                    buildTextFieldWithButton(
+                      'Access Key',
+                      _accessKeyController,
+                      'Reset Key',
+                      _resetKey,
+                    ),
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: _saveChanges,
@@ -99,6 +127,7 @@ class _EditClassState extends State<EditClass> {
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
                             AppColors.appBarColor),
+                            foregroundColor: MaterialStateProperty.all(Colors.white)
                       ),
                     ),
                   ],
@@ -127,6 +156,46 @@ class _EditClassState extends State<EditClass> {
           borderSide: BorderSide(color: Colors.purple),
         ),
       ),
+    );
+  }
+
+  Widget buildTextFieldWithButton(
+    String label,
+    TextEditingController controller,
+    String buttonLabel,
+    VoidCallback onButtonPressed, {
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            style: const TextStyle(color: Colors.white),
+            keyboardType: keyboardType,
+            decoration: InputDecoration(
+              labelText: label,
+              labelStyle: const TextStyle(color: Colors.white),
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.purple),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        ElevatedButton(
+          onPressed: onButtonPressed,
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(AppColors.appBarColor),
+                foregroundColor: MaterialStateProperty.all(Colors.white)
+          ),
+          child: Text(buttonLabel),
+        ),
+      ],
     );
   }
 }
