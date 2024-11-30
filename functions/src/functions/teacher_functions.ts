@@ -74,8 +74,9 @@ export const createTeacherAccount = functions.https.onCall(async (request) => {
     if (error.code === "auth/invalid-email") {
       errorMessage = "Invalid email format.";
       errorCode = "invalid-argument";
-    } else if (error.code === "auth/weak-password") {
-      errorMessage = "Password is too weak.";
+    } else if (error.code === "auth/invalid-password" || error.code === "auth/weak-password") {
+      errorMessage =
+        "Password must contain upper case letters, lower case letters, numbers and has a length of 6 characters at least.";
       errorCode = "invalid-argument";
     } else if (error.code === "auth/email-already-exists") {
       errorMessage = "This email is already in use.";
@@ -84,7 +85,7 @@ export const createTeacherAccount = functions.https.onCall(async (request) => {
 
     throw new functions.https.HttpsError(
       errorCode,
-      errorMessage
+      errorMessage,
     );
   }
 });
@@ -125,6 +126,38 @@ export const getTeacher = functions.https.onCall(async (request) => {
     throw new functions.https.HttpsError(
       "internal",
       "Error fetching teacher data",
+      error
+    );
+  }
+});
+
+export const getTeacherName = functions.https.onCall(async (request) => {
+  const {teacherId} = request.data;
+
+  // Ensure the teacher ID is provided
+  if (!teacherId) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Missing required parameter: teacher ID"
+    );
+  }
+
+  // Check if the requesting user is allowed to view the teacher's account
+  if (request.auth?.token.role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You do not have permission to view this teacher's name."
+    );
+  }
+
+  try {
+    const teacherDoc = await getBasicTeacherDetails(teacherId);
+
+    return teacherDoc.name;
+  } catch (error) {
+    throw new functions.https.HttpsError(
+      "internal",
+      "Error fetching teacher name",
       error
     );
   }
@@ -185,6 +218,13 @@ export const updateTeacherAccount = functions.https.onCall(async (request) => {
 
   if (!teacherDoc.exists) {
     throw new functions.https.HttpsError("not-found", "Teacher not found");
+  } else if (teacherDoc.data()!.name !== updateData.name) {
+    if (await documentExists("teachers", "name", updateData.name)) {
+      throw new functions.https.HttpsError(
+        "already-exists",
+        "A teacher with the same name already exists."
+      );
+    }
   }
 
   try {
@@ -332,6 +372,36 @@ export const updateTeacherSubjects = functions.https.onCall(async (request) => {
     throw new functions.https.HttpsError(
       "internal",
       "Error updating teacher subjects",
+      error
+    );
+  }
+});
+
+export const getAllTeachersNames = functions.https.onCall(async (request) => {
+  // Check if the requesting user is allowed to view the classes
+  if (request.auth?.token.role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You do not have permission to view teachers."
+    );
+  }
+
+  try {
+    // Fetch all classes from Firestore
+    const teachersSnapshot = await db
+      .collection("teachers")
+      .get();
+    const teachersList: any[] = [];
+
+    teachersSnapshot.forEach((doc) => {
+      teachersList.push(doc.data()?.name);
+    });
+
+    return {teachers: teachersList};
+  } catch (error) {
+    throw new functions.https.HttpsError(
+      "internal",
+      "Error fetching teachers names",
       error
     );
   }
