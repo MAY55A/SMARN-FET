@@ -121,10 +121,10 @@ export const getRoom = functions.https.onCall(async (request) => {
 
 export const getAllRooms = functions.https.onCall(async (request) => {
   // Ensure only an admin can call this function
-  if (request.auth?.token.role !== "admin") {
+  if (request.auth?.token.role !== "admin" && request.auth?.token.role !== "teacher") {
     throw new functions.https.HttpsError(
       "permission-denied",
-      "Only admins can view rooms."
+      "You do not have permission to view rooms."
     );
   }
 
@@ -284,15 +284,14 @@ export async function deleteRoomAndUpdateActivities(
   });
 }
 
-export function getBasicRoomDetails(id: string) {
-  const teacherDoc = db.collection("rooms").doc(id);
-  return teacherDoc.get().then((doc) => {
-    if (!doc.exists) {
-      throw new Error("Room not found");
-    }
-    return {
-      id: doc.data()?.id, name: doc.data()?.name,
-      type: doc.data()?.type, building: doc.data()?.building,
-    };
-  });
+export async function getBasicRoomDetails(id: string) {
+  const roomDoc = db.collection("rooms").doc(id);
+  const doc = await roomDoc.get();
+  if (!doc.exists) {
+    throw new Error("Room not found");
+  }
+  return {
+    id: doc.data()?.id, name: doc.data()?.name,
+    type: doc.data()?.type, building: doc.data()?.building,
+  };
 }

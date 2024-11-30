@@ -6,8 +6,10 @@ admin.initializeApp();
 import {createTeacherAccount, updateTeacherAccount,
   getTeacher, getAllTeachers, deleteTeacherAccount,
   getTeachersBySubject,
-  updateTeacherSubjects} from "./functions/teacher_functions";
-import {addClass, deleteClass, getAllClasses, getClass,
+  updateTeacherSubjects,
+  getAllTeachersNames,
+  getTeacherName} from "./functions/teacher_functions";
+import {addClass, deleteClass, getAllClasses, getAllClassesNames, getClass,
   regenerateClassKey, updateClass} from "./functions/class_functions";
 import {addRoom, deleteRoom, getAllRooms, getRoom,
   getRoomsByBuilding,
@@ -24,9 +26,9 @@ import {addActivity, updateActivity, getActivity, getAllActivities,
 
 
 // export {setAdminRole};
-export {createTeacherAccount, updateTeacherAccount, updateTeacherSubjects,
-  getTeacher, getAllTeachers, deleteTeacherAccount, getTeachersBySubject};
-export {addClass, updateClass, regenerateClassKey,
+export {createTeacherAccount, updateTeacherAccount, updateTeacherSubjects, getTeacherName,
+  getTeacher, getAllTeachers, deleteTeacherAccount, getTeachersBySubject, getAllTeachersNames};
+export {addClass, updateClass, regenerateClassKey, getAllClassesNames,
   getClass, getAllClasses, deleteClass};
 export {addSubject, updateSubject, getSubject,
   getAllSubjects, deleteSubject};
