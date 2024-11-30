@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/change_request_status.dart';
-import 'package:smarn/services/change_request_service.dart';
 import 'package:smarn/models/change_request.dart';
+import 'package:smarn/services/change_request_service.dart';
 
 class RequestForm extends StatelessWidget {
   RequestForm({super.key});
 
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _reasonController = TextEditingController();
-  final _formKey = GlobalKey<FormState>(); // Key for form validation
+  final TextEditingController _newTimeSlotController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  final List<String> _availableRooms = ['RM001']; // Example room list
+  String? _selectedRoom;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +31,7 @@ class RequestForm extends StatelessWidget {
         color: const Color(0xFF2C2C2C),
         padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey, // Assign the form key
+          key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -53,6 +57,7 @@ class RequestForm extends StatelessWidget {
                       controller: _reasonController,
                       decoration: InputDecoration(
                         hintText: 'Enter reason for the request',
+                        hintStyle: const TextStyle(color: Colors.white),
                         filled: true,
                         fillColor: Colors.grey[800],
                         border: OutlineInputBorder(
@@ -75,6 +80,7 @@ class RequestForm extends StatelessWidget {
                       maxLines: 5,
                       decoration: InputDecoration(
                         hintText: 'Enter your description here',
+                        hintStyle: const TextStyle(color: Colors.white),
                         filled: true,
                         fillColor: Colors.grey[800],
                         border: OutlineInputBorder(
@@ -91,10 +97,63 @@ class RequestForm extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 20),
+                    // New Room dropdown
+                    DropdownButtonFormField<String>(
+                      value: _selectedRoom,
+                      items: _availableRooms
+                          .map((room) => DropdownMenuItem(
+                                value: room,
+                                child: Text(room, style: const TextStyle(color: Colors.white)),
+                              ))
+                          .toList(),
+                      dropdownColor: Colors.grey[800],
+                      decoration: InputDecoration(
+                        hintText: 'Select new room',
+                        hintStyle: const TextStyle(color: Colors.white),
+                        filled: true,
+                        fillColor: Colors.grey[800],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: const TextStyle(color: Colors.white),
+                      onChanged: (value) {
+                        _selectedRoom = value;
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select a new room';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    // New Time Slot field
+                    TextFormField(
+                      controller: _newTimeSlotController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter new time slot',
+                        hintStyle: const TextStyle(color: Colors.white),
+                        filled: true,
+                        fillColor: Colors.grey[800],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: const TextStyle(color: Colors.white),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'New time slot is required';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          // Show confirmation dialog
                           final confirmed = await _showConfirmationDialog(context);
                           if (confirmed) {
                             await _submitRequest(context);
@@ -155,7 +214,9 @@ class RequestForm extends StatelessWidget {
     final changeRequest = ChangeRequest(
       reason: _reasonController.text.trim(),
       content: _descriptionController.text.trim(),
-      teacher: "TeacherID123", // Replace with the actual teacher identifier
+      newRoom: _selectedRoom,
+      newTimeSlot: _newTimeSlotController.text.trim(),
+      teacher: "TeacherID123", // Replace with actual teacher identifier
       submissionDate: DateTime.now().toIso8601String(),
       status: ChangeRequestStatus.pending,
     );
@@ -166,7 +227,7 @@ class RequestForm extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Request submitted successfully!")),
       );
-      Navigator.pop(context); // Go back after submission
+      Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: ${response['message']}")),
