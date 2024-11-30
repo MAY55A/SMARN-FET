@@ -21,6 +21,8 @@ class _AddActivityState extends State<AddActivity> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
 
+  final List<String> _tags = ActivityTag.values.map((t) => t.name).toList();
+
   String? _selectedClass;
   String? _selectedTag;
   String? _selectedTeacher;
@@ -28,7 +30,6 @@ class _AddActivityState extends State<AddActivity> {
   String? _selectedRoom;
 
   List<String> _classes = [];
-  List<String> _tags = ['lecture', 'lab', 'seminar', 'workshop', 'exam', 'other'];
   List<dynamic> _teachers = [];
   List<String> _subjects = [];
   List<Room> _rooms = [];
@@ -55,7 +56,8 @@ class _AddActivityState extends State<AddActivity> {
   Future<void> _fetchTeachers() async {
     final teachersList = await _teacherService.getAllTeachers();
     setState(() {
-      _teachers = teachersList.map((teacher) => teacher['teacher'].name).toList();
+      _teachers =
+          teachersList.map((teacher) => teacher['teacher'].name).toList();
     });
   }
 
@@ -72,21 +74,24 @@ class _AddActivityState extends State<AddActivity> {
       _rooms = roomsList;
     });
   }
-  //methode to get all classes
-Future<void> _fetchClasses() async {
-  try {
-    final List<Class> fetchedClasses = await ClassService().getAllclasses();
 
-    setState(() {
-      _classes = fetchedClasses.map((c) => c.name).toList(); // Extract the name property
-    });
-  } catch (e) {
-    print('Error fetching classes: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Failed to fetch classes')),
-    );
+  //methode to get all classes
+  Future<void> _fetchClasses() async {
+    try {
+      final List<Class> fetchedClasses = await ClassService().getAllClasses();
+
+      setState(() {
+        _classes = fetchedClasses
+            .map((c) => c.name)
+            .toList(); // Extract the name property
+      });
+    } catch (e) {
+      print('Error fetching classes: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to fetch classes')),
+      );
+    }
   }
-}
 
   void _saveActivity() {
     if (_formIsValid()) {
@@ -102,7 +107,9 @@ Future<void> _fetchClasses() async {
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill out all fields and ensure the duration is at least 60 minutes.')),
+        const SnackBar(
+            content: Text(
+                'Please fill out all fields and ensure the duration is at least 60 minutes.')),
       );
     }
   }
@@ -133,21 +140,10 @@ Future<void> _fetchClasses() async {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Activity Name
-              TextField(
-                controller: _nameController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Activity Name',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
               // Subject Dropdown
               DropdownButton<String>(
-                hint: const Text("Select Subject", style: TextStyle(color: Colors.white)),
+                hint: const Text("Select Subject",
+                    style: TextStyle(color: Colors.white)),
                 value: _selectedSubject,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -157,7 +153,8 @@ Future<void> _fetchClasses() async {
                 items: _subjects.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
+                    child: Text(value,
+                        style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
                 dropdownColor: Colors.black,
@@ -166,7 +163,8 @@ Future<void> _fetchClasses() async {
 
               // Teacher Dropdown
               DropdownButton<String>(
-                hint: const Text("Select Teacher", style: TextStyle(color: Colors.white)),
+                hint: const Text("Select Teacher",
+                    style: TextStyle(color: Colors.white)),
                 value: _selectedTeacher,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -176,7 +174,8 @@ Future<void> _fetchClasses() async {
                 items: _teachers.map<DropdownMenuItem<String>>((dynamic value) {
                   return DropdownMenuItem<String>(
                     value: value as String,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
+                    child: Text(value,
+                        style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
                 dropdownColor: Colors.black,
@@ -185,7 +184,8 @@ Future<void> _fetchClasses() async {
 
               // Class Dropdown
               DropdownButton<String>(
-                hint: const Text("Select Class", style: TextStyle(color: Colors.white)),
+                hint: const Text("Select Class",
+                    style: TextStyle(color: Colors.white)),
                 value: _selectedClass,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -195,7 +195,8 @@ Future<void> _fetchClasses() async {
                 items: _classes.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
+                    child: Text(value,
+                        style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
                 dropdownColor: Colors.black,
@@ -217,7 +218,8 @@ Future<void> _fetchClasses() async {
 
               // Tag Dropdown
               DropdownButton<String>(
-                hint: const Text("Select Tag", style: TextStyle(color: Colors.white)),
+                hint: const Text("Select Tag",
+                    style: TextStyle(color: Colors.white)),
                 value: _selectedTag,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -227,7 +229,8 @@ Future<void> _fetchClasses() async {
                 items: _tags.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
+                    child: Text(value,
+                        style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
                 dropdownColor: Colors.black,
@@ -236,7 +239,8 @@ Future<void> _fetchClasses() async {
 
               // Room Dropdown
               DropdownButton<String>(
-                hint: const Text("Select Room", style: TextStyle(color: Colors.white)),
+                hint: const Text("Select Room",
+                    style: TextStyle(color: Colors.white)),
                 value: _selectedRoom,
                 onChanged: (String? newValue) {
                   setState(() {
@@ -246,7 +250,8 @@ Future<void> _fetchClasses() async {
                 items: _rooms.map<DropdownMenuItem<String>>((Room room) {
                   return DropdownMenuItem<String>(
                     value: room.name,
-                    child: Text(room.name, style: const TextStyle(color: Colors.white)),
+                    child: Text(room.name,
+                        style: const TextStyle(color: Colors.white)),
                   );
                 }).toList(),
                 dropdownColor: Colors.black,
@@ -259,7 +264,8 @@ Future<void> _fetchClasses() async {
                 child: const Text('Save Activity'),
                 style: ButtonStyle(
                   foregroundColor: MaterialStateProperty.all(Colors.black),
-                  backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 129, 77, 139)),
+                  backgroundColor: MaterialStateProperty.all(
+                      const Color.fromARGB(255, 129, 77, 139)),
                 ),
               ),
             ],
