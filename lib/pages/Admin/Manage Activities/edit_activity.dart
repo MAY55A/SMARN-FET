@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/activity.dart';
 import 'package:smarn/models/activity_tag.dart';
+import 'package:smarn/models/class.dart';
+import 'package:smarn/models/subject.dart';
+import 'package:smarn/models/teacher.dart';
 import 'package:smarn/services/activity_service.dart';
+import 'package:smarn/services/class_service.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/room_service.dart';
 import 'package:smarn/models/room.dart';
-
-import 'package:smarn/pages/widgets/canstants.dart';
 
 class EditActivity extends StatefulWidget {
   final Map<String, dynamic> activity;
@@ -19,80 +21,108 @@ class EditActivity extends StatefulWidget {
 }
 
 class _EditActivityState extends State<EditActivity> {
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
 
-  String? _selectedClass;
-  String? _selectedTag;
-  String? _selectedTeacher;
-  String? _selectedSubject;
-  String? _selectedRoom;
+  final List<String> _tags = ActivityTag.values.map((a) => a.name).toList();
 
-  List<String> _classes = [];
-  //List of the tags
-  List<String> _tags = ['lecture', 'lab', 'seminar', 'workshop', 'exam', 'other'];
-  List<dynamic> _teachers = [];
-  List<String> _subjects = [];
+  List<Class> _classes = [];
+  List<Teacher> _allTeachers = [];
+  List<Subject> _allSubjects = [];
+  List<Teacher> _teachers = [];
+  List<Subject> _subjects = [];
   List<Room> _rooms = [];
+
+  Class? _selectedClass;
+  String? _selectedTag;
+  Teacher? _selectedTeacher;
+  Subject? _selectedSubject;
+  Room? _selectedRoom;
+
+  late Activity _oldActivity;
 
   final TeacherService _teacherService = TeacherService();
   final SubjectService _subjectService = SubjectService();
+  final ClassService _classService = ClassService();
   final RoomService _roomService = RoomService();
 
   @override
   void initState() {
     super.initState();
     _fetchData();
-
-    // Pre-fill fields with existing data
-    _nameController.text = widget.activity['name'] ?? '';
-    _durationController.text = widget.activity['duration']?.toString() ?? '';
-    _selectedClass = widget.activity['studentsClass'];
-    _selectedTag = widget.activity['tag'];
-    _selectedTeacher = widget.activity['teacher'];
-    _selectedSubject = widget.activity['subject'];
-    _selectedRoom = widget.activity['room'];
   }
 
-  Future<void> _fetchData() async {
+  void _fetchData() async {
     await Future.wait([
       _fetchTeachers(),
       _fetchSubjects(),
       _fetchRooms(),
-      _fetchClasses(), // Replace with dynamic class fetching logic if needed
+      _fetchClasses(),
     ]);
 
-    // Validate the selected values after fetching data
+    // Ensure data is loaded before accessing
     setState(() {
-      if (_selectedClass != null && !_classes.contains(_selectedClass)) {
-        _selectedClass = _classes.isNotEmpty ? _classes[0] : null;
-      }
-      if (_selectedTag != null && !_tags.contains(_selectedTag)) {
-        _selectedTag = _tags.isNotEmpty ? _tags[0] : null;
-      }
-      if (_selectedTeacher != null && !_teachers.contains(_selectedTeacher)) {
-        _selectedTeacher = _teachers.isNotEmpty ? _teachers[0] : null;
-      }
-      if (_selectedSubject != null && !_subjects.contains(_selectedSubject)) {
-        _selectedSubject = _subjects.isNotEmpty ? _subjects[0] : null;
-      }
-      if (_selectedRoom != null && !_rooms.map((e) => e.name).contains(_selectedRoom)) {
-        _selectedRoom = _rooms.isNotEmpty ? _rooms[0].name : null;
-      }
+      // Pre-fill fields with existing data
+      _durationController.text = widget.activity['duration']?.toString() ?? '';
+      _selectedClass = _classes.firstWhere(
+          (c) => c.name == widget.activity['studentsClass']['name']);
+      _selectedTag = widget.activity['tag'];
+      _selectedTeacher = _allTeachers
+          .firstWhere((t) => t.name == widget.activity['teacher']['name']);
+      _selectedSubject = _allSubjects.firstWhere(
+          (s) => s.longName == widget.activity['subject']['longName']);
+      _selectedRoom = widget.activity['room'] != null
+          ? _rooms
+              .firstWhere((r) => r.name == (widget.activity['room']['name']))
+          : null;
+      _oldActivity = fillActivity();
     });
   }
 
+  Activity fillActivity() {
+    return Activity(
+      id: widget.activity['id'],
+      subject: _selectedSubject!.id!,
+      teacher: _selectedTeacher!.id!,
+      studentsClass: _selectedClass!.id!,
+      duration: int.parse(_durationController.text),
+      tag: ActivityTag.values.firstWhere((t) => t.name == _selectedTag),
+      room: _selectedRoom?.id,
+    );
+  }
+
   Future<void> _fetchTeachers() async {
-    final teachersList = await _teacherService.getAllTeachers();
+    final teachersList = (await _teacherService.getAllTeachers())
+        .map((teacher) => teacher['teacher'] as Teacher)
+        .toList();
     setState(() {
-      _teachers = teachersList.map((teacher) => teacher['teacher'].name).toList();
+      _allTeachers = teachersList;
+      _teachers = teachersList;
     });
   }
 
   Future<void> _fetchSubjects() async {
     final subjectsList = await _subjectService.getAllSubjects();
     setState(() {
-      _subjects = subjectsList.map((subject) => subject.name).toList();
+      _allSubjects = subjectsList;
+      _subjects = subjectsList;
+    });
+  }
+
+  Future<void> _refreshTeachers() async {
+    final teachersList = _allTeachers
+        .where((teacher) => teacher.subjects.contains(_selectedSubject!.id))
+        .toList();
+    setState(() {
+      _teachers = teachersList;
+    });
+  }
+
+  Future<void> _refreshSubjects() async {
+    final subjectsList = _allSubjects
+        .where((s) => _selectedTeacher!.subjects.contains(s.id))
+        .toList();
+    setState(() {
+      _subjects = subjectsList;
     });
   }
 
@@ -104,32 +134,33 @@ class _EditActivityState extends State<EditActivity> {
   }
 
   Future<void> _fetchClasses() async {
-    // Replace with API call for dynamic class fetching
+    final classesList = await _classService.getAllClasses();
     setState(() {
-      _classes = ['Class A', 'Class B', 'Class C']; // Example data
+      _classes = classesList;
     });
   }
 
   void _saveActivity() async {
     if (_formIsValid()) {
-      final updatedActivity = Activity(
-        id: widget.activity['id'],
-        subject: _selectedSubject!,
-        teacher: _selectedTeacher!,
-        studentsClass: _selectedClass!,
-        duration: int.parse(_durationController.text),
-        tag: ActivityTag.values.firstWhere((e) => e.name == _selectedTag),
-        room: _selectedRoom!,
-      );
-
-      final result = await ActivityService().updateActivity(widget.activity['id'], updatedActivity);
-
-      if (result['success'] == true) {
-        Navigator.pop(context, updatedActivity);
-      } else {
+      final updatedActivity = fillActivity();
+      if (_oldActivity.equals(updatedActivity)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating activity: ${result['message']}')),
+          const SnackBar(content: Text('No modifications were made')),
         );
+      } else {
+        final result = await ActivityService()
+            .updateActivity(widget.activity['id'], updatedActivity);
+
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Activity updated successfully')));
+          Navigator.pop(context, true);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Error updating activity: ${result['message']}')),
+          );
+        }
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -139,17 +170,15 @@ class _EditActivityState extends State<EditActivity> {
   }
 
   bool _formIsValid() {
-    return _nameController.text.isNotEmpty &&
-        _selectedSubject != null &&
+    return _selectedSubject != null &&
         _selectedTeacher != null &&
         _selectedClass != null &&
         _selectedTag != null &&
-        _selectedRoom != null &&
         _durationController.text.isNotEmpty &&
         int.tryParse(_durationController.text) != null &&
         int.parse(_durationController.text) >= 60;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,74 +193,51 @@ class _EditActivityState extends State<EditActivity> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Activity Name
-              TextField(
-                controller: _nameController,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: 'Activity Name',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
               // Subject Dropdown
-              DropdownButton<String>(
-                value: _selectedSubject,
-                hint: const Text("Select Subject", style: TextStyle(color: Colors.white)),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedSubject = newValue;
-                  });
-                },
-                items: _subjects.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                dropdownColor: Colors.black,
-              ),
+              dropdownButton("subject", _selectedSubject, _subjects,
+                  (dynamic newValue) {
+                setState(() {
+                  _selectedSubject = newValue as Subject;
+                  _refreshTeachers();
+                });
+              }),
               const SizedBox(height: 16),
 
               // Teacher Dropdown
-              DropdownButton<String>(
-                value: _selectedTeacher,
-                hint: const Text("Select Teacher", style: TextStyle(color: Colors.white)),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedTeacher = newValue;
-                  });
-                },
-                items: _teachers.map<DropdownMenuItem<String>>((dynamic value) {
-                  return DropdownMenuItem<String>(
-                    value: value as String,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                dropdownColor: Colors.black,
-              ),
+              dropdownButton("teacher", _selectedTeacher, _teachers,
+                  (dynamic newValue) {
+                setState(() {
+                  _selectedTeacher = newValue as Teacher;
+                  _refreshSubjects();
+                });
+              }),
               const SizedBox(height: 16),
 
               // Class Dropdown
-              DropdownButton<String>(
-                value: _selectedClass,
-                hint: const Text("Select Class", style: TextStyle(color: Colors.white)),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedClass = newValue;
-                  });
-                },
-                items: _classes.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                dropdownColor: Colors.black,
-              ),
+              dropdownButton("class", _selectedClass, _classes,
+                  (dynamic newValue) {
+                setState(() {
+                  _selectedClass = newValue as Class;
+                });
+              }),
               const SizedBox(height: 16),
+
+              // Tag Dropdown,
+              dropdownButton("tag", _selectedTag, _tags, (dynamic newValue) {
+                setState(() {
+                  _selectedTag = newValue as String;
+                });
+              }),
+              const SizedBox(height: 16),
+
+              // Room Dropdown
+              dropdownButton("room", _selectedRoom, _rooms, (dynamic newValue) {
+                setState(() {
+                  _selectedRoom = newValue as Room;
+                });
+              }),
+              const SizedBox(height: 16),
+
               // Duration TextField
               TextField(
                 controller: _durationController,
@@ -243,44 +249,7 @@ class _EditActivityState extends State<EditActivity> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 16),
 
-              // Tag Dropdown
-              DropdownButton<String>(
-                value: _selectedTag,
-                hint: const Text("Select Tag", style: TextStyle(color: Colors.white)),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedTag = newValue;
-                  });
-                },
-                items: _tags.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value, style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                dropdownColor: Colors.black,
-              ),
-              const SizedBox(height: 16),
-
-              // Room Dropdown
-              DropdownButton<String>(
-                value: _selectedRoom,
-                hint: const Text("Select Room", style: TextStyle(color: Colors.white)),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedRoom = newValue;
-                  });
-                },
-                items: _rooms.map<DropdownMenuItem<String>>((Room room) {
-                  return DropdownMenuItem<String>(
-                    value: room.name,
-                    child: Text(room.name, style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                dropdownColor: Colors.black,
-              ),
               const SizedBox(height: 16),
 
               // Save Button
@@ -298,4 +267,22 @@ class _EditActivityState extends State<EditActivity> {
       ),
     );
   }
+}
+
+Widget dropdownButton(String type, dynamic selected, List list,
+    void Function(dynamic)? onChange) {
+  return DropdownButton<dynamic>(
+    padding: const EdgeInsets.only(left: 20, right: 20),
+    value: selected,
+    hint: Text("Select $type", style: const TextStyle(color: Colors.white)),
+    onChanged: onChange,
+    items: list.map<DropdownMenuItem<dynamic>>((dynamic value) {
+      return DropdownMenuItem<dynamic>(
+        value: value,
+        child: Text(value is String ? value : value.name,
+            style: const TextStyle(color: Colors.white)),
+      );
+    }).toList(),
+    dropdownColor: Colors.black,
+  );
 }
