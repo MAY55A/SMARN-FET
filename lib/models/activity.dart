@@ -1,4 +1,5 @@
 import 'package:smarn/models/activity_tag.dart';
+import 'package:smarn/models/work_day.dart';
 
 class Activity {
   String? id;
@@ -8,6 +9,9 @@ class Activity {
   bool isActive;
   // duration in minutes
   int duration;
+  WorkDay? day;
+  String? startTime;
+  String? endTime;
   ActivityTag tag;
   String? room;
 
@@ -19,6 +23,9 @@ class Activity {
     required this.studentsClass,
     required this.duration,
     required this.tag,
+    this.day,
+    this.startTime,
+    this.endTime,
     this.room,
     this.isActive = true,
   });
@@ -31,33 +38,52 @@ class Activity {
       'teacher': teacher,
       'class': studentsClass,
       'tag': tag.name,
-      'room': room,
-      'isActive': isActive,
       'duration': duration,
+      'room': room,
+      'day': day?.name,
+      'startTime': startTime,
+      'endTime': endTime,
+      'isActive': isActive,
     };
   }
 
   // Create a Activity object from a Map
   factory Activity.fromMap(Map<String, dynamic> map) {
     return Activity(
-      id: map['id'],
-      subject: map['subject'] ?? '', // Default to empty string if null
-      teacher: map['teacher'] ?? '', // Default to empty string if null
-      studentsClass: map['class'] ?? '', // Default to empty string if null
-      tag: map['tag'] != null
-          ? ActivityTag.values.firstWhere(
-              (e) => e.name == map['tag'],
-              orElse: () => ActivityTag.lecture, // Default to 'lecture' if invalid tag
-            )
-          : ActivityTag.lecture, // Default to 'lecture' if null
-      isActive: map['isActive'] ?? true, // Default to true if null
-      duration: map['duration'] ?? 0, // Default to 0 if null
-      room: map['room'] ?? '', // Default to empty string if null
-    );
+        id: map['id'],
+        subject: map['subject'] ?? '', // Default to empty string if null
+        teacher: map['teacher'] ?? '', // Default to empty string if null
+        studentsClass: map['class'] ?? '', // Default to empty string if null
+        tag: map['tag'] != null
+            ? ActivityTag.values.firstWhere(
+                (e) => e.name == map['tag'],
+                orElse: () =>
+                    ActivityTag.lecture, // Default to 'lecture' if invalid tag
+              )
+            : ActivityTag.lecture, // Default to 'lecture' if null
+        day: WorkDay.values.firstWhere((d) => d.name == map['day']),
+        startTime: map['startTime'],
+        endTime: map['endTime'],
+        isActive: map['isActive'] ?? true, // Default to true if null
+        duration: map['duration'] ?? 0, // Default to 0 if null
+        room: map['room']);
+  }
+
+  bool equals(Activity a) {
+    return id == a.id &&
+        subject == a.subject &&
+        teacher == a.teacher &&
+        studentsClass == a.studentsClass &&
+        tag == a.tag &&
+        isActive == a.isActive &&
+        duration == a.duration &&
+        room == a.room &&
+        startTime == a.startTime &&
+        endTime == a.endTime;
   }
 
   @override
   String toString() {
-    return 'Activity{\nid: $id,\n subject: $subject,\n teacher: $teacher,\n class: $studentsClass,\n tag: $tag,\n isActive: $isActive,\n duration(minutes): $duration,\n room: $room\n}';
+    return 'Activity{\nid: $id,\n subject: $subject,\n teacher: $teacher,\n class: $studentsClass,\n tag: $tag,\n isActive: $isActive,\n duration(minutes): $duration,\n room: $room,\n startTime: $startTime,\n $endTime\n}';
   }
 }

@@ -34,9 +34,16 @@ class Class {
         accessKey: map['accessKey']);
   }
 
+  bool equals(Class other) {
+    return other.id == id &&
+        other.name == name &&
+        other.longName == longName &&
+        other.nbStudents == nbStudents &&
+        other.accessKey == accessKey;
+  }
+
   @override
   String toString() {
     return "class $id : \n name: $name\n long name: $longName\nnbStudents: $nbStudents\n access key: $accessKey";
   }
-
 }

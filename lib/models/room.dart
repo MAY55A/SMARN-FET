@@ -41,6 +41,15 @@ class Room {
         building: map['building']);
   }
 
+  bool equals(Room other) {
+    return id == other.id &&
+        name == other.name &&
+        type == other.type &&
+        description == other.description &&
+        capacity == other.capacity &&
+        building == other.building;
+  }
+
   @override
   String toString() {
     return "room $id : \n name: $name\n type: $type\ndescription: $description\n capacity: $capacity\n building: $building";

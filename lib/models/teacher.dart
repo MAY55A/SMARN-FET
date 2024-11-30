@@ -30,7 +30,6 @@ class Teacher {
     };
   }
 
- 
   // Create a Teacher object from a Map
   factory Teacher.fromMap(Map<String, dynamic> map) {
     return Teacher(
@@ -45,9 +44,16 @@ class Teacher {
           : [], // Provide an empty list if subjects is null
     );
   }
- 
- 
- 
+
+  bool equals(Teacher other) {
+    return id == other.id &&
+        name == other.name &&
+        email == other.email &&
+        phone == other.phone &&
+        picture == other.picture &&
+        nbHours == other.nbHours &&
+        subjects == other.subjects;
+  }
 
   @override
   String toString() {
