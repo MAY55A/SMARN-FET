@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/models/subject.dart';
 import 'package:smarn/services/teacher_service.dart'; // Import TeacherService
@@ -12,25 +13,27 @@ class SelectSubjectScreen extends StatefulWidget {
 }
 
 class _SelectSubjectScreenState extends State<SelectSubjectScreen> {
-  late SubjectService _subjectService;
-  late TeacherService _teacherService; // Declare TeacherService
+  final SubjectService _subjectService = SubjectService();
+  final TeacherService _teacherService = TeacherService();
+  User? currentTeacher = AuthService().getCurrentUser();
   List<Subject> _allSubjects = [];
+  List<String> _oldSubjects = [];
   List<String> _selectedSubjects = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _subjectService = SubjectService();
-    _teacherService = TeacherService(); // Initialize TeacherService
     _fetchSubjects();
   }
 
   Future<void> _fetchSubjects() async {
     try {
       final subjects = await _subjectService.getAllSubjects();
+      _oldSubjects = (await _teacherService.fetchTeacherData())!.subjects;
       setState(() {
-        _allSubjects = subjects;
+        _allSubjects =
+            subjects.where((s) => !_oldSubjects.contains(s.id)).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -46,66 +49,74 @@ class _SelectSubjectScreenState extends State<SelectSubjectScreen> {
   // Add selected subject IDs to the teacher's subjects
   Future<void> _updateTeacherSubjects() async {
     try {
-      final teacherId = FirebaseAuth.instance.currentUser!.uid;
       final result = await _teacherService.updateTeacherSubjects(
-        teacherId,
-        _selectedSubjects,
+        currentTeacher!.uid,
+        _oldSubjects + _selectedSubjects,
       );
 
       if (result['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Subject added successfully")),
+        );
         Navigator.pop(
             context, _selectedSubjects); // Return the selected subject IDs
       } else {
-        throw Exception("Failed to update teacher's subjects.");
+        throw Exception("Failed to update qualified subjects.");
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error updating teacher's subjects: $e")),
+        SnackBar(content: Text("Error updating qualified subjects: $e")),
       );
     }
   }
 
   // Show confirmation dialog before updating the teacher's subjects
   Future<void> _showConfirmationDialog() async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.black, // Black background for the dialog
-          title: const Text(
-            "Are you sure?",
-            style: TextStyle(color: Colors.white), // White title text
-          ),
-          content: const Text(
-            "Do you want to add the selected subjects to your list?",
-            style: TextStyle(color: Colors.white), // White content text
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text(
-                "Cancel",
-                style:
-                    TextStyle(color: Colors.white), // White text for the button
-              ),
+    if (_selectedSubjects.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("No subjects selected")),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.black, // Black background for the dialog
+            title: const Text(
+              "Are you sure?",
+              style: TextStyle(color: Colors.white), // White title text
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                _updateTeacherSubjects(); // Proceed to update subjects
-              },
-              child: const Text(
-                "Confirm",
-                style:
-                    TextStyle(color: Colors.white), // White text for the button
-              ),
+            content: const Text(
+              "Do you want to add the selected subjects to your list?",
+              style: TextStyle(color: Colors.white), // White content text
             ),
-          ],
-        );
-      },
-    );
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: const Text(
+                  "Cancel",
+                  style: TextStyle(
+                      color: Colors.white), // White text for the button
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  _updateTeacherSubjects(); // Proceed to update subjects
+                },
+                child: const Text(
+                  "Confirm",
+                  style: TextStyle(
+                      color: Colors.white), // White text for the button
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -126,7 +137,7 @@ class _SelectSubjectScreenState extends State<SelectSubjectScreen> {
                 final isSelected = _selectedSubjects.contains(subject.id);
                 return ListTile(
                   title: Text(
-                    subject.name,
+                    subject.longName!,
                     style: const TextStyle(color: Colors.white), // White text
                   ),
                   subtitle: Text(

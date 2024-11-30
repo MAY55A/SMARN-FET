@@ -80,7 +80,7 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
     final updatedSubject = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditSubjectForm(subjectId: subject.id!),
+        builder: (context) => EditSubjectForm(subject: subject),
       ),
     );
 
@@ -100,7 +100,8 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirm Delete'),
-        content: Text('Are you sure you want to delete the subject "${subject.name}"?'),
+        content: Text(
+            'Are you sure you want to delete the subject "${subject.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -127,9 +128,10 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
           subjects.remove(subject);
           _filterSubjects();
         });
-      } else {
-        print("Failed to delete subject: ${response['message']}");
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
     } catch (e) {
       print("Error deleting subject: $e");
     }
@@ -139,7 +141,8 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Manage Subjects", style: TextStyle(color: Colors.white)),
+        title: const Text("Manage Subjects",
+            style: TextStyle(color: Colors.white)),
         backgroundColor: AppColors.appBarColor,
       ),
       body: isLoading
@@ -156,7 +159,8 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
                       decoration: InputDecoration(
                         hintText: 'Search subjects...',
                         hintStyle: const TextStyle(color: Colors.white),
-                        prefixIcon: const Icon(Icons.search, color: Colors.white),
+                        prefixIcon:
+                            const Icon(Icons.search, color: Colors.white),
                         filled: true,
                         fillColor: Colors.grey[800],
                         border: OutlineInputBorder(
@@ -169,44 +173,54 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
                   ),
                   // Subject List
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: filteredSubjects.length,
-                      itemBuilder: (context, index) {
-                        final subject = filteredSubjects[index];
-                        return Card(
-                          color: const Color.fromARGB(255, 44, 44, 44),
-                          margin: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                            title: Text(
-                              subject.name,
-                              style: const TextStyle(color: Colors.white),
+                    child: filteredSubjects.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'No subjects found',
+                              style: TextStyle(color: Colors.white),
                             ),
-                            subtitle: Text(
-                              subject.longName ?? '',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.white),
-                                  onPressed: () => _editSubject(subject),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.white),
-                                  onPressed: () => _confirmDeleteSubject(subject),
-                                ),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredSubjects.length,
+                            itemBuilder: (context, index) {
+                              final subject = filteredSubjects[index];
+                              return Card(
+                                color: const Color.fromARGB(255, 44, 44, 44),
+                                margin: const EdgeInsets.all(8.0),
+                                child: ListTile(
+                                  title: Text(
+                                    subject.name,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  subtitle: Text(
+                                    subject.longName ?? '',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit,
+                                            color: Colors.white),
+                                        onPressed: () => _editSubject(subject),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete,
+                                            color: Colors.white),
+                                        onPressed: () =>
+                                            _confirmDeleteSubject(subject),
+                                      ),
                                 // View Details Icon
                                 IconButton(
                                   icon: const Icon(Icons.visibility, color: Colors.white),
                                   onPressed: () => _viewSubjectDetails(subject),
                                 ),
-                              ],
-                            ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
                   ),
                 ],
               ),
@@ -219,6 +233,7 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
     );
   }
 
+  
   // Navigate to Subject Details page
   void _viewSubjectDetails(Subject subject) async {
     final subjectDetails = await _subjectService.getSubjectDetails(subject.id!);

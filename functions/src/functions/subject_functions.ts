@@ -203,13 +203,14 @@ export const deleteSubject = functions.https.onCall(async (request) => {
   }
 });
 
-export function getBasicSubjectDetails(id: string) {
+export async function getBasicSubjectDetails(id: string) {
   const teacherDoc = db.collection("subjects").doc(id);
-  return teacherDoc.get().then((doc) => {
-    if (!doc.exists) {
-      throw new Error("Subject not found");
-    }
-    return {id: doc.data()?.id, name: doc.data()?.name,
-      longName: doc.data()?.longName};
-  });
+  const doc = await teacherDoc.get();
+  if (!doc.exists) {
+    throw new Error("Subject not found");
+  }
+  return {
+    id: doc.data()?.id, name: doc.data()?.name,
+    longName: doc.data()?.longName
+  };
 }
