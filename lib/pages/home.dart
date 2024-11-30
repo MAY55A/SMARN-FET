@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/SelectionPage.dart';
 import 'package:smarn/pages/Admin/admin_dashboard.dart';
@@ -14,23 +16,32 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _userRole = ''; // Tracks user role (admin, teacher, or empty if none)
+  late StreamSubscription<User?> _authSubscription;
   User? _currentUser;
 
   @override
   void initState() {
     super.initState();
-    _checkUserRole();
+
+    // Listen for authentication state changes
+    _authSubscription = AuthService().authStateChanges.listen((user) {
+      _checkUserRole(); // Fetch the user role when logged in
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSubscription.cancel(); // Cancel the subscription to avoid memory leaks
+    super.dispose();
   }
 
   Future<void> _checkUserRole() async {
     User? user = AuthService().getCurrentUser();
-    if (user != null) {
-      String? role = await AuthService().getUserRole(user);
-      setState(() {
-        _currentUser = user;
-        _userRole = role ?? '';
-      });
-    }
+    String? role = await AuthService().getUserRole(user);
+    setState(() {
+      _currentUser = user;
+      _userRole = role ?? '';
+    });
   }
 
   void _navigateToRolePage() {
@@ -47,7 +58,7 @@ class _HomePageState extends State<HomePage> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) =>  SelectionPage()),
+        MaterialPageRoute(builder: (context) => SelectionPage()),
       );
     }
   }
