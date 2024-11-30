@@ -26,6 +26,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
   late TextEditingController _phoneController;
   late TextEditingController _nbHoursController;
   late TextEditingController _passwordController;
+
   bool _obscurePassword = true;
   List<Subject> allSubjects = [];
   List<Subject> selectedSubjects = [];
@@ -233,6 +234,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   );
                 }).toList(),
               ),
+              /*
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -259,6 +261,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   ),
                 ],
               ),
+              */
             ],
           ),
         ),

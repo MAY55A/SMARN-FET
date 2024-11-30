@@ -97,6 +97,7 @@ class RequestForm extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 20),
+
                     // New Room dropdown
                     DropdownButtonFormField<String>(
                       value: _selectedRoom,
