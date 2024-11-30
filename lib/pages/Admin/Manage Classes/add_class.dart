@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smarn/models/class.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/class_service.dart';
+import 'dart:math'; // Import the math library for random number generation
 
 class AddClass extends StatefulWidget {
   const AddClass({super.key});
@@ -16,9 +17,21 @@ class _AddClassState extends State<AddClass> {
   final TextEditingController _nbStudentsController = TextEditingController();
   final TextEditingController _accessKeyController = TextEditingController();
 
-  final ClassService _classService = ClassService();
-
   bool _isLoading = false;
+
+  // Function to generate a 6-character access key consisting of letters and digits
+  String _generateAccessKey() {
+    const length = 6; // Length of the generated key
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; // Alphanumeric characters
+    Random random = Random();
+
+    // Generate a random key of the specified length
+    String key = List.generate(length, (index) {
+      return characters[random.nextInt(characters.length)];
+    }).join();
+
+    return key;
+  }
 
   void _addClass() async {
     if (_nameController.text.isNotEmpty &&
@@ -31,11 +44,12 @@ class _AddClassState extends State<AddClass> {
         longName: _longNameController.text,
         nbStudents: int.parse(_nbStudentsController.text),
         accessKey: _accessKeyController.text.isEmpty
-            ? null
+            ? _generateAccessKey()  // Generate the key locally if not provided
             : _accessKeyController.text,
       );
 
-      final response = await _classService.createClass(newClass);
+      // Assuming you are still calling your service to create the class
+      final response = await ClassService().createClass(newClass);
 
       setState(() => _isLoading = false);
 
@@ -78,14 +92,28 @@ class _AddClassState extends State<AddClass> {
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 16),
-                    buildTextField('Access Key (Optional)', _accessKeyController),
+                    buildTextField('Access Key ', _accessKeyController),
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        // Generate a new key when requested
+                        setState(() {
+                          _accessKeyController.text = _generateAccessKey();
+                        });
+                      },
+                      icon: const Icon(Icons.refresh, color: Colors.white),
+                      label: const Text('Generate Key', style: TextStyle(color: Colors.white)),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.purple),
+                      ),
+                    ),
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: _addClass,
                       child: const Text('Add Class'),
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            AppColors.appBarColor),
+                        backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
+                        foregroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 255, 255, 255)),
                       ),
                     ),
                   ],
@@ -111,7 +139,7 @@ class _AddClassState extends State<AddClass> {
           borderSide: BorderSide(color: Colors.white),
         ),
         focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.purple),
+          borderSide: BorderSide(color: Color.fromARGB(255, 110, 57, 119)),
         ),
       ),
     );

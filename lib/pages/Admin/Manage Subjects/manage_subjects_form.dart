@@ -4,6 +4,7 @@ import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'add_subject.dart';
 import 'edit_subject.dart';
+import 'view_subject_details.dart';  // Add this import
 
 class ManageSubjectsForm extends StatefulWidget {
   const ManageSubjectsForm({Key? key}) : super(key: key);
@@ -195,6 +196,11 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
                                   icon: const Icon(Icons.delete, color: Colors.white),
                                   onPressed: () => _confirmDeleteSubject(subject),
                                 ),
+                                // View Details Icon
+                                IconButton(
+                                  icon: const Icon(Icons.visibility, color: Colors.white),
+                                  onPressed: () => _viewSubjectDetails(subject),
+                                ),
                               ],
                             ),
                           ),
@@ -211,5 +217,18 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  // Navigate to Subject Details page
+  void _viewSubjectDetails(Subject subject) async {
+    final subjectDetails = await _subjectService.getSubjectDetails(subject.id!);
+    if (subjectDetails != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ViewSubjectDetails(subject: subjectDetails),
+        ),
+      );
+    }
   }
 }

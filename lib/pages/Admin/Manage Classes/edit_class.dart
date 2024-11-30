@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smarn/models/class.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/class_service.dart'; // Import the class service
+import 'dart:math'; // Import the math library for random number generation
 
 class EditClass extends StatefulWidget {
   final Class classItem;
@@ -66,6 +67,38 @@ class _EditClassState extends State<EditClass> {
     }
   }
 
+  // Reset the access key locally
+  Future<void> _resetKey() async {
+    if (widget.classItem.id == null) return;
+
+    setState(() => _isLoading = true);
+    final newKey = _generateAccessKey(); // Generate new key locally
+
+    setState(() {
+      _accessKeyController.text = newKey; // Update the controller with the new key
+    });
+
+    setState(() => _isLoading = false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Access key reset successfully!')),
+    );
+  }
+
+  // Key generation method that includes letters and digits
+  String _generateAccessKey() {
+    const length = 6; // Length of the generated key
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; // Alphanumeric characters
+    Random random = Random();
+
+    // Generate a random key of the specified length
+    String key = List.generate(length, (index) {
+      return characters[random.nextInt(characters.length)];
+    }).join();
+
+    return key;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,7 +124,12 @@ class _EditClassState extends State<EditClass> {
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 16),
-                    buildTextField('Access Key', _accessKeyController),
+                    buildTextFieldWithButton(
+                      'Access Key',
+                      _accessKeyController,
+                      'Reset Key',
+                      _resetKey,
+                    ),
                     const SizedBox(height: 32),
                     ElevatedButton(
                       onPressed: _saveChanges,
@@ -99,6 +137,7 @@ class _EditClassState extends State<EditClass> {
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
                             AppColors.appBarColor),
+                        foregroundColor: MaterialStateProperty.all(Colors.white),
                       ),
                     ),
                   ],
@@ -127,6 +166,46 @@ class _EditClassState extends State<EditClass> {
           borderSide: BorderSide(color: Colors.purple),
         ),
       ),
+    );
+  }
+
+  Widget buildTextFieldWithButton(
+    String label,
+    TextEditingController controller,
+    String buttonLabel,
+    VoidCallback onButtonPressed, {
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            style: const TextStyle(color: Colors.white),
+            keyboardType: keyboardType,
+            decoration: InputDecoration(
+              labelText: label,
+              labelStyle: const TextStyle(color: Colors.white),
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.purple),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        ElevatedButton(
+          onPressed: onButtonPressed,
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(AppColors.appBarColor),
+            foregroundColor: MaterialStateProperty.all(Colors.white),
+          ),
+          child: Text(buttonLabel),
+        ),
+      ],
     );
   }
 }

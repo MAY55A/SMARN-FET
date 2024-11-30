@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
+import 'package:smarn/pages/Admin/Manage%20Teachers/view_teacher_details.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'add_teacher_form.dart';
@@ -236,6 +237,18 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                               IconButton(
                                 icon: const Icon(Icons.delete, color: Colors.white),
                                 onPressed: () => _confirmDeleteTeacher(teacher.id!, teacherName),
+                              ),
+                              // View details icon
+                              IconButton(
+                                icon: const Icon(Icons.visibility, color: Colors.white),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ViewTeacherDetailsForm(teacher: teacher),
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),

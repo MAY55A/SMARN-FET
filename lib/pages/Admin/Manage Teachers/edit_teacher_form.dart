@@ -26,7 +26,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
   late TextEditingController _phoneController;
   late TextEditingController _nbHoursController;
   late TextEditingController _passwordController;
-  bool _obscurePassword = true; // To toggle password visibility
+
+  bool _obscurePassword = true;
   List<Subject> allSubjects = [];
   List<Subject> selectedSubjects = [];
 
@@ -42,7 +43,6 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
     _fetchAllSubjects();
   }
 
-  // Fetch all subjects from the database
   Future<void> _fetchAllSubjects() async {
     List<Subject> subjects = await SubjectService().getAllSubjects();
     setState(() {
@@ -51,14 +51,12 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
     });
   }
 
-  // Load teacher's assigned subjects into selectedSubjects list
   void _loadTeacherSubjects() {
     selectedSubjects = allSubjects.where((subject) {
       return widget.teacher.subjects!.contains(subject.name);
     }).toList();
   }
 
-  // Update the teacher
   Future<void> _updateTeacher() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -68,7 +66,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
           email: _emailController.text.trim(),
           phone: _phoneController.text.trim(),
           nbHours: int.parse(_nbHoursController.text.trim()),
-          subjects: [], //empty
+          subjects: selectedSubjects.map((e) => e.name).toList(),
+          
         );
 
         final response = await TeacherService().updateTeacher(
@@ -104,7 +103,6 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
     }
   }
 
-  // Cancel and go back
   void _cancelUpdates() {
     Navigator.pop(context);
   }
@@ -138,6 +136,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(
@@ -153,6 +152,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _phoneController,
                 decoration: const InputDecoration(
@@ -169,6 +169,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _nbHoursController,
                 decoration: const InputDecoration(
@@ -183,6 +184,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -212,6 +214,26 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8.0,
+                children: allSubjects.map((subject) {
+                  final isSelected = selectedSubjects.contains(subject);
+                  return ChoiceChip(
+                    label: Text(subject.name),
+                    selected: isSelected,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        if (selected) {
+                          selectedSubjects.add(subject);
+                        } else {
+                          selectedSubjects.remove(subject);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
               /*
               const SizedBox(height: 20),
               Row(
@@ -239,6 +261,7 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   ),
                 ],
               ),
+              */
             ],
           ),
         ),

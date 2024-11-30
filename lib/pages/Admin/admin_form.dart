@@ -15,6 +15,8 @@ class _AdminFormState extends State<AdminForm> {
   final TextEditingController _passwordController = TextEditingController();
   final AdminService _adminService = AdminService();
 
+  bool _isPasswordVisible = false; // Track password visibility
+
   Future<void> _loginAdmin() async {
     if (_formKey.currentState!.validate()) {
       var res = await _adminService.login(
@@ -27,8 +29,8 @@ class _AdminFormState extends State<AdminForm> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text(res["message"] ?? "Login failed. Unauthorized access.")),
+            content: Text(res["message"] ?? "Login failed. Unauthorized access."),
+          ),
         );
       }
     }
@@ -88,10 +90,22 @@ class _AdminFormState extends State<AdminForm> {
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+                    obscureText: !_isPasswordVisible, // Toggle visibility
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
                       labelText: 'Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {

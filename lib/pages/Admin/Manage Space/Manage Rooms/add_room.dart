@@ -148,14 +148,23 @@ class _AddRoomState extends State<AddRoom> {
                       ? const CircularProgressIndicator(
                           color: Colors.white,
                         )
-                      : const Text('Add Room'),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                        const Color.fromARGB(255, 129, 77, 139),
+                      : const Text(
+                          'Add Room',
+                          style: TextStyle(
+                            fontSize: 15, // Increased text size
+                             // Optional: Make text bold
+                          ),
                         ),
-                        foregroundColor: MaterialStateProperty.all(Colors.black),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 129, 77, 139),
+                    ),
+                    foregroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 254, 254, 254)),
                     padding: MaterialStateProperty.all(
-                        const EdgeInsets.symmetric(vertical: 16)),
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 32), // Increased padding
+                    ),
+                    textStyle: MaterialStateProperty.all(
+                      const TextStyle(fontSize: 10), // Optional: Adjust text size here too
+                    ),
                   ),
                 ),
               ],
