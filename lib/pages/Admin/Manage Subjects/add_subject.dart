@@ -5,7 +5,6 @@ import 'package:smarn/services/subject_service.dart';
 
 class AddSubject extends StatefulWidget {
   const AddSubject({Key? key}) : super(key: key);
-
   @override
   _AddSubjectState createState() => _AddSubjectState();
 }
@@ -15,35 +14,27 @@ class _AddSubjectState extends State<AddSubject> {
   final TextEditingController _longNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final SubjectService _subjectService = SubjectService();
+  final _subjectService = SubjectService();
 
   bool _isLoading = false;
 
-  Future<void> _submitForm() async {
+  void _addSubject() async {
     if (_formKey.currentState!.validate()) {
-      final subject = Subject(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+      setState(() => _isLoading = true);
+      final newSubject = Subject(
         name: _nameController.text,
         longName: _longNameController.text,
         description: _descriptionController.text,
       );
 
-      setState(() => _isLoading = true);
-      try {
-        final result = await _subjectService.addSubject(subject);
-        setState(() => _isLoading = false);
+      final response = await _subjectService.addSubject(newSubject);
 
-        if (result['success']) {
-          Navigator.pop(context, subject);
-        } else {
-          throw result['message'];
-        }
-      } catch (e) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error adding subject: $e')),
-        );
-      }
+      setState(() => _isLoading = false);
+
+      if (response['success']) Navigator.pop(context, newSubject);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
     }
   }
 
@@ -81,11 +72,11 @@ class _AddSubjectState extends State<AddSubject> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Submit Button
+                      // Add Subject Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _submitForm,
+                          onPressed: _addSubject,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.appBarColor,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -103,7 +94,7 @@ class _AddSubjectState extends State<AddSubject> {
                   ),
                 ),
               ),
-      ),
+            ),
     );
   }
 
