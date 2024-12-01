@@ -41,11 +41,11 @@ class BuildingService {
           FirebaseFunctions.instance.httpsCallable('getAllBuildings');
       final response = await callable.call();
 
-      // Ensure the response contains the list of buildinges
-      List<Building> buildingsList =
-          (response.data["buildings"] as List<dynamic>)
-              .map((r) => Building.fromMap(r))
-              .toList();
+      // Ensure the response contains the list of buildings
+      List<Building> buildingsList = (response.data["buildings"] as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .map((s) => Building.fromMap(s))
+          .toList();
 
       return buildingsList;
     } catch (e) {

@@ -84,7 +84,7 @@ void classCrud() async {
       nbStudents: 31);
   var res = await classService.createClass(class1);
   print(res["message"]);
-  List<Class> classes = await classService.getAllclasses();
+  List<Class> classes = await classService.getAllClasses();
   for (var c in classes) {
     print(c);
   }
