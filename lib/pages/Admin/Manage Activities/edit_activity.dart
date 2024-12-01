@@ -4,6 +4,7 @@ import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/models/class.dart';
 import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
+import 'package:smarn/pages/widgets/dropDownMenu.dart';
 import 'package:smarn/services/activity_service.dart';
 import 'package:smarn/services/class_service.dart';
 import 'package:smarn/services/subject_service.dart';
@@ -145,7 +146,7 @@ class _EditActivityState extends State<EditActivity> {
       final updatedActivity = fillActivity();
       if (_oldActivity.equals(updatedActivity)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No modifications were made')),
+          const SnackBar(content: Text('No changes were made to the activity')),
         );
       } else {
         final result = await ActivityService()
@@ -194,7 +195,7 @@ class _EditActivityState extends State<EditActivity> {
           child: Column(
             children: [
               // Subject Dropdown
-              dropdownButton("subject", _selectedSubject, _subjects,
+              activityDropdownMenu("subject", _selectedSubject, _subjects,
                   (dynamic newValue) {
                 setState(() {
                   _selectedSubject = newValue as Subject;
@@ -204,7 +205,7 @@ class _EditActivityState extends State<EditActivity> {
               const SizedBox(height: 16),
 
               // Teacher Dropdown
-              dropdownButton("teacher", _selectedTeacher, _teachers,
+              activityDropdownMenu("teacher", _selectedTeacher, _teachers,
                   (dynamic newValue) {
                 setState(() {
                   _selectedTeacher = newValue as Teacher;
@@ -214,7 +215,7 @@ class _EditActivityState extends State<EditActivity> {
               const SizedBox(height: 16),
 
               // Class Dropdown
-              dropdownButton("class", _selectedClass, _classes,
+              activityDropdownMenu("class", _selectedClass, _classes,
                   (dynamic newValue) {
                 setState(() {
                   _selectedClass = newValue as Class;
@@ -223,7 +224,8 @@ class _EditActivityState extends State<EditActivity> {
               const SizedBox(height: 16),
 
               // Tag Dropdown,
-              dropdownButton("tag", _selectedTag, _tags, (dynamic newValue) {
+              activityDropdownMenu("tag", _selectedTag, _tags,
+                  (dynamic newValue) {
                 setState(() {
                   _selectedTag = newValue as String;
                 });
@@ -231,7 +233,8 @@ class _EditActivityState extends State<EditActivity> {
               const SizedBox(height: 16),
 
               // Room Dropdown
-              dropdownButton("room", _selectedRoom, _rooms, (dynamic newValue) {
+              activityDropdownMenu("room", _selectedRoom, _rooms,
+                  (dynamic newValue) {
                 setState(() {
                   _selectedRoom = newValue as Room;
                 });
@@ -267,22 +270,4 @@ class _EditActivityState extends State<EditActivity> {
       ),
     );
   }
-}
-
-Widget dropdownButton(String type, dynamic selected, List list,
-    void Function(dynamic)? onChange) {
-  return DropdownButton<dynamic>(
-    padding: const EdgeInsets.only(left: 20, right: 20),
-    value: selected,
-    hint: Text("Select $type", style: const TextStyle(color: Colors.white)),
-    onChanged: onChange,
-    items: list.map<DropdownMenuItem<dynamic>>((dynamic value) {
-      return DropdownMenuItem<dynamic>(
-        value: value,
-        child: Text(value is String ? value : value.name,
-            style: const TextStyle(color: Colors.white)),
-      );
-    }).toList(),
-    dropdownColor: Colors.black,
-  );
 }
