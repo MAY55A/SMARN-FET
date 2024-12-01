@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:smarn/models/subject.dart';
 import 'package:smarn/pages/Teacher/Manage%20qualified%20subjects/add_subject.dart';
+import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/subject_service.dart'; // Importing SubjectService
 import 'package:smarn/pages/widgets/canstants.dart';
@@ -14,17 +14,17 @@ class ManageQualifiedSubjectsForm extends StatefulWidget {
 
 class _ManageQualifiedSubjectsFormState
     extends State<ManageQualifiedSubjectsForm> {
-  late TeacherService _teacherService;
-  late SubjectService _subjectService; // Declare SubjectService
+  final TeacherService _teacherService = TeacherService();
+  final SubjectService _subjectService = SubjectService();
+  User? currentTeacher = AuthService().getCurrentUser();
   List<String> _subjectIds = []; // List of Subject IDs
-  Map<String, String> _subjectNames = {}; // Map to store Subject names by their IDs
+  Map<String, String> _subjectNames =
+      {}; // Map to store Subject names by their IDs
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _teacherService = TeacherService();
-    _subjectService = SubjectService(); // Initialize SubjectService
     _fetchTeacherData();
   }
 
@@ -63,7 +63,8 @@ class _ManageQualifiedSubjectsFormState
       final subject = await _subjectService.getSubjectDetails(subjectId);
       if (subject != null) {
         setState(() {
-          _subjectNames[subjectId] = subject.name; // Map the ID to the subject name
+          _subjectNames[subjectId] =
+              "${subject.longName} \n${subject.name}"; // Map the ID to the subject name
         });
       }
     }
@@ -75,13 +76,14 @@ class _ManageQualifiedSubjectsFormState
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor:  const Color.fromARGB(255, 30, 30, 30), // Black background for the dialog
+          backgroundColor: const Color.fromARGB(
+              255, 30, 30, 30), // Black background for the dialog
           title: const Text(
             "Are you sure?",
             style: TextStyle(color: Colors.white), // White title text
           ),
           content: const Text(
-            "Do you want to delete this subject from your list?",
+            "Do you want to remove this subject from your list of qualified subjects ?",
             style: TextStyle(color: Colors.white), // White content text
           ),
           actions: <Widget>[
@@ -91,7 +93,8 @@ class _ManageQualifiedSubjectsFormState
               },
               child: const Text(
                 "Cancel",
-                style: TextStyle(color: Colors.white), // White text for the button
+                style:
+                    TextStyle(color: Colors.white), // White text for the button
               ),
             ),
             TextButton(
@@ -101,7 +104,8 @@ class _ManageQualifiedSubjectsFormState
               },
               child: const Text(
                 "Confirm",
-                style: TextStyle(color: Colors.white), // White text for the button
+                style:
+                    TextStyle(color: Colors.white), // White text for the button
               ),
             ),
           ],
@@ -116,15 +120,17 @@ class _ManageQualifiedSubjectsFormState
     });
 
     try {
-      final updatedSubjects = _subjectIds
-          .where((subject) => subject != subjectId)
-          .toList();
+      final updatedSubjects =
+          _subjectIds.where((subject) => subject != subjectId).toList();
 
       final result = await _teacherService.updateTeacherSubjects(
-          FirebaseAuth.instance.currentUser!.uid, updatedSubjects);
+          currentTeacher!.uid, updatedSubjects);
 
       if (result['success']) {
         _fetchTeacherData();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Subject removed successfully")),
+        );
       } else {
         throw Exception(result['message']);
       }
@@ -133,7 +139,7 @@ class _ManageQualifiedSubjectsFormState
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error deleting subject: $e")),
+        SnackBar(content: Text("Error removing subject: $e")),
       );
     }
   }
@@ -150,7 +156,7 @@ class _ManageQualifiedSubjectsFormState
       ];
 
       final result = await _teacherService.updateTeacherSubjects(
-          FirebaseAuth.instance.currentUser!.uid, updatedSubjects);
+          currentTeacher!.uid, updatedSubjects);
 
       if (result['success']) {
         _fetchTeacherData();
@@ -193,7 +199,8 @@ class _ManageQualifiedSubjectsFormState
                         itemCount: _subjectIds.length,
                         itemBuilder: (context, index) {
                           final subjectId = _subjectIds[index];
-                          final subjectName = _subjectNames[subjectId] ?? "Unknown Subject";
+                          final subjectName =
+                              _subjectNames[subjectId] ?? "Unknown Subject";
 
                           return Card(
                             color: AppColors.formColor,
@@ -210,18 +217,20 @@ class _ManageQualifiedSubjectsFormState
                               title: Text(
                                 subjectName,
                                 style: const TextStyle(
-                                    fontSize: 18, color: Colors.white),
+                                    fontSize: 15, color: Colors.white),
                               ),
                               subtitle: Text(
                                 "ID: $subjectId",
                                 style: const TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   color: Color.fromARGB(221, 184, 220, 240),
                                 ),
                               ),
                               trailing: IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => _showDeleteConfirmationDialog(subjectId),
+                                icon: const Icon(Icons.highlight_remove,
+                                    color: Colors.red),
+                                onPressed: () =>
+                                    _showDeleteConfirmationDialog(subjectId),
                               ),
                             ),
                           );
@@ -242,7 +251,8 @@ class _ManageQualifiedSubjectsFormState
                         }
                       },
                       child: const Text("Add Subject"),
-                      style: ElevatedButton.styleFrom(foregroundColor: Colors.blue), // Blue button
+                      style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.blue), // Blue button
                     ),
                   ],
                 ),
