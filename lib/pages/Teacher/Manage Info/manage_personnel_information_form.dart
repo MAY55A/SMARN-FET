@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:smarn/models/teacher.dart';
+import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'edit_personal_information_form.dart';
 
@@ -14,6 +15,7 @@ class ManagePersonnelInformationForm extends StatefulWidget {
 
 class _ManagePersonnelInformationFormState
     extends State<ManagePersonnelInformationForm> {
+  User? currentUser = AuthService().getCurrentUser();
   String personnelName = "";
   String personnelId = "";
   String email = "";
@@ -26,19 +28,15 @@ class _ManagePersonnelInformationFormState
   // Fetch the personnel information (authenticated user data)
   Future<void> _fetchPersonnelInfo() async {
     try {
-      User? currentUser = FirebaseAuth.instance.currentUser;
-
       if (currentUser != null) {
         Teacher? teacher = await TeacherService().fetchTeacherData();
         if (teacher != null) {
           setState(() {
             currentTeacher = teacher;
-            personnelName =
-                teacher.name ?? currentUser.displayName ?? "Unknown";
-            email = currentUser.email ?? "No email provided";
-            phoneNumber = teacher.phone ??
-                currentUser.phoneNumber ?? "No phone number provided";
-            personnelId = teacher.id ?? currentUser.uid;
+            personnelName = teacher.name;
+            email = teacher.email ?? currentUser!.email!;
+            phoneNumber = teacher.phone;
+            personnelId = teacher.id!;
           });
         } else {
           throw Exception("Teacher data not found.");
@@ -96,7 +94,8 @@ class _ManagePersonnelInformationFormState
                             ? CircleAvatar(
                                 radius: 50,
                                 backgroundImage: AssetImage(
-                                                          '${currentTeacher!.picture}', // Assuming picture stores a file name like 'default.jpg'
+                                  currentTeacher!
+                                      .picture, // Assuming picture stores a file name like 'default.jpg'
                                 ),
                               )
                             : const Icon(
@@ -117,11 +116,19 @@ class _ManagePersonnelInformationFormState
                           ),
                         ),
                         const SizedBox(height: 20),
-                        _buildInfoRow(Icons.badge, personnelId),
+                        _buildInfoRow(Icons.perm_identity, "Account ID :",
+                            currentUser!.uid),
                         const SizedBox(height: 10),
-                        _buildInfoRow(Icons.email, email),
+                        _buildInfoRow(Icons.badge, "Teacher ID :", personnelId),
                         const SizedBox(height: 10),
-                        _buildInfoRow(Icons.phone, phoneNumber),
+                        _buildInfoRow(Icons.email, "Email :", email),
+                        const SizedBox(height: 10),
+                        _buildInfoRow(Icons.phone, "Phone :", phoneNumber),
+                        const SizedBox(height: 10),
+                        _buildInfoRow(
+                            Icons.access_time_filled,
+                            "Target Hours :",
+                            currentTeacher!.nbHours.toString()),
                         const SizedBox(height: 30),
                         ElevatedButton(
                           onPressed: () {
@@ -130,13 +137,16 @@ class _ManagePersonnelInformationFormState
                               MaterialPageRoute(
                                 builder: (context) =>
                                     EditPersonnelInformationForm(
-                                  personnelName: personnelName,
-                                  personnelId: personnelId,
-                                  email: email,
-                                  phoneNumber: phoneNumber,
-                                ),
+                                        teacher: currentTeacher!,
+                                        teacherId: currentUser!.uid),
                               ),
-                            );
+                            ).then((result) {
+                              if (result == true) {
+                                setState(() {
+                                  _fetchPersonnelInfo();
+                                });
+                              }
+                            });
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
@@ -161,16 +171,22 @@ class _ManagePersonnelInformationFormState
   }
 
   // Info Row Builder
-  Widget _buildInfoRow(IconData icon, String text) {
+  Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(icon, color: Colors.blue),
         const SizedBox(width: 10),
+        Text(label,
+            style: const TextStyle(
+                fontSize: 15,
+                color: Color.fromARGB(221, 12, 59, 104),
+                fontWeight: FontWeight.bold)),
+        const SizedBox(width: 10),
         Expanded(
           child: Text(
-            text.isNotEmpty ? text : "Loading...",
-            style: const TextStyle(fontSize: 16, color: Colors.black87),
+            value.isNotEmpty ? value : "Loading...",
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
             overflow: TextOverflow.ellipsis,
           ),
         ),
