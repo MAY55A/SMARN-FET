@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/teacher.dart';
 import 'package:smarn/services/teacher_service.dart';
-import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
-import 'package:smarn/models/subject.dart';
 
 class AddTeacherForm extends StatefulWidget {
   final Future<void> Function() refreshTeachers;
@@ -23,15 +21,14 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nbHoursController = TextEditingController();
 
-  List<Subject> _subjectsList = [];
-  List<String> _selectedSubjects = [];
-  
+  //List<Subject> _subjectsList = [];
+  //List<String> _selectedSubjects = [];
+
   bool _isPasswordVisible = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchSubjects();
   }
 
   @override
@@ -43,7 +40,8 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
     _nbHoursController.dispose();
     super.dispose();
   }
-
+/*
+  // Fetch all subjects from the database
   Future<void> _fetchSubjects() async {
     try {
       List<Subject> subjects = await SubjectService().getAllSubjects();
@@ -54,8 +52,9 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
       print("Error fetching subjects: $e");
     }
   }
+  */
 
-  Future<void> _addTeacher() async {
+  void _addTeacher() async {
     if (_formKey.currentState!.validate()) {
       try {
         Teacher newTeacher = Teacher(
@@ -70,11 +69,12 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
           newTeacher,
         );
 
-        if (response != null && response['success'] == true) {
+        if (response['success']) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(response['message'] ?? 'Teacher created successfully!'),
+                content: Text(
+                    response['message'] ?? 'Teacher created successfully!'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -84,7 +84,8 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(response['message'] ?? 'Failed to create teacher.'),
+                content:
+                    Text(response['message'] ?? 'Failed to create teacher.'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -195,7 +196,8 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
                   if (value.length < 6) {
                     return 'Password must be at least 6 characters';
                   }
-                  if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
+                  if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)')
+                      .hasMatch(value)) {
                     return 'Password must contain upper, lower case letters, and a number';
                   }
                   return null;
@@ -204,17 +206,17 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
               TextFormField(
                 controller: _nbHoursController,
                 decoration: const InputDecoration(
-                  labelText: "Number of Hours",
+                  labelText: "Target Hours",
                   labelStyle: TextStyle(color: Colors.white),
                 ),
                 keyboardType: TextInputType.number,
                 style: const TextStyle(color: Colors.white),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Number of hours is required';
+                    return 'Number of target hours is required';
                   }
-                  if (int.tryParse(value)! <= 0) {
-                    return 'Number of hours must be greater than 0';
+                  if (int.tryParse(value)! <= 0 && int.tryParse(value)! > 40) {
+                    return 'Number of target hours must be between 0 and 40.';
                   }
                   return null;
                 },
