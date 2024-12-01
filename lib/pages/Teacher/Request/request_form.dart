@@ -1,18 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/change_request_status.dart';
 import 'package:smarn/models/change_request.dart';
+import 'package:smarn/models/room.dart';
+import 'package:smarn/services/activity_service.dart';
+import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/change_request_service.dart';
+import 'package:smarn/models/change_request.dart';
+import 'package:smarn/services/room_service.dart';
+import 'package:smarn/services/teacher_service.dart';
 
-class RequestForm extends StatelessWidget {
-  RequestForm({super.key});
+class RequestForm extends StatefulWidget {
+  const RequestForm({Key? key}) : super(key: key);
 
+  @override
+  _RequestFormState createState() => _RequestFormState();
+}
+
+class _RequestFormState extends State<RequestForm> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _reasonController = TextEditingController();
   final TextEditingController _newTimeSlotController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  final List<String> _availableRooms = ['RM001']; // Example room list
-  String? _selectedRoom;
+  List<Room> _availableRooms = [];
+  List<Map<String, dynamic>> _availableActivities = [];
+
+  Room? _selectedRoom;
+  Map<String, dynamic>? _selectedActivity;
+
+  Future<void> _fetchActivities() async {
+    final activitiesList = (await ActivityService()
+        .getActivitiesByTeacher(AuthService().getCurrentUser()!.uid));
+    setState(() {
+      _availableActivities = activitiesList;
+    });
+  }
+
+  Future<void> _fetchRooms() async {
+    final roomsList = await RoomService().getAllRooms();
+    setState(() {
+      _availableRooms = roomsList;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchActivities();
+    _fetchRooms();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +87,30 @@ class RequestForm extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
+                    // Description field
+                    TextFormField(
+                      controller: _descriptionController,
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        hintText:
+                            'Enter your description for the changes you wish to be made',
+                        hintStyle: const TextStyle(color: Colors.white),
+                        filled: true,
+                        fillColor: Colors.grey[800],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: const TextStyle(color: Colors.white),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Description is required';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
                     const SizedBox(height: 20),
                     // Reason field
                     TextFormField(
@@ -74,67 +134,71 @@ class RequestForm extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 20),
-                    // Description field
-                    TextFormField(
-                      controller: _descriptionController,
-                      maxLines: 5,
-                      decoration: InputDecoration(
-                        hintText: 'Enter your description here',
-                        hintStyle: const TextStyle(color: Colors.white),
-                        filled: true,
-                        fillColor: Colors.grey[800],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
+                    // Concernd activity dropdown
+                    DropdownButtonFormField<Map<String, dynamic>>(
+                        value: _selectedActivity,
+                        items: [null, ..._availableActivities]
+                            .map((activity) => DropdownMenuItem(
+                                  value: activity,
+                                  child: Text(
+                                      activity == null
+                                          ? "Select concerned activity"
+                                          : "${activity['subject']['longName']} - ${activity["studentsClass"]["name"]} - ${activity["day"] ?? "unknown day"}",
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                ))
+                            .toList(),
+                        dropdownColor: Colors.grey[800],
+                        decoration: InputDecoration(
+                          hintText: 'Select concerned activity (optional)',
+                          hintStyle: const TextStyle(color: Colors.white),
+                          filled: true,
+                          fillColor: Colors.grey[800],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Description is required';
-                        }
-                        return null;
-                      },
-                    ),
+                        style: const TextStyle(color: Colors.white),
+                        onChanged: (value) {
+                          _selectedActivity = value;
+                        }),
                     const SizedBox(height: 20),
-
                     // New Room dropdown
-                    DropdownButtonFormField<String>(
-                      value: _selectedRoom,
-                      items: _availableRooms
-                          .map((room) => DropdownMenuItem(
-                                value: room,
-                                child: Text(room, style: const TextStyle(color: Colors.white)),
-                              ))
-                          .toList(),
-                      dropdownColor: Colors.grey[800],
-                      decoration: InputDecoration(
-                        hintText: 'Select new room',
-                        hintStyle: const TextStyle(color: Colors.white),
-                        filled: true,
-                        fillColor: Colors.grey[800],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
+                    DropdownButtonFormField<Room>(
+                        value: _selectedRoom,
+                        items: [null, ..._availableRooms]
+                            .map((room) => DropdownMenuItem(
+                                  value: room,
+                                  child: Text(
+                                      room == null
+                                          ? "select new room"
+                                          : room.name,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                ))
+                            .toList(),
+                        dropdownColor: Colors.grey[800],
+                        decoration: InputDecoration(
+                          hintText: 'Select new room (optional)',
+                          hintStyle: const TextStyle(color: Colors.white),
+                          filled: true,
+                          fillColor: Colors.grey[800],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      onChanged: (value) {
-                        _selectedRoom = value;
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select a new room';
-                        }
-                        return null;
-                      },
-                    ),
+                        style: const TextStyle(color: Colors.white),
+                        onChanged: (value) {
+                          _selectedRoom = value;
+                        }),
                     const SizedBox(height: 20),
                     // New Time Slot field
                     TextFormField(
                       controller: _newTimeSlotController,
                       decoration: InputDecoration(
-                        hintText: 'Enter new time slot',
+                        hintText: 'Enter new time slot (optional)',
                         hintStyle: const TextStyle(color: Colors.white),
                         filled: true,
                         fillColor: Colors.grey[800],
@@ -144,18 +208,14 @@ class RequestForm extends StatelessWidget {
                         ),
                       ),
                       style: const TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'New time slot is required';
-                        }
-                        return null;
-                      },
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          final confirmed = await _showConfirmationDialog(context);
+                          // Show confirmation dialog
+                          final confirmed =
+                              await _showConfirmationDialog(context);
                           if (confirmed) {
                             await _submitRequest(context);
                           }
@@ -194,7 +254,8 @@ class RequestForm extends StatelessWidget {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text("Confirm Submission"),
-            content: const Text("Are you sure you want to submit this request?"),
+            content:
+                const Text("Are you sure you want to submit this request?"),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -212,17 +273,19 @@ class RequestForm extends StatelessWidget {
 
   // Submit the request
   Future<void> _submitRequest(BuildContext context) async {
+    final teacher = await TeacherService().fetchTeacherData();
+    final teacherId = teacher!.id!;
     final changeRequest = ChangeRequest(
       reason: _reasonController.text.trim(),
       content: _descriptionController.text.trim(),
-      newRoom: _selectedRoom,
+      newRoom: _selectedRoom?.id,
+      activity: _selectedActivity?["id"],
       newTimeSlot: _newTimeSlotController.text.trim(),
-      teacher: "TeacherID123", // Replace with actual teacher identifier
-      submissionDate: DateTime.now().toIso8601String(),
-      status: ChangeRequestStatus.pending,
+      teacher: teacherId, // Replace with actual teacher identifier
     );
 
-    final response = await ChangeRequestService().addChangeRequest(changeRequest);
+    final response =
+        await ChangeRequestService().addChangeRequest(changeRequest);
 
     if (response['success'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/change_request.dart';
+import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/change_request_service.dart';
 import 'request_form.dart';
 
 class ViewRequests extends StatefulWidget {
-  final String teacherId; // Add teacher ID parameter
-
-  const ViewRequests({super.key, required this.teacherId});
+  const ViewRequests({super.key});
 
   @override
   State<ViewRequests> createState() => _ViewRequestsState();
 }
 
 class _ViewRequestsState extends State<ViewRequests> {
+  final String? teacherId = AuthService().getCurrentUser()?.uid;
   final ChangeRequestService _changeRequestService = ChangeRequestService();
   List<ChangeRequest> _requests = [];
   bool _isLoading = true;
@@ -30,7 +30,7 @@ class _ViewRequestsState extends State<ViewRequests> {
       });
       // Fetch requests by teacher ID
       List<ChangeRequest> requests =
-          await getChangeRequestsByTeacher(widget.teacherId);
+          await getChangeRequestsByTeacher(teacherId!);
       setState(() {
         _requests = requests;
       });
@@ -67,7 +67,7 @@ class _ViewRequestsState extends State<ViewRequests> {
   void _navigateToAddRequest() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) =>  RequestForm()),
+      MaterialPageRoute(builder: (context) => RequestForm()),
     ).then((_) {
       _fetchRequests(); // Refresh the list after adding a request
     });
