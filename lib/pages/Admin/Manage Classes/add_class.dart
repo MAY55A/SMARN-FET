@@ -55,11 +55,10 @@ class _AddClassState extends State<AddClass> {
 
       if (response['success']) {
         Navigator.pop(context, newClass);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${response['message']}')),
-        );
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill out all fields')),

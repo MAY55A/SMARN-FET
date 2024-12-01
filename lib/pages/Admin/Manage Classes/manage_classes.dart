@@ -26,7 +26,7 @@ class _ManageClassesState extends State<ManageClasses> {
   // Fetch classes dynamically from the backend
   Future<void> _fetchClasses() async {
     try {
-      List<Class> fetchedClasses = await _classService.getAllclasses();
+      List<Class> fetchedClasses = await _classService.getAllClasses();
       setState(() {
         classes = fetchedClasses;
         filteredClasses = classes; // Initially show all classes
@@ -72,7 +72,8 @@ class _ManageClassesState extends State<ManageClasses> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Class'),
-        content: Text('Are you sure you want to delete the class "${classItem.name}"?'),
+        content: Text(
+            'Are you sure you want to delete the class "${classItem.name}"?'),
         actions: [
           TextButton(
             onPressed: () {
@@ -91,6 +92,7 @@ class _ManageClassesState extends State<ManageClasses> {
       ),
     );
   }
+
   // Function to handle delete class
   void _deleteClass(Class classItem) async {
     final result = await _classService.deleteClass(classItem.id!);
@@ -100,7 +102,8 @@ class _ManageClassesState extends State<ManageClasses> {
         classes.remove(classItem);
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Class "${classItem.name}" deleted successfully.')),
+        SnackBar(
+            content: Text('Class "${classItem.name}" deleted successfully.')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -143,14 +146,20 @@ class _ManageClassesState extends State<ManageClasses> {
                     ),
                   ),
                 ),
-                SizedBox(width: 5), // Space between search bar and filter dropdowns
+                SizedBox(
+                    width: 5), // Space between search bar and filter dropdowns
               ],
             ),
           ),
           // List of Filtered Classes
           Expanded(
             child: filteredClasses.isEmpty
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: Text(
+                      'No classes found',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: filteredClasses.length,
                     itemBuilder: (context, index) {
@@ -159,7 +168,8 @@ class _ManageClassesState extends State<ManageClasses> {
                         margin: const EdgeInsets.all(8.0),
                         color: const Color.fromARGB(255, 34, 34, 34),
                         child: ListTile(
-                          title: Text(classItem.name, style: const TextStyle(color: Colors.white)),
+                          title: Text(classItem.name,
+                              style: const TextStyle(color: Colors.white)),
                           subtitle: Text(
                               'Students: ${classItem.nbStudents}, Access Key: ${classItem.accessKey}',
                               style: const TextStyle(color: Colors.white)),
@@ -168,12 +178,14 @@ class _ManageClassesState extends State<ManageClasses> {
                             children: [
                               // Edit Icon
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () => _editClass(classItem),
                               ),
                               // Delete Icon with Confirmation
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.white),
+                                icon: const Icon(Icons.delete,
+                                    color: Colors.white),
                                 onPressed: () => _confirmDelete(classItem),
                               ),
                             ],
