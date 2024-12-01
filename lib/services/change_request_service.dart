@@ -44,8 +44,9 @@ class ChangeRequestService {
 
       // Ensure the response contains the list of changeRequestes
       List<ChangeRequest> changeRequestsList =
-          (response.data["changeRequests"] as List<dynamic>)
-              .map((r) => ChangeRequest.fromMap(r))
+          (response.data["changeRequests"] as List)
+              .map((item) => Map<String, dynamic>.from(item as Map))
+              .map((s) => ChangeRequest.fromMap(s))
               .toList();
 
       return changeRequestsList;
@@ -98,8 +99,9 @@ Future<List<ChangeRequest>> getChangeRequestsByTeacher(
 
     // Ensure the response contains the list of changeRequests
     List<ChangeRequest> changeRequestsList =
-        (response.data["changeRequests"] as List<dynamic>)
-            .map((r) => ChangeRequest.fromMap(r))
+        (response.data["changeRequests"] as List)
+            .map((item) => Map<String, dynamic>.from(item as Map))
+            .map((s) => ChangeRequest.fromMap(s))
             .toList();
 
     return changeRequestsList;

@@ -22,7 +22,6 @@ class ActivityService {
 
   Future<Map<String, dynamic>?> getActivityDetails(String activityId) async {
     try {
-    
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('getActivity');
       final response =
@@ -35,30 +34,21 @@ class ActivityService {
     }
   }
 
-Future<List<Activity>> getAllActivities() async {
-  try {
-    final HttpsCallable callable =
-        FirebaseFunctions.instance.httpsCallable('getAllActivities');
-    final response = await callable.call();
-
-    if (response.data["activities"] != null) {
-      List<Activity> activitiesList =
-          (response.data["activities"] as List<dynamic>)
-              .map((r) => Activity.fromMap(r ?? {})) // Handle possible null 
+  Future<List<Map<String, dynamic>>> getAllActivities() async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getAllActivities');
+      final response = await callable.call();
+      List<Map<String, dynamic>> activitiesList =
+          (response.data["activities"] as List)
+              .map((item) => Map<String, dynamic>.from(item as Map))
               .toList();
       return activitiesList;
-    } else {
+    } catch (e) {
+      print('Error fetching all activities: $e');
       return [];
     }
-  } catch (e) {
-    print('Error fetching all activities: $e');
-    return [];
   }
-}
-
-
-
-
 
   Future<Map<String, dynamic>> updateActivity(
       String activityId, Activity activity) async {
@@ -90,24 +80,42 @@ Future<List<Activity>> getAllActivities() async {
       return {'success': false, 'message': e};
     }
   }
-}
 
-Future<List<Activity>> getActivitiesByTeacher(String teacherDocId) async {
-  try {
-    final HttpsCallable callable =
-        FirebaseFunctions.instance.httpsCallable('getActivitiesByTeacher');
-    final response =
-        await callable.call(<String, dynamic>{'teacherDocId': teacherDocId});
+  Future<List<Map<String, dynamic>>> getActivitiesByTeacher(
+      String teacherDocId) async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getActivitiesByTeacher');
+      final response =
+          await callable.call(<String, dynamic>{'teacherDocId': teacherDocId});
 
-    // Ensure the response contains the list of activities
-    List<Activity> activitiesList =
-        (response.data["activities"] as List<dynamic>)
-            .map((r) => Activity.fromMap(r))
-            .toList();
+      List<Map<String, dynamic>> activitiesList =
+          (response.data["activities"] as List)
+              .map((item) => Map<String, dynamic>.from(item as Map))
+              .toList();
+      return activitiesList;
+    } catch (e) {
+      print("Error fetching teacher's activities : $e");
+      return [];
+    }
+  }
 
-    return activitiesList;
-  } catch (e) {
-    print("Error fetching teacher's activities : $e");
-    return [];
+  Future<List<Map<String, dynamic>>> getActivitiesByClass(
+      String classId) async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getActivitiesByClass');
+      final response =
+          await callable.call(<String, dynamic>{'classId': classId});
+
+      List<Map<String, dynamic>> activitiesList =
+          (response.data["activities"] as List)
+              .map((item) => Map<String, dynamic>.from(item as Map))
+              .toList();
+      return activitiesList;
+    } catch (e) {
+      print("Error fetching class's activities : $e");
+      return [];
+    }
   }
 }
