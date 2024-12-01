@@ -37,7 +37,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
     _nameController = TextEditingController(text: widget.teacher.name);
     _emailController = TextEditingController(text: widget.teacher.email);
     _phoneController = TextEditingController(text: widget.teacher.phone);
-    _nbHoursController = TextEditingController(text: widget.teacher.nbHours.toString());
+    _nbHoursController =
+        TextEditingController(text: widget.teacher.nbHours.toString());
     _passwordController = TextEditingController();
 
     _fetchAllSubjects();
@@ -67,29 +68,37 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
           phone: _phoneController.text.trim(),
           nbHours: int.parse(_nbHoursController.text.trim()),
           subjects: selectedSubjects.map((e) => e.name).toList(),
-          
         );
 
-        final response = await TeacherService().updateTeacher(
-          widget.teacher.id!,
-          updatedTeacher,
-        );
-
-        if (response['success'] == true) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response['message'] ?? 'Teacher updated successfully!'),
-              backgroundColor: Colors.green,
-            ),
+        if (!updatedTeacher.equals(widget.teacher)) {
+          final response = await TeacherService().updateTeacher(
+            widget.teacher.id!,
+            updatedTeacher,
           );
-          widget.refreshTeachers();
-          Navigator.pop(context);
+
+          if (response['success'] == true) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                    response['message'] ?? 'Teacher updated successfully!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            widget.refreshTeachers();
+            Navigator.pop(context);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content:
+                    Text(response['message'] ?? 'Failed to update teacher.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response['message'] ?? 'Failed to update teacher.'),
-              backgroundColor: Colors.red,
-            ),
+            const SnackBar(
+                content: Text('No changes were made to the teacher.')),
           );
         }
       } catch (e) {
@@ -132,7 +141,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                 ),
                 style: const TextStyle(color: Colors.white),
                 validator: (value) {
-                  if (value == null || value.isEmpty) return "Name is required.";
+                  if (value == null || value.isEmpty)
+                    return "Name is required.";
                   return null;
                 },
               ),
@@ -145,7 +155,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                 ),
                 style: const TextStyle(color: Colors.white),
                 validator: (value) {
-                  if (value == null || value.isEmpty) return "Email is required.";
+                  if (value == null || value.isEmpty)
+                    return "Email is required.";
                   if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                     return "Enter a valid email address.";
                   }
@@ -162,7 +173,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                 style: const TextStyle(color: Colors.white),
                 keyboardType: TextInputType.phone,
                 validator: (value) {
-                  if (value == null || value.isEmpty) return "Phone is required.";
+                  if (value == null || value.isEmpty)
+                    return "Phone is required.";
                   if (value.length != 8 || !RegExp(r'^\d+$').hasMatch(value)) {
                     return "Phone number must be 8 digits.";
                   }
@@ -173,14 +185,16 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
               TextFormField(
                 controller: _nbHoursController,
                 decoration: const InputDecoration(
-                  labelText: "Number of Hours",
+                  labelText: "Target Hours",
                   labelStyle: TextStyle(color: Colors.white),
                 ),
                 style: const TextStyle(color: Colors.white),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.isEmpty) return "Number of hours is required.";
-                  if (int.tryParse(value)! <= 0) return "Hours must be greater than 0.";
+                  if (value == null || value.isEmpty)
+                    return "Number of target hours is required.";
+                  if (int.tryParse(value)! <= 0 && int.tryParse(value)! > 40)
+                    return "Number of target hours must be between 0 and 40.";
                   return null;
                 },
               ),
@@ -192,7 +206,9 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   labelStyle: const TextStyle(color: Colors.white),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: Colors.white,
                     ),
                     onPressed: () {
@@ -206,42 +222,24 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                 obscureText: _obscurePassword,
                 validator: (value) {
                   if (value != null && value.isNotEmpty) {
-                    if (value.length < 6) return "Password must be at least 6 characters.";
-                    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
+                    if (value.length < 6)
+                      return "Password must be at least 6 characters.";
+                    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)')
+                        .hasMatch(value)) {
                       return "Password must include upper, lower case, and a number.";
                     }
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8.0,
-                children: allSubjects.map((subject) {
-                  final isSelected = selectedSubjects.contains(subject);
-                  return ChoiceChip(
-                    label: Text(subject.name),
-                    selected: isSelected,
-                    onSelected: (bool selected) {
-                      setState(() {
-                        if (selected) {
-                          selectedSubjects.add(subject);
-                        } else {
-                          selectedSubjects.remove(subject);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-              /*
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
+                      backgroundColor:
+                          MaterialStateProperty.all(AppColors.appBarColor),
                     ),
                     onPressed: _updateTeacher,
                     child: const Text(
@@ -261,7 +259,6 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                   ),
                 ],
               ),
-              */
             ],
           ),
         ),
