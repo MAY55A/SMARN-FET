@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:smarn/models/activity.dart';
 import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/models/class.dart';
+import 'package:smarn/models/subject.dart';
+import 'package:smarn/models/teacher.dart';
+import 'package:smarn/pages/widgets/dropDownMenu.dart';
 import 'package:smarn/services/class_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/subject_service.dart';
@@ -23,19 +26,22 @@ class _AddActivityState extends State<AddActivity> {
 
   final List<String> _tags = ActivityTag.values.map((t) => t.name).toList();
 
-  String? _selectedClass;
+  Class? _selectedClass;
   String? _selectedTag;
-  String? _selectedTeacher;
-  String? _selectedSubject;
-  String? _selectedRoom;
+  Teacher? _selectedTeacher;
+  Subject? _selectedSubject;
+  Room? _selectedRoom;
 
-  List<String> _classes = [];
-  List<dynamic> _teachers = [];
-  List<String> _subjects = [];
+  List<Class> _classes = [];
+  List<Teacher> _allTeachers = [];
+  List<Subject> _allSubjects = [];
+  List<Teacher> _teachers = [];
+  List<Subject> _subjects = [];
   List<Room> _rooms = [];
 
   final TeacherService _teacherService = TeacherService();
   final SubjectService _subjectService = SubjectService();
+  final ClassService _classService = ClassService();
   final RoomService _roomService = RoomService();
 
   @override
@@ -54,17 +60,38 @@ class _AddActivityState extends State<AddActivity> {
   }
 
   Future<void> _fetchTeachers() async {
-    final teachersList = await _teacherService.getAllTeachers();
+    final teachersList = (await _teacherService.getAllTeachers())
+        .map((teacher) => teacher['teacher'] as Teacher)
+        .toList();
     setState(() {
-      _teachers =
-          teachersList.map((teacher) => teacher['teacher'].name).toList();
+      _allTeachers = teachersList;
+      _teachers = teachersList;
     });
   }
 
   Future<void> _fetchSubjects() async {
     final subjectsList = await _subjectService.getAllSubjects();
     setState(() {
-      _subjects = subjectsList.map((subject) => subject.name).toList();
+      _allSubjects = subjectsList;
+      _subjects = subjectsList;
+    });
+  }
+
+  Future<void> _refreshTeachers() async {
+    final teachersList = _allTeachers
+        .where((teacher) => teacher.subjects.contains(_selectedSubject!.id))
+        .toList();
+    setState(() {
+      _teachers = teachersList;
+    });
+  }
+
+  Future<void> _refreshSubjects() async {
+    final subjectsList = _allSubjects
+        .where((s) => _selectedTeacher!.subjects.contains(s.id))
+        .toList();
+    setState(() {
+      _subjects = subjectsList;
     });
   }
 
@@ -75,33 +102,22 @@ class _AddActivityState extends State<AddActivity> {
     });
   }
 
-  //methode to get all classes
   Future<void> _fetchClasses() async {
-    try {
-      final List<Class> fetchedClasses = await ClassService().getAllClasses();
-
-      setState(() {
-        _classes = fetchedClasses
-            .map((c) => c.name)
-            .toList(); // Extract the name property
-      });
-    } catch (e) {
-      print('Error fetching classes: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to fetch classes')),
-      );
-    }
+    final classesList = await _classService.getAllClasses();
+    setState(() {
+      _classes = classesList;
+    });
   }
 
   void _saveActivity() {
     if (_formIsValid()) {
       final activity = Activity(
-        subject: _selectedSubject!,
-        teacher: _selectedTeacher!,
-        studentsClass: _selectedClass!,
+        subject: _selectedSubject!.id!,
+        teacher: _selectedTeacher!.id!,
+        studentsClass: _selectedClass!.id!,
         duration: int.parse(_durationController.text),
         tag: ActivityTag.values.firstWhere((e) => e.name == _selectedTag),
-        room: _selectedRoom!,
+        room: _selectedRoom!.id!,
       );
       ActivityService().addActivity(activity);
       Navigator.pop(context);
@@ -141,69 +157,53 @@ class _AddActivityState extends State<AddActivity> {
           child: Column(
             children: [
               // Subject Dropdown
-              DropdownButton<String>(
-                hint: const Text("Select Subject",
-                    style: TextStyle(color: Colors.white)),
-                value: _selectedSubject,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedSubject = newValue;
-                  });
-                },
-                items: _subjects.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value,
-                        style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                dropdownColor: Colors.black,
-              ),
+              activityDropdownMenu("subject", _selectedSubject, _subjects,
+                  (dynamic newValue) {
+                setState(() {
+                  _selectedSubject = newValue as Subject;
+                  _refreshTeachers();
+                });
+              }),
               const SizedBox(height: 16),
 
               // Teacher Dropdown
-              DropdownButton<String>(
-                hint: const Text("Select Teacher",
-                    style: TextStyle(color: Colors.white)),
-                value: _selectedTeacher,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedTeacher = newValue;
-                  });
-                },
-                items: _teachers.map<DropdownMenuItem<String>>((dynamic value) {
-                  return DropdownMenuItem<String>(
-                    value: value as String,
-                    child: Text(value,
-                        style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                dropdownColor: Colors.black,
-              ),
+              activityDropdownMenu("teacher", _selectedTeacher, _teachers,
+                  (dynamic newValue) {
+                setState(() {
+                  _selectedTeacher = newValue as Teacher;
+                  _refreshSubjects();
+                });
+              }),
               const SizedBox(height: 16),
 
               // Class Dropdown
-              DropdownButton<String>(
-                hint: const Text("Select Class",
-                    style: TextStyle(color: Colors.white)),
-                value: _selectedClass,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedClass = newValue;
-                  });
-                },
-                items: _classes.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value,
-                        style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                dropdownColor: Colors.black,
-              ),
+              activityDropdownMenu("class", _selectedClass, _classes,
+                  (dynamic newValue) {
+                setState(() {
+                  _selectedClass = newValue as Class;
+                });
+              }),
               const SizedBox(height: 16),
 
-              // Duration (in minutes)
+              // Tag Dropdown,
+              activityDropdownMenu("tag", _selectedTag, _tags,
+                  (dynamic newValue) {
+                setState(() {
+                  _selectedTag = newValue as String;
+                });
+              }),
+              const SizedBox(height: 16),
+
+              // Room Dropdown
+              activityDropdownMenu("room", _selectedRoom, _rooms,
+                  (dynamic newValue) {
+                setState(() {
+                  _selectedRoom = newValue as Room;
+                });
+              }),
+              const SizedBox(height: 16),
+
+              // Duration TextField
               TextField(
                 controller: _durationController,
                 style: const TextStyle(color: Colors.white),
@@ -213,48 +213,6 @@ class _AddActivityState extends State<AddActivity> {
                   labelStyle: TextStyle(color: Colors.white),
                   border: OutlineInputBorder(),
                 ),
-              ),
-              const SizedBox(height: 16),
-
-              // Tag Dropdown
-              DropdownButton<String>(
-                hint: const Text("Select Tag",
-                    style: TextStyle(color: Colors.white)),
-                value: _selectedTag,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedTag = newValue;
-                  });
-                },
-                items: _tags.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value,
-                        style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                dropdownColor: Colors.black,
-              ),
-              const SizedBox(height: 16),
-
-              // Room Dropdown
-              DropdownButton<String>(
-                hint: const Text("Select Room",
-                    style: TextStyle(color: Colors.white)),
-                value: _selectedRoom,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedRoom = newValue;
-                  });
-                },
-                items: _rooms.map<DropdownMenuItem<String>>((Room room) {
-                  return DropdownMenuItem<String>(
-                    value: room.name,
-                    child: Text(room.name,
-                        style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                dropdownColor: Colors.black,
               ),
               const SizedBox(height: 16),
 
