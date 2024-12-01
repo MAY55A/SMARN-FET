@@ -51,17 +51,22 @@ class _EditSubjectFormState extends State<EditSubjectForm> {
         description: _descriptionController.text,
       );
 
-      final response = await _subjectService.updateSubject(
-          widget.subject.id!, updatedSubject);
+      if (!updatedSubject.equals(widget.subject)) {
+        final response = await _subjectService.updateSubject(
+            widget.subject.id!, updatedSubject);
 
-      setState(() => _isLoading = false);
-
-      if (response['success']) {
-        Navigator.pop(context, updatedSubject);
+        if (response['success']) {
+          Navigator.pop(context, updatedSubject);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No changes were made to the subject')),
+        );
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'])),
-      );
+      setState(() => _isLoading = false);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill out all fields')),

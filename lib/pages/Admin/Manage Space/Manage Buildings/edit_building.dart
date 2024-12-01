@@ -10,14 +10,18 @@ class EditBuilding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController nameController = TextEditingController(text: building.name);
-    final TextEditingController longNameController = TextEditingController(text: building.longName);
-    final TextEditingController descriptionController = TextEditingController(text: building.description);
+    final TextEditingController nameController =
+        TextEditingController(text: building.name);
+    final TextEditingController longNameController =
+        TextEditingController(text: building.longName);
+    final TextEditingController descriptionController =
+        TextEditingController(text: building.description);
     final BuildingService buildingService = BuildingService();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Building', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Edit Building', style: TextStyle(color: Colors.white)),
         backgroundColor: AppColors.appBarColor,
       ),
       body: Container(
@@ -52,7 +56,8 @@ class EditBuilding extends StatelessWidget {
                       longNameController.text.isEmpty ||
                       descriptionController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please fill in all fields')),
+                      const SnackBar(
+                          content: Text('Please fill in all fields')),
                     );
                     return;
                   }
@@ -65,23 +70,35 @@ class EditBuilding extends StatelessWidget {
                     description: descriptionController.text,
                   );
 
-                  // Call the service to update the building
-                  final result = await buildingService.updateBuilding(building.id!, updatedBuilding);
+                  if (!updatedBuilding.equals(building)) {
+                    // Call the service to update the building
+                    final result = await buildingService.updateBuilding(
+                        building.id!, updatedBuilding);
 
-                  if (result['success'] == true) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Building updated successfully!')),
-                    );
-                    Navigator.pop(context, updatedBuilding); // Return the updated building to the previous screen
+                    if (result['success'] == true) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Building updated successfully!')),
+                      );
+                      Navigator.pop(context,
+                          updatedBuilding); // Return the updated building to the previous screen
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${result['message']}')),
+                      );
+                    }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: ${result['message']}')),
+                      const SnackBar(
+                          content:
+                              Text('No changes were made to the building')),
                     );
                   }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 129, 77, 139),
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                 ),
                 child: const Text(
                   'Save',
@@ -115,7 +132,8 @@ class EditBuilding extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(8.0)),
         ),
         filled: true,
-        fillColor: Colors.grey[850], // Slightly lighter black for field background
+        fillColor:
+            Colors.grey[850], // Slightly lighter black for field background
       ),
     );
   }

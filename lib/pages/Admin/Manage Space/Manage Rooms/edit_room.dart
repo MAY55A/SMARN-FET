@@ -32,7 +32,7 @@ class _EditRoomState extends State<EditRoom> {
     description = widget.roomItem.description;
     capacity = widget.roomItem.capacity;
     type = widget.roomItem.type;
-    building = widget.roomItem.building ;
+    building = widget.roomItem.building;
   }
 
   Future<void> _updateRoom() async {
@@ -50,22 +50,29 @@ class _EditRoomState extends State<EditRoom> {
         building: building,
       );
 
-      final result = await _roomService.updateRoom(widget.roomItem.id!, updatedRoom);
+      if (!updatedRoom.equals(widget.roomItem)) {
+        final result =
+            await _roomService.updateRoom(widget.roomItem.id!, updatedRoom);
+
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Room updated successfully!')),
+          );
+          Navigator.pop(context, updatedRoom); // Return the updated room
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${result['message']}')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No changes were made to the room')),
+        );
+      }
 
       setState(() {
         isLoading = false;
       });
-
-      if (result['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Room updated successfully!')),
-        );
-        Navigator.pop(context, updatedRoom); // Return the updated room
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${result['message']}')),
-        );
-      }
     }
   }
 
@@ -141,7 +148,8 @@ class _EditRoomState extends State<EditRoom> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter the room capacity';
                           }
-                          if (int.tryParse(value) == null || int.tryParse(value)! <= 0) {
+                          if (int.tryParse(value) == null ||
+                              int.tryParse(value)! <= 0) {
                             return 'Capacity must be a positive number';
                           }
                           return null;
@@ -181,12 +189,14 @@ class _EditRoomState extends State<EditRoom> {
                         onPressed: _updateRoom,
                         child: const Text('Save Changes'),
                         style: ButtonStyle(
-                          foregroundColor: MaterialStateProperty.all(Colors.black),
+                          foregroundColor:
+                              MaterialStateProperty.all(Colors.black),
                           backgroundColor: MaterialStateProperty.all(
                             const Color.fromARGB(255, 129, 77, 139),
                           ),
                           padding: MaterialStateProperty.all(
-                            const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                            const EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 32),
                           ),
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(

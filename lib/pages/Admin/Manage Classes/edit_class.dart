@@ -47,19 +47,22 @@ class _EditClassState extends State<EditClass> {
         nbStudents: int.parse(_nbStudentsController.text),
         accessKey: _accessKeyController.text,
       );
+      if (!updatedClass.equals(widget.classItem)) {
+        final response =
+            await _classService.updateClass(widget.classItem.id!, updatedClass);
 
-      final response = await _classService.updateClass(
-          widget.classItem.id!, updatedClass);
-
-      setState(() => _isLoading = false);
-
-      if (response['success']) {
-        Navigator.pop(context, updatedClass);
+        if (response['success']) {
+          Navigator.pop(context, updatedClass);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${response['message']}')),
+          const SnackBar(content: Text('No changes were made to the class')),
         );
       }
+      setState(() => _isLoading = false);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill out all fields')),
@@ -75,20 +78,18 @@ class _EditClassState extends State<EditClass> {
     final newKey = _generateAccessKey(); // Generate new key locally
 
     setState(() {
-      _accessKeyController.text = newKey; // Update the controller with the new key
+      _accessKeyController.text =
+          newKey; // Update the controller with the new key
     });
 
     setState(() => _isLoading = false);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Access key reset successfully!')),
-    );
   }
 
   // Key generation method that includes letters and digits
   String _generateAccessKey() {
     const length = 6; // Length of the generated key
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; // Alphanumeric characters
+    const characters =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; // Alphanumeric characters
     Random random = Random();
 
     // Generate a random key of the specified length
@@ -127,7 +128,7 @@ class _EditClassState extends State<EditClass> {
                     buildTextFieldWithButton(
                       'Access Key',
                       _accessKeyController,
-                      'Reset Key',
+                      'regenerate Key',
                       _resetKey,
                     ),
                     const SizedBox(height: 32),
@@ -135,9 +136,10 @@ class _EditClassState extends State<EditClass> {
                       onPressed: _saveChanges,
                       child: const Text('Save Changes'),
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            AppColors.appBarColor),
-                        foregroundColor: MaterialStateProperty.all(Colors.white),
+                        backgroundColor:
+                            MaterialStateProperty.all(AppColors.appBarColor),
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.white),
                       ),
                     ),
                   ],
@@ -199,8 +201,7 @@ class _EditClassState extends State<EditClass> {
         ElevatedButton(
           onPressed: onButtonPressed,
           style: ButtonStyle(
-            backgroundColor:
-                MaterialStateProperty.all(AppColors.appBarColor),
+            backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
             foregroundColor: MaterialStateProperty.all(Colors.white),
           ),
           child: Text(buttonLabel),
