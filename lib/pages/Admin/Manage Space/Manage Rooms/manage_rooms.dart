@@ -29,7 +29,7 @@ class _ManageRoomsState extends State<ManageRooms> {
       final fetchedRooms = await _roomService.getAllRooms();
       setState(() {
         rooms = fetchedRooms;
-        filteredRooms = rooms;
+        filteredRooms = List.from(rooms); // Make a copy of rooms for filtering
       });
     } catch (e) {
       _showErrorAlert('Failed to fetch rooms. Please try again.');
@@ -40,7 +40,8 @@ class _ManageRoomsState extends State<ManageRooms> {
   void _filterRooms() {
     setState(() {
       filteredRooms = rooms
-          .where((roomItem) => roomItem.name.toLowerCase().contains(filterName.toLowerCase()))
+          .where((roomItem) =>
+              roomItem.name.toLowerCase().contains(filterName.toLowerCase()))
           .toList();
     });
   }
@@ -182,7 +183,7 @@ class _ManageRoomsState extends State<ManageRooms> {
                         child: ListTile(
                           title: Text(roomItem.name, style: const TextStyle(color: Colors.white)),
                           subtitle: Text(
-                            'Capacity: ${roomItem.capacity}, Type: ${roomItem.type.name}, Building: ${roomItem.building}',
+                            'Capacity: ${roomItem.capacity}, Type: ${roomItem.type.name}, Building: ${roomItem.building ?? 'Unknown Building'}',
                             style: const TextStyle(color: Colors.white),
                           ),
                           trailing: Row(
@@ -221,6 +222,9 @@ class _ManageRoomsState extends State<ManageRooms> {
                   rooms.add(Room.fromMap(result['data']));
                   _filterRooms();
                 });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Room added successfully')),
+                );
               } else {
                 _showErrorAlert('Failed to add room: ${result['message']}');
               }

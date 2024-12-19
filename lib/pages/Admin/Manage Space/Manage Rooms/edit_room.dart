@@ -3,6 +3,7 @@ import 'package:smarn/models/building.dart';
 import 'package:smarn/models/room.dart';
 import 'package:smarn/models/room_type.dart';
 import 'package:smarn/services/room_service.dart'; // Assume this service is defined
+import 'package:smarn/services/building_service.dart'; // Assume BuildingService is defined
 
 class EditRoom extends StatefulWidget {
   final Room roomItem;
@@ -16,14 +17,17 @@ class EditRoom extends StatefulWidget {
 class _EditRoomState extends State<EditRoom> {
   final _formKey = GlobalKey<FormState>();
   final RoomService _roomService = RoomService();
+  final BuildingService _buildingService = BuildingService();
 
   late String name;
   late String description;
   late int capacity;
   late RoomType type;
-  late String building;
-
+  late Building selectedBuilding;
   bool isLoading = false;
+  bool isBuildingsLoading = true;
+
+  List<Building> buildings = [];
 
   @override
   void initState() {
@@ -32,7 +36,19 @@ class _EditRoomState extends State<EditRoom> {
     description = widget.roomItem.description;
     capacity = widget.roomItem.capacity;
     type = widget.roomItem.type;
-    building = widget.roomItem.building ;
+    selectedBuilding = widget.roomItem.building! as Building; // Initialize with the room's current building
+
+    // Fetch the list of buildings
+    _loadBuildings();
+  }
+
+  // Fetch the list of buildings from the BuildingService
+  Future<void> _loadBuildings() async {
+    List<Building> fetchedBuildings = await _buildingService.getAllBuildings();
+    setState(() {
+      buildings = fetchedBuildings;
+      isBuildingsLoading = false;
+    });
   }
 
   Future<void> _updateRoom() async {
@@ -47,7 +63,7 @@ class _EditRoomState extends State<EditRoom> {
         type: type,
         description: description,
         capacity: capacity,
-        building: building,
+        building: selectedBuilding.id!, // Send the selected building ID
       );
 
       final result = await _roomService.updateRoom(widget.roomItem.id!, updatedRoom);
@@ -80,7 +96,7 @@ class _EditRoomState extends State<EditRoom> {
       backgroundColor: Colors.black,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: isLoading
+        child: isLoading || isBuildingsLoading
             ? const Center(child: CircularProgressIndicator())
             : Form(
                 key: _formKey,
@@ -172,6 +188,31 @@ class _EditRoomState extends State<EditRoom> {
                             .map((e) => DropdownMenuItem(
                                   value: e,
                                   child: Text(e.name),
+                                ))
+                            .toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      // Building dropdown
+                      DropdownButtonFormField<Building>(
+                        decoration: const InputDecoration(
+                          labelText: 'Building',
+                          labelStyle: TextStyle(color: Colors.white),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                        ),
+                        dropdownColor: Colors.black,
+                        style: const TextStyle(color: Colors.white),
+                        value: selectedBuilding,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedBuilding = value!;
+                          });
+                        },
+                        items: buildings
+                            .map((building) => DropdownMenuItem(
+                                  value: building,
+                                  child: Text(building.name),
                                 ))
                             .toList(),
                       ),

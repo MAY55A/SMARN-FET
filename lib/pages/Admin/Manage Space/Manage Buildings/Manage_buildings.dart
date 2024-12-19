@@ -3,6 +3,7 @@ import 'package:smarn/models/building.dart';
 import 'package:smarn/services/building_service.dart';
 import 'add_building.dart'; // Import AddBuilding screen
 import 'edit_building.dart'; // Import EditBuilding screen
+import 'view_building.dart'; // Import ViewBuilding screen
 
 class ManageBuildings extends StatefulWidget {
   const ManageBuildings({super.key});
@@ -13,9 +14,9 @@ class ManageBuildings extends StatefulWidget {
 
 class _ManageBuildingsState extends State<ManageBuildings> {
   final BuildingService _buildingService = BuildingService();
-  List<Building> buildings = []; // List of buildings fetched dynamically
+  List<Building> buildings = [];
   List<Building> filteredBuildings = [];
-  String filterName = ''; // Filter for building name
+  String filterName = '';
   bool isLoading = true;
 
   @override
@@ -24,7 +25,6 @@ class _ManageBuildingsState extends State<ManageBuildings> {
     _fetchBuildings();
   }
 
-  // Function to fetch buildings from the service
   Future<void> _fetchBuildings() async {
     setState(() {
       isLoading = true;
@@ -38,7 +38,6 @@ class _ManageBuildingsState extends State<ManageBuildings> {
     });
   }
 
-  // Function to filter buildings based on the current filters
   void _filterBuildings() {
     setState(() {
       filteredBuildings = buildings
@@ -47,7 +46,6 @@ class _ManageBuildingsState extends State<ManageBuildings> {
     });
   }
 
-  // Function to handle edit building and navigate to EditBuilding
   void _editBuilding(Building building) async {
     final updatedBuilding = await Navigator.push(
       context,
@@ -67,7 +65,6 @@ class _ManageBuildingsState extends State<ManageBuildings> {
     }
   }
 
-  // Function to confirm and delete a building
   void _deleteBuilding(Building building) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -118,17 +115,15 @@ class _ManageBuildingsState extends State<ManageBuildings> {
       ),
       body: Column(
         children: [
-          // Filter Section combined with Search
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                // Search Bar for Building Name
                 Expanded(
                   child: TextField(
                     onChanged: (value) {
                       filterName = value;
-                      _filterBuildings(); // Filter by name
+                      _filterBuildings();
                     },
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
@@ -144,13 +139,9 @@ class _ManageBuildingsState extends State<ManageBuildings> {
               ],
             ),
           ),
-          // Show loading spinner while data is being fetched
           if (isLoading)
-            const Expanded(
-              child: Center(child: CircularProgressIndicator()),
-            )
+            const Expanded(child: Center(child: CircularProgressIndicator()))
           else
-            // List of Filtered Buildings
             Expanded(
               child: ListView.builder(
                 itemCount: filteredBuildings.length,
@@ -168,15 +159,24 @@ class _ManageBuildingsState extends State<ManageBuildings> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Edit Icon
                           IconButton(
                             icon: const Icon(Icons.edit, color: Colors.white),
                             onPressed: () => _editBuilding(building),
                           ),
-                          // Delete Icon
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.white),
                             onPressed: () => _deleteBuilding(building),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.visibility, color: Colors.white), // Eye Icon for View
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ViewBuilding(building: building),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -187,7 +187,6 @@ class _ManageBuildingsState extends State<ManageBuildings> {
             ),
         ],
       ),
-      // Floating Action Button to Add Buildings
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final newBuilding = await Navigator.push(

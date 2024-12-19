@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smarn/models/teacher.dart';
+import 'package:smarn/pages/Teacher/Account%20Settings/account_settings.dart';
 import 'package:smarn/services/teacher_service.dart';
-import 'edit_personal_information_form.dart';
 
 class ManagePersonnelInformationForm extends StatefulWidget {
   const ManagePersonnelInformationForm({super.key});
@@ -128,13 +128,7 @@ class _ManagePersonnelInformationFormState
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    EditPersonnelInformationForm(
-                                  personnelName: personnelName,
-                                  personnelId: personnelId,
-                                  email: email,
-                                  phoneNumber: phoneNumber,
-                                ),
+                                builder: (context) => AccountSettingsPage()
                               ),
                             );
                           },

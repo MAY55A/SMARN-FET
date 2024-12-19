@@ -10,31 +10,29 @@ class TeacherService {
       FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
 
   // Add a new teacher
- 
- 
- Future<Map<String, dynamic>> createTeacher(
-    String email, String password, Teacher teacher) async {
-  try {
-    final HttpsCallable callable =
-        FirebaseFunctions.instance.httpsCallable('createTeacherAccount');
-    final response = await callable.call(<String, dynamic>{
-      'email': email,
-      'password': password,
-      'teacher': teacher.toMap(),
-    });
-    return response.data;
-  } catch (e) {
-    if (e is FirebaseFunctionsException) {
-      // Log Firebase-specific errors
-      print('FirebaseFunctionsException: ${e.code}, ${e.message}');
-      return {'success': false, 'message': e.message ?? 'An error occurred'};
-    }
-    // Log any other unexpected errors
-    print('Unexpected error: $e');
-    return {'success': false, 'message': e.toString()};
-  }
-}
 
+  Future<Map<String, dynamic>> createTeacher(
+      String email, String password, Teacher teacher) async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('createTeacherAccount');
+      final response = await callable.call(<String, dynamic>{
+        'email': email,
+        'password': password,
+        'teacher': teacher.toMap(),
+      });
+      return response.data;
+    } catch (e) {
+      if (e is FirebaseFunctionsException) {
+        // Log Firebase-specific errors
+        print('FirebaseFunctionsException: ${e.code}, ${e.message}');
+        return {'success': false, 'message': e.message ?? 'An error occurred'};
+      }
+      // Log any other unexpected errors
+      print('Unexpected error: $e');
+      return {'success': false, 'message': e.toString()};
+    }
+  }
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
@@ -56,7 +54,8 @@ class TeacherService {
       };
     }
   }
-    /// Fetches the authenticated teacher's data from Firebase or Cloud Functions.
+
+  /// Fetches the authenticated teacher's data from Firebase or Cloud Functions.
   Future<Teacher?> fetchTeacherData() async {
     try {
       User? currentUser = FirebaseAuth.instance.currentUser;
@@ -86,7 +85,6 @@ class TeacherService {
       return null;
     }
   }
-
 
   Future<List<Map<String, dynamic>>> getAllTeachers() async {
     try {
@@ -167,25 +165,22 @@ class TeacherService {
       return {'success': false, 'message': "Error deleting teacher: $e."};
     }
   }
-
-  Future<List<Map<String, dynamic>>> getTeachersBySubject(
-      String subjectId) async {
+   // Fetches teachers for a specific subject
+  Future<List<Map<String, dynamic>>> getTeachersBySubject(String subjectId) async {
     try {
-      final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('getTeachersBySubject');
-      final response =
-          await callable.call(<String, dynamic>{'subjectId': subjectId});
+      final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('getTeachersBySubject');
+      final response = await callable.call(<String, dynamic>{'subjectId': subjectId});
 
-      // Ensure the response contains the list of teachers
-      List<Map<String, dynamic>> teachersList = [];
-      for (Map<String, dynamic> t in response.data["teachers"]) {
-        teachersList
-            .add({"id": t["id"], "teacher": Teacher.fromMap(t["teacher"])});
+      // Ensure the response contains the teachers key and it's not null
+      if (response.data != null && response.data['teachers'] != null) {
+        List<Map<String, dynamic>> teachersList = List<Map<String, dynamic>>.from(response.data['teachers']);
+        return teachersList;
+      } else {
+        return []; // Return an empty list if there's no valid data
       }
-      return teachersList;
     } catch (e) {
-      print('Error fetching teachers teaching this subject : $e');
-      return [];
+      print('Error fetching teachers for subject: $e');
+      return []; // Return an empty list in case of error
     }
   }
 }
