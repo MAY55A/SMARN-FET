@@ -10,7 +10,6 @@ class TeacherService {
       FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
 
   // Add a new teacher
-
   Future<Map<String, dynamic>> createTeacher(
       String email, String password, Teacher teacher) async {
     try {
@@ -22,15 +21,8 @@ class TeacherService {
         'teacher': teacher.toMap(),
       });
       return response.data;
-    } catch (e) {
-      if (e is FirebaseFunctionsException) {
-        // Log Firebase-specific errors
-        print('FirebaseFunctionsException: ${e.code}, ${e.message}');
-        return {'success': false, 'message': e.message ?? 'An error occurred'};
-      }
-      // Log any other unexpected errors
-      print('Unexpected error: $e');
-      return {'success': false, 'message': e.toString()};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 
@@ -55,22 +47,6 @@ class TeacherService {
     }
   }
 
-  /// Fetches the authenticated teacher's data from Firebase or Cloud Functions.
-  Future<Teacher?> fetchTeacherData() async {
-    try {
-      User? currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        throw Exception("No authenticated user found.");
-      }
-
-      // Assuming `getTeacher` fetches teacher data based on their UID.
-      return await getTeacher(currentUser.uid);
-    } catch (e) {
-      print("Error fetching teacher data: $e");
-      return null;
-    }
-  }
-
   Future<Teacher?> getTeacher(String teacherDocId) async {
     try {
       // Call function to get teacher details
@@ -86,6 +62,35 @@ class TeacherService {
     }
   }
 
+  Future<String?> getTeacherName(String teacherId) async {
+    try {
+      // Call function to get teacher details
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getTeacherName');
+      final response =
+          await callable.call(<String, dynamic>{'teacherId': teacherId});
+
+      return response.data;
+    } catch (e) {
+      print('Error fetching teacher name: $e');
+      return null;
+    }
+  }
+
+  /// Fetches the authenticated teacher's data from Firebase or Cloud Functions.
+  Future<Teacher?> fetchTeacherData() async {
+    try {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        throw Exception("No authenticated user found.");
+      }
+      return await getTeacher(currentUser.uid);
+    } catch (e) {
+      print("Error fetching teacher data: $e");
+      return null;
+    }
+  }
+
   Future<List<Map<String, dynamic>>> getAllTeachers() async {
     try {
       final HttpsCallable callable =
@@ -93,14 +98,31 @@ class TeacherService {
       final response = await callable.call();
 
       // Ensure the response contains the list of teachers
-      List<Map<String, dynamic>> teachersList = [];
-      for (Map<String, dynamic> t in response.data["teachers"]) {
-        teachersList
-            .add({"id": t["id"], "teacher": Teacher.fromMap(t["teacher"])});
-      }
+      List<Map<String, dynamic>> teachersList = (response.data["teachers"]
+              as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .map((t) => {
+                "id": t["id"],
+                "teacher":
+                    Teacher.fromMap(Map<String, dynamic>.from(t["teacher"])),
+              })
+          .toList();
       return teachersList;
     } catch (e) {
       print('Error fetching all teachers: $e');
+      return [];
+    }
+  }
+
+  Future<List<String>> getAllTeachersNames() async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getAllTeachersNames');
+      final response = await callable.call();
+      List<String> teachersList = List<String>.from(response.data["teachers"]);
+      return teachersList;
+    } catch (e) {
+      print('Error fetching all teachers names: $e');
       return [];
     }
   }
@@ -117,8 +139,8 @@ class TeacherService {
       });
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': "Error updating teacher: $e."};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 
@@ -147,8 +169,8 @@ class TeacherService {
       });
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': "Error updating teacher: $e."};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 
@@ -161,23 +183,27 @@ class TeacherService {
           await callable.call(<String, dynamic>{'teacherDocId': teacherDocId});
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': "Error deleting teacher: $e."};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
-   // Fetches teachers for a specific subject
-  Future<List<Map<String, dynamic>>> getTeachersBySubject(String subjectId) async {
+
+  Future<List<Map<String, String>>> getTeachersBySubject(
+      String subjectId) async {
     try {
       final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('getTeachersBySubject');
       final response = await callable.call(<String, dynamic>{'subjectId': subjectId});
 
-      // Ensure the response contains the teachers key and it's not null
-      if (response.data != null && response.data['teachers'] != null) {
-        List<Map<String, dynamic>> teachersList = List<Map<String, dynamic>>.from(response.data['teachers']);
-        return teachersList;
-      } else {
-        return []; // Return an empty list if there's no valid data
-      }
+      // Ensure the response contains the list of teachers
+      List<Map<String, String>> teachersList =
+          (response.data["teachers"] as List)
+              .map((item) => Map<String, String>.from(item as Map))
+              .map((t) => {
+                    "id": t["id"] as String,
+                    "name": t["name"] as String,
+                  })
+              .toList();
+      return teachersList;
     } catch (e) {
       print('Error fetching teachers for subject: $e');
       return []; // Return an empty list in case of error

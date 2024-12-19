@@ -53,21 +53,26 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
   }
 
   Future<List<Map<String, dynamic>>> _filterTeachers() async {
+    var filteredTeachers = await _teachersFuture;
+    ;
     if (_selectedSubject != null && _selectedSubject!.isNotEmpty) {
-      return _teacherService.getTeachersBySubject(_selectedSubject!);
-    } else {
-      final allTeachers = await _teacherService.getAllTeachers();
-      final searchTerm = _searchController.text.toLowerCase();
-
-      return allTeachers.where((teacherData) {
+      filteredTeachers = filteredTeachers.where((teacherData) {
         final teacher = teacherData['teacher'] as Teacher;
-        final teacherName = teacher.name.toLowerCase() ?? '';
-        return teacherName.contains(searchTerm);
+        final teacherSubjects = teacher.subjects;
+        return teacherSubjects.contains(_selectedSubject);
       }).toList();
     }
+
+    final searchTerm = _searchController.text.toLowerCase();
+    return filteredTeachers.where((teacherData) {
+      final teacher = teacherData['teacher'] as Teacher;
+      final teacherName = teacher.name.toLowerCase();
+      return teacherName.contains(searchTerm);
+    }).toList();
   }
 
-  Future<void> _confirmDeleteTeacher(String teacherId, String teacherName) async {
+  Future<void> _confirmDeleteTeacher(
+      String teacherId, String teacherName) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) {
@@ -163,12 +168,14 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                           "Select Subject",
                           style: TextStyle(color: Colors.white),
                         ),
-                        items: subjects
+                        items: [null, ...subjects]
                             .map<DropdownMenuItem<String>>(
                               (subject) => DropdownMenuItem<String>(
-                                value: subject.id,
+                                value: subject != null ? subject.id : "",
                                 child: Text(
-                                  subject.name,
+                                  subject != null
+                                      ? subject.name
+                                      : "All subjects",
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ),
@@ -182,7 +189,8 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
               ),
             ),
             Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>( // Fetch filtered teachers
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                // Fetch filtered teachers
                 future: _filterTeachers(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -199,44 +207,68 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                     itemBuilder: (context, index) {
                       final teacherData = teachersList[index];
                       final teacher = teacherData["teacher"] as Teacher;
-
+                      final teacherDocId = teacherData["id"];
                       final teacherName = teacher.name ?? 'No name provided';
                       final teacherEmail = teacher.email ?? 'No email provided';
                       final teacherPhone = teacher.phone ?? 'Not provided';
-                      final teacherSubjects = teacher.subjects?.isNotEmpty == true
-                          ? teacher.subjects!.map((subjectId) => getSubjectNameById(subjectId)).join(', ')
+                      final teacherSubjects = teacher.subjects.isNotEmpty ==
+                              true
+                          ? teacher.subjects
+                              .map((subjectId) => getSubjectNameById(subjectId))
+                              .join(', ')
                           : 'No subjects available';
 
                       return Card(
                         color: Colors.grey[850],
                         margin: const EdgeInsets.all(8.0),
                         child: ListTile(
-                          title: Text(teacherName, style: const TextStyle(color: Colors.white)),
+                          title: Text(teacherName,
+                              style: const TextStyle(color: Colors.white)),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Email: $teacherEmail", style: const TextStyle(color: Colors.white)),
-                              Text("Phone: $teacherPhone", style: const TextStyle(color: Colors.white)),
-                              Text("Subjects: $teacherSubjects", style: const TextStyle(color: Colors.white)),
+                              Text("Email: $teacherEmail",
+                                  style: const TextStyle(color: Colors.white)),
+                              Text("Phone: $teacherPhone",
+                                  style: const TextStyle(color: Colors.white)),
+                              Text("Subjects: $teacherSubjects",
+                                  style: const TextStyle(color: Colors.white)),
                             ],
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => EditTeacherForm(teacher: teacher, refreshTeachers: _refreshTeachers),
+                                      builder: (context) => EditTeacherForm(
+                                          teacher: teacher,
+                                          refreshTeachers: _refreshTeachers),
                                     ),
                                   );
                                 },
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.white),
-                                onPressed: () => _confirmDeleteTeacher(teacher.id!, teacherName),
+                                icon: const Icon(Icons.delete,
+                                    color: Colors.white),
+                                onPressed: () => _confirmDeleteTeacher(
+                                    teacherDocId, teacherName),
+                              ),
+                              // View details icon
+                              IconButton(
+                                icon: const Icon(Icons.visibility, color: Colors.white),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ViewTeacherDetailsForm(teacher: teacher),
+                                    ),
+                                  );
+                                },
                               ),
                               // View details icon
                               IconButton(
@@ -267,7 +299,8 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddTeacherForm(refreshTeachers: _refreshTeachers),
+              builder: (context) =>
+                  AddTeacherForm(refreshTeachers: _refreshTeachers),
             ),
           );
         },

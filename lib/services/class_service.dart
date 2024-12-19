@@ -15,12 +15,12 @@ class ClassService {
       });
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': e};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 
-  Future<Class?> getclassDetails(String className, String classKey) async {
+  Future<Class?> getClassDetails(String className, String classKey) async {
     try {
       // Call function to get class details
       final HttpsCallable callable =
@@ -35,20 +35,34 @@ class ClassService {
     }
   }
 
-  Future<List<Class>> getAllclasses() async {
+  Future<List<Class>> getAllClasses() async {
     try {
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('getAllClasses');
       final response = await callable.call();
 
       // Ensure the response contains the list of classes
-      List<Class> classesList = (response.data["classes"] as List<dynamic>)
+      List<Class> classesList = (response.data["classes"] as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
           .map((c) => Class.fromMap(c))
           .toList();
 
       return classesList;
     } catch (e) {
       print('Error fetching all classes: $e');
+      return [];
+    }
+  }
+
+  Future<List<String>> getAllClassesNames() async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getAllClassesNames');
+      final response = await callable.call();
+
+      return List<String>.from(response.data["classes"]);
+    } catch (e) {
+      print('Error fetching all classes names: $e');
       return [];
     }
   }

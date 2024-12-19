@@ -41,8 +41,9 @@ class RoomService {
       final response = await callable.call();
 
       // Ensure the response contains the list of roomes
-      List<Room> roomsList = (response.data["rooms"] as List<dynamic>)
-          .map((r) => Room.fromMap(r))
+      List<Room> roomsList = (response.data["rooms"] as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .map((s) => Room.fromMap(s))
           .toList();
 
       return roomsList;
@@ -82,21 +83,22 @@ class RoomService {
   }
 
   Future<List<Room>> getRoomsByBuilding(String buildingId) async {
-  try {
-    final HttpsCallable callable =
-        FirebaseFunctions.instance.httpsCallable('getRoomsByBuilding');
-    final response =
-        await callable.call(<String, dynamic>{'buildingId': buildingId});
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getRoomsByBuilding');
+      final response =
+          await callable.call(<String, dynamic>{'buildingId': buildingId});
 
-    // Ensure the response contains the list of rooms
-    List<Room> roomsList = (response.data["rooms"] as List<dynamic>)
-        .map((r) => Room.fromMap(r))
-        .toList();
+      // Ensure the response contains the list of rooms
+      List<Room> roomsList = (response.data["rooms"] as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .map((s) => Room.fromMap(s))
+          .toList();
 
-    return roomsList;
-  } catch (e) {
-    print('Error fetching rooms by building: $e');
-    return [];
+      return roomsList;
+    } catch (e) {
+      print('Error fetching rooms by building: $e');
+      return [];
+    }
   }
-}
 }

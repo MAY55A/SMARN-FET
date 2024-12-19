@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions/v2";
 import {generateId} from "../helpers/id_generator";
-import {Activity, ActivityTag} from "../models";
+import {Activity, ActivityTag, WorkDay} from "../models";
 import {documentExists} from "../helpers/check_existence";
 import {freeHours} from "../helpers/get_teacher_free_hours";
 import {getBasicSubjectDetails} from "./subject_functions";
@@ -61,6 +61,14 @@ export const addActivity = functions.https.onCall(async (request) => {
     throw new functions.https.HttpsError(
       "invalid-argument",
       "Invalid activity tag"
+    );
+  }
+
+  // Ensure the activity day is valid
+  if (activityData.day && !Object.values(WorkDay).includes(activityData.day as WorkDay)) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Invalid working day"
     );
   }
 
@@ -133,10 +141,10 @@ export const getActivity = functions.https.onCall(async (request) => {
   }
 
   const activity = activityDoc.data()!;
-  activity.subject = getBasicSubjectDetails(activity.subject);
+  activity.subject = await getBasicSubjectDetails(activity.subject);
   activity.teacher = await getBasicTeacherDetails(activity.teacher);
-  activity.studentsClass = getBasicClassDetails(activity.studentsClass);
-  activity.room = getBasicRoomDetails(activity.room);
+  activity.studentsClass = await getBasicClassDetails(activity.studentsClass);
+  activity.room = activity.room == null ? null : await getBasicRoomDetails(activity.room);
   return activity;
 });
 
@@ -157,9 +165,14 @@ export const getAllActivities = functions.https.onCall(async (request) => {
       .get();
     const activitiesList: any[] = [];
 
-    activitiesSnapshot.forEach((doc) => {
-      activitiesList.push(doc.data());
-    });
+    for (const doc of activitiesSnapshot.docs) {
+      const activity = doc.data()!;
+      activity.subject = await getBasicSubjectDetails(activity.subject);
+      activity.teacher = await getBasicTeacherDetails(activity.teacher);
+      activity.studentsClass = await getBasicClassDetails(activity.studentsClass);
+      activity.room = activity.room == null ? null : await getBasicRoomDetails(activity.room);
+      activitiesList.push(activity);
+    }
 
     return {activities: activitiesList};
   } catch (error) {
@@ -264,11 +277,16 @@ export const getActivitiesByTeacher = functions.https.onCall(async (request) => 
 
     const activitiesList: any[] = [];
 
-    activitiesSnapshot.forEach((doc) => {
-      activitiesList.push(doc.data());
-    });
-
-    return {activities: activitiesList};
+    for (const doc of activitiesSnapshot.docs) {
+      const activity = doc.data()!;
+      activity.subject = await getBasicSubjectDetails(activity.subject);
+      activity.teacher = await getBasicTeacherDetails(activity.teacher);
+      activity.studentsClass = await getBasicClassDetails(activity.studentsClass);
+      activity.room = activity.room == null ? null : await getBasicRoomDetails(activity.room);
+      activitiesList.push(activity);
+    }
+    
+    return { activities: activitiesList };
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -299,9 +317,14 @@ export const getActivitiesByClass = functions.https.onCall(async (request) => {
 
     const activitiesList: any[] = [];
 
-    activitiesSnapshot.forEach((doc) => {
-      activitiesList.push(doc.data());
-    });
+    for (const doc of activitiesSnapshot.docs) {
+      const activity = doc.data()!;
+      activity.subject = await getBasicSubjectDetails(activity.subject);
+      activity.teacher = await getBasicTeacherDetails(activity.teacher);
+      activity.studentsClass = await getBasicClassDetails(activity.studentsClass);
+      activity.room = activity.room == null ? null : await getBasicRoomDetails(activity.room);
+      activitiesList.push(activity);
+    }
 
     return {activities: activitiesList};
   } catch (error) {

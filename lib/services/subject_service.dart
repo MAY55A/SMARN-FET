@@ -15,8 +15,8 @@ class SubjectService {
       });
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': e};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 
@@ -25,8 +25,8 @@ class SubjectService {
       // Call function to get Subject details
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('getSubject');
-      final response = await callable.call(
-          <String, dynamic>{'subjectId': subjectId});
+      final response =
+          await callable.call(<String, dynamic>{'subjectId': subjectId});
 
       return Subject.fromMap(response.data);
     } catch (e) {
@@ -42,8 +42,9 @@ class SubjectService {
       final response = await callable.call();
 
       // Ensure the response contains the list of Subjectes
-      List<Subject> subjectsList = (response.data["subjects"] as List<dynamic>)
-          .map((c) => Subject.fromMap(c))
+      List<Subject> subjectsList = (response.data["subjects"] as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .map((s) => Subject.fromMap(s))
           .toList();
 
       return subjectsList;
@@ -60,13 +61,13 @@ class SubjectService {
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('updateSubject');
       final response = await callable.call(<String, dynamic>{
-        'SubjectId': subjectId,
+        'subjectId': subjectId,
         'updateData': subject.toMap(),
       });
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': e};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 
@@ -76,11 +77,11 @@ class SubjectService {
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('deleteSubject');
       final response =
-          await callable.call(<String, dynamic>{'SubjectId': subjectId});
+          await callable.call(<String, dynamic>{'subjectId': subjectId});
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': e};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 }

@@ -32,6 +32,13 @@ class Building {
     );
   }
 
+  bool equals(Building other) {
+    return id == other.id &&
+        name == other.name &&
+        longName == other.longName &&
+        description == other.description;
+  }
+
   @override
   String toString() {
     return "building $id : \n name: $name\n long name: $longName\ndescription: $description";

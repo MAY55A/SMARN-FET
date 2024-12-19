@@ -9,6 +9,7 @@ import 'package:smarn/pages/Admin/Manage%20Teachers/manage_teachers_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Time%20Constarints/time_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20requests/manage_complaints_form.dart';
+import 'package:smarn/pages/Admin/admin_dashboard.dart';
 import 'package:smarn/pages/home.dart';
 import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
@@ -39,7 +40,7 @@ class _AdminMenuState extends State<AdminMenu> {
         userName = user.displayName ?? 'Admin';
         userEmail = user.email ?? 'No Email';
         userImageUrl = user.photoURL ??
-            '/teachers/pfp.jpg'; // Placeholder image if no photo
+            'assets/teachers/pfp.jpg'; // Placeholder image if no photo
       });
     }
   }
@@ -62,7 +63,7 @@ class _AdminMenuState extends State<AdminMenu> {
               ),
             ),
             // Home Menu Item
-            _buildMenuItem(context, Icons.home, 'Home', HomePage()),
+            _buildMenuItem(context, Icons.home, 'Home', const AdminDashboard()),
 
             // Other Menu Items
             _buildMenuItem(context, Icons.person_outline, 'Manage Teachers',
@@ -85,7 +86,8 @@ class _AdminMenuState extends State<AdminMenu> {
                   const Text("Logout", style: TextStyle(color: Colors.white)),
               onTap: () async {
                 await AuthService().signOut();
-                Navigator.pushReplacementNamed(context, '/');
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/', (route) => false);
               },
             ),
           ],

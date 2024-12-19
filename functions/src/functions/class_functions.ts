@@ -123,6 +123,36 @@ export const getAllClasses = functions.https.onCall(async (request) => {
   }
 });
 
+export const getAllClassesNames = functions.https.onCall(async (request) => {
+  // Check if the requesting user is allowed to view the classes
+  if (request.auth?.token.role !== "admin" && request.auth?.token.role !== "teacher") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You do not have permission to view classes."
+    );
+  }
+
+  try {
+    // Fetch all classes from Firestore
+    const classesSnapshot = await db
+      .collection("classes")
+      .get();
+    const classesList: any[] = [];
+
+    classesSnapshot.forEach((doc) => {
+      classesList.push(doc.data()?.name);
+    });
+
+    return {classes: classesList};
+  } catch (error) {
+    throw new functions.https.HttpsError(
+      "internal",
+      "Error fetching classes names",
+      error
+    );
+  }
+});
+
 export const updateClass = functions.https.onCall(async (request) => {
   const {classId, updateData} = request.data;
 
@@ -252,15 +282,14 @@ export const deleteClass = functions.https.onCall(async (request) => {
   }
 });
 
-export function getBasicClassDetails(id: string) {
+export async function getBasicClassDetails(id: string) {
   const teacherDoc = db.collection("classes").doc(id);
-  return teacherDoc.get().then((doc) => {
-    if (!doc.exists) {
-      throw new Error("Class not found");
-    }
-    return {
-      id: doc.data()?.id, name: doc.data()?.name,
-      longName: doc.data()?.longName,
-    };
-  });
+  const doc = await teacherDoc.get();
+  if (!doc.exists) {
+    throw new Error("Class not found");
+  }
+  return {
+    id: doc.data()?.id, name: doc.data()?.name,
+    longName: doc.data()?.longName,
+  };
 }

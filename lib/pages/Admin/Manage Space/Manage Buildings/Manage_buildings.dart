@@ -41,7 +41,8 @@ class _ManageBuildingsState extends State<ManageBuildings> {
   void _filterBuildings() {
     setState(() {
       filteredBuildings = buildings
-          .where((building) => building.name.toLowerCase().contains(filterName.toLowerCase()))
+          .where((building) =>
+              building.name.toLowerCase().contains(filterName.toLowerCase()))
           .toList();
     });
   }
@@ -94,7 +95,9 @@ class _ManageBuildingsState extends State<ManageBuildings> {
           _filterBuildings();
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Building "${building.name}" deleted successfully!')),
+          SnackBar(
+              content:
+                  Text('Building "${building.name}" deleted successfully!')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -143,47 +146,48 @@ class _ManageBuildingsState extends State<ManageBuildings> {
             const Expanded(child: Center(child: CircularProgressIndicator()))
           else
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredBuildings.length,
-                itemBuilder: (context, index) {
-                  final building = filteredBuildings[index];
-                  return Card(
-                    margin: const EdgeInsets.all(8.0),
-                    color: const Color.fromARGB(255, 34, 34, 34),
-                    child: ListTile(
-                      title: Text(building.name, style: const TextStyle(color: Colors.white)),
-                      subtitle: Text(
-                        '${building.longName}: ${building.description}',
-                        style: const TextStyle(color: Colors.white),
+              child: filteredBuildings.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No buildings found',
+                        style: TextStyle(color: Colors.white),
                       ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.white),
-                            onPressed: () => _editBuilding(building),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.white),
-                            onPressed: () => _deleteBuilding(building),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.visibility, color: Colors.white), // Eye Icon for View
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ViewBuilding(building: building),
+                    )
+                  : ListView.builder(
+                      itemCount: filteredBuildings.length,
+                      itemBuilder: (context, index) {
+                        final building = filteredBuildings[index];
+                        return Card(
+                          margin: const EdgeInsets.all(8.0),
+                          color: const Color.fromARGB(255, 34, 34, 34),
+                          child: ListTile(
+                            title: Text(building.name,
+                                style: const TextStyle(color: Colors.white)),
+                            subtitle: Text(
+                              '${building.longName}: ${building.description}',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Edit Icon
+                                IconButton(
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.white),
+                                  onPressed: () => _editBuilding(building),
                                 ),
-                              );
-                            },
+                                // Delete Icon
+                                IconButton(
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.white),
+                                  onPressed: () => _deleteBuilding(building),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
         ],
       ),

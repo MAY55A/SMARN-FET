@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:smarn/models/building.dart';
 import 'package:smarn/models/room.dart';
 import 'package:smarn/models/room_type.dart';
-import 'package:smarn/services/room_service.dart'; // Assume this service is defined
-import 'package:smarn/services/building_service.dart'; // Assume BuildingService is defined
+import 'package:smarn/services/room_service.dart';
+import 'package:smarn/services/building_service.dart';
 
 class EditRoom extends StatefulWidget {
   final Room roomItem;
@@ -36,18 +36,22 @@ class _EditRoomState extends State<EditRoom> {
     description = widget.roomItem.description;
     capacity = widget.roomItem.capacity;
     type = widget.roomItem.type;
-    selectedBuilding = widget.roomItem.building! as Building; // Initialize with the room's current building
 
-    // Fetch the list of buildings
+    // Load buildings
     _loadBuildings();
   }
 
-  // Fetch the list of buildings from the BuildingService
   Future<void> _loadBuildings() async {
     List<Building> fetchedBuildings = await _buildingService.getAllBuildings();
     setState(() {
       buildings = fetchedBuildings;
       isBuildingsLoading = false;
+
+      // Find the Building object based on the building ID (String)
+      selectedBuilding = buildings.firstWhere(
+        (building) => building.id == widget.roomItem.building, // Match with building ID
+        orElse: () => buildings.first, // Fallback to the first building if not found
+      );
     });
   }
 
@@ -63,25 +67,31 @@ class _EditRoomState extends State<EditRoom> {
         type: type,
         description: description,
         capacity: capacity,
-        building: selectedBuilding.id!, // Send the selected building ID
+        building: selectedBuilding.id!, // Use the ID of the selected building
       );
 
-      final result = await _roomService.updateRoom(widget.roomItem.id!, updatedRoom);
+      if (!updatedRoom.equals(widget.roomItem)) {
+        final result = await _roomService.updateRoom(widget.roomItem.id!, updatedRoom);
+
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Room updated successfully!')),
+          );
+          Navigator.pop(context, updatedRoom);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${result['message']}')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No changes were made to the room')),
+        );
+      }
 
       setState(() {
         isLoading = false;
       });
-
-      if (result['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Room updated successfully!')),
-        );
-        Navigator.pop(context, updatedRoom); // Return the updated room
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${result['message']}')),
-        );
-      }
     }
   }
 

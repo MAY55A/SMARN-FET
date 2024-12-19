@@ -71,7 +71,8 @@ class _AddRoomState extends State<AddRoom> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Room added successfully')),
       );
-      Navigator.pop(context, newRoom); // This will return the new room to ManageRooms
+      Navigator.pop(
+          context, newRoom); // This will return the new room to ManageRooms
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['message'] ?? 'Failed to add room')),

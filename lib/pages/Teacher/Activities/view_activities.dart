@@ -1,35 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import the intl package
 import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/pages/widgets/dropDownMenu.dart';
 import 'package:smarn/services/activity_service.dart';
+import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/class_service.dart';
-import 'package:smarn/services/teacher_service.dart';
-import 'add_activity.dart';
-import 'edit_activity.dart';
 
-class ManageActivitiesForm extends StatefulWidget {
-  const ManageActivitiesForm({Key? key}) : super(key: key);
+class ViewActivities extends StatefulWidget {
+  const ViewActivities({Key? key}) : super(key: key);
 
   @override
-  _ManageActivitiesFormState createState() => _ManageActivitiesFormState();
+  _ViewActivitiesState createState() => _ViewActivitiesState();
 }
 
-class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
+class _ViewActivitiesState extends State<ViewActivities> {
   final ActivityService _activityService = ActivityService();
   final ClassService _classService = ClassService();
-  final TeacherService _teacherService = TeacherService();
 
   final List<String> tags = ActivityTag.values.map((t) => t.name).toList();
 
   List<Map<String, dynamic>> activities = [];
   List<Map<String, dynamic>> filteredActivities = [];
   List<String> classes = [];
-  List<String> teachers = [];
 
   String filterName = '';
   String filterClass = 'All';
-  String filterTeacher = 'All';
   String filterTag = 'All';
 
   bool isLoading = true;
@@ -47,7 +41,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
       isClassesLoading = true;
     });
 
-    await Future.wait([_fetchActivities(), _fetchClasses(), _fetchTeachers()]);
+    await Future.wait([_fetchActivities(), _fetchClasses()]);
 
     setState(() {
       isLoading = false;
@@ -57,7 +51,8 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
 
   Future<void> _fetchActivities() async {
     try {
-      final fetchedActivities = await _activityService.getAllActivities();
+      final fetchedActivities = await _activityService
+          .getActivitiesByTeacher(AuthService().getCurrentUser()!.uid);
       setState(() {
         activities = fetchedActivities;
         filteredActivities = activities;
@@ -78,17 +73,6 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
     }
   }
 
-  Future<void> _fetchTeachers() async {
-    try {
-      final fetchedTeachers = await _teacherService.getAllTeachersNames();
-      setState(() {
-        teachers = fetchedTeachers;
-      });
-    } catch (e) {
-      print('Error fetching classes: $e');
-    }
-  }
-
   void _filterActivities() {
     setState(() {
       filteredActivities = activities.where((activity) {
@@ -98,41 +82,16 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
             activity["subject"]["name"]
                 .toLowerCase()
                 .contains(filterName.toLowerCase());
-        bool matchesClass = filterClass == 'All' ||
+        bool matchesClass = filterClass == null ||
+            filterClass == 'All' ||
             activity["studentsClass"]["name"] == filterClass;
-        bool matchesTag = filterTag == 'All' ||
+        bool matchesTag = filterTag == null ||
+            filterTag == 'All' ||
             activity["tag"].toLowerCase() == filterTag;
-        bool matchesTeacher = filterTeacher == 'All' ||
-            activity["teacher"]["name"] == filterTeacher;
 
-        return matchesName && matchesClass && matchesTeacher && matchesTag;
+        return matchesName && matchesClass && matchesTag;
       }).toList();
     });
-  }
-
-  void _editActivity(Map<String, dynamic> activity) async {
-    final updated = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => EditActivity(activity: activity)),
-    );
-
-    if (updated != null && updated) {
-      setState(() {
-        _fetchActivities();
-      });
-    }
-  }
-
-  void _deleteActivity(Map<String, dynamic> activity) async {
-    final result = await _activityService.deleteActivity(activity["id"]);
-    if (result['success']) {
-      setState(() {
-        activities.remove(activity);
-        filteredActivities.remove(activity);
-      });
-    } else {
-      print('Error deleting activity: ${result['message']}');
-    }
   }
 
   @override
@@ -140,7 +99,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Manage Activities'),
+        title: const Text('Activities'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Column(
@@ -167,15 +126,8 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const SizedBox(width: 8),
                     filterMenu(classes, filterClass, "classes", (String value) {
                       filterClass = value;
-                      _filterActivities();
-                    }),
-                    const SizedBox(width: 8),
-                    filterMenu(teachers, filterTeacher, "teachers",
-                        (String value) {
-                      filterTeacher = value;
                       _filterActivities();
                     }),
                     const SizedBox(width: 8),
@@ -203,32 +155,6 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                         itemCount: filteredActivities.length,
                         itemBuilder: (context, index) {
                           final activity = filteredActivities[index];
-
-                          // Format start and end times
-                          String formattedStartTime = activity['startTime'] ?? "??";
-                          String formattedEndTime = activity['endTime'] ?? "??";
-
-                          // Optional: If you want to format the time
-                          DateFormat inputFormat = DateFormat("HH:mm");
-                          DateFormat outputFormat = DateFormat("h:mm a");
-
-                          // Check if startTime and endTime are valid before parsing
-                          if (formattedStartTime != "??" && formattedStartTime.isNotEmpty) {
-                            try {
-                              formattedStartTime = outputFormat.format(inputFormat.parse(formattedStartTime));
-                            } catch (e) {
-                              formattedStartTime = "Invalid time";
-                            }
-                          }
-
-                          if (formattedEndTime != "??" && formattedEndTime.isNotEmpty) {
-                            try {
-                              formattedEndTime = outputFormat.format(inputFormat.parse(formattedEndTime));
-                            } catch (e) {
-                              formattedEndTime = "Invalid time";
-                            }
-                          }
-
                           return Card(
                             color: const Color.fromARGB(255, 34, 34, 34),
                             margin: const EdgeInsets.all(8.0),
@@ -237,38 +163,18 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                                   "${activity['subject']['longName']} - ${activity["studentsClass"]["name"]}",
                                   style: const TextStyle(color: Colors.white)),
                               subtitle: Text(
-                                'By ${activity["teacher"]["name"]}\nOn ${activity['day'] ?? "??"} $formattedStartTime --> $formattedEndTime',
+                                'On ${activity['day'] ?? "??"} ${activity['startTime'] ?? "??"}h --> ${activity['endTime'] ?? "??"}h',
                                 style: const TextStyle(color: Colors.white),
                               ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit,
-                                        color: Colors.white),
-                                    onPressed: () => _editActivity(activity),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.white),
-                                    onPressed: () => _deleteActivity(activity),
-                                  ),
-                                ],
-                              ),
+                              trailing: Text(
+                                  "${activity['room']?['name'] ?? "no assigned room"}",
+                                  style: const TextStyle(color: Colors.white)),
                             ),
                           );
                         },
                       ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AddActivity()));
-        },
-        child: const Icon(Icons.add),
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
     );
   }

@@ -10,6 +10,7 @@ class ViewSubjectDetails extends StatefulWidget {
   @override
   _ViewSubjectDetailsState createState() => _ViewSubjectDetailsState();
 }
+
 class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
   final TeacherService _teacherService = TeacherService();
   bool _isLoading = true;
@@ -25,7 +26,8 @@ class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
   Future<void> _loadTeachersForSubject() async {
     try {
       // Fetch the list of teachers who teach the subject
-      var teachersList = await _teacherService.getTeachersBySubject(widget.subject.id!);
+      var teachersList =
+          await _teacherService.getTeachersBySubject(widget.subject.id!);
 
       // Check if the teachersList is not empty
       if (teachersList.isNotEmpty) {
@@ -34,11 +36,12 @@ class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
               .map((teacherData) {
                 // Ensure that teacherData contains valid 'teacher' data
                 if (teacherData['teacher'] != null) {
-                  return Teacher.fromMap(teacherData['teacher']);
+                  return Teacher.fromMap(teacherData['teacher'] as Map<String, dynamic>);
                 }
                 return null; // If no valid teacher data, return null
               })
-              .whereType<Teacher>() // This ensures only non-null Teacher objects are included
+              .whereType<
+                  Teacher>() // This ensures only non-null Teacher objects are included
               .toList();
           _isLoading = false;
         });
@@ -62,7 +65,8 @@ class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("Subject Details", style: TextStyle(color: Colors.white)),
+        title: const Text("Subject Details",
+            style: TextStyle(color: Colors.white)),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Container(
@@ -80,7 +84,8 @@ class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
             Text('Description: ${widget.subject.description ?? 'Not Provided'}',
                 style: const TextStyle(color: Colors.white, fontSize: 18)),
             const SizedBox(height: 20),
-            const Text('Teachers:', style: TextStyle(color: Colors.white, fontSize: 20)),
+            const Text('Teachers:',
+                style: TextStyle(color: Colors.white, fontSize: 20)),
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -100,10 +105,12 @@ class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
                                   contentPadding:
                                       const EdgeInsets.symmetric(vertical: 5),
                                   title: Text(teacher.name,
-                                      style: const TextStyle(color: Colors.white)),
+                                      style:
+                                          const TextStyle(color: Colors.white)),
                                   subtitle: Text(
                                       teacher.email ?? 'No email provided',
-                                      style: const TextStyle(color: Colors.grey)),
+                                      style:
+                                          const TextStyle(color: Colors.grey)),
                                   leading: teacher.picture.isNotEmpty
                                       ? CircleAvatar(
                                           backgroundImage:

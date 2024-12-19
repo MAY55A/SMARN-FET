@@ -5,12 +5,7 @@ class Subject {
   String? description;
 
   // Constructor
-  Subject({
-    this.id,
-    required this.name,
-    this.longName,
-     this.description
-  });
+  Subject({this.id, required this.name, this.longName, this.description});
 
   // Convert a Subject object into a Map
   Map<String, dynamic> toMap() {
@@ -31,7 +26,13 @@ class Subject {
         description: map['description']);
   }
 
-  
+  bool equals(Subject other) {
+    return other.id == id &&
+        other.name == name &&
+        other.description == description &&
+        other.longName == longName;
+  }
+
   @override
   String toString() {
     return "subject $id : \n name: $name\n long name: $longName\ndescription: $description";

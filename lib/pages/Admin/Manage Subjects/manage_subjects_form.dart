@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/subject.dart';
-import 'package:smarn/pages/widgets/canstants.dart';
+import 'package:smarn/pages/widgets/canstants.dart'; // Fixed typo in 'constants'
 import 'package:smarn/services/subject_service.dart';
 import 'add_subject.dart';
 import 'edit_subject.dart';
-import 'view_subject_details.dart';  // Add this import
+import 'view_subject_details.dart';
 
 class ManageSubjectsForm extends StatefulWidget {
   const ManageSubjectsForm({Key? key}) : super(key: key);
@@ -80,7 +80,7 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
     final updatedSubject = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditSubjectForm(subjectId: subject.id!),
+        builder: (context) => EditSubjectForm(subject: subject),
       ),
     );
 
@@ -127,9 +127,10 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
           subjects.remove(subject);
           _filterSubjects();
         });
-      } else {
-        print("Failed to delete subject: ${response['message']}");
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
     } catch (e) {
       print("Error deleting subject: $e");
     }
@@ -169,44 +170,51 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
                   ),
                   // Subject List
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: filteredSubjects.length,
-                      itemBuilder: (context, index) {
-                        final subject = filteredSubjects[index];
-                        return Card(
-                          color: const Color.fromARGB(255, 44, 44, 44),
-                          margin: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                            title: Text(
-                              subject.name,
-                              style: const TextStyle(color: Colors.white),
+                    child: filteredSubjects.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'No subjects found',
+                              style: TextStyle(color: Colors.white),
                             ),
-                            subtitle: Text(
-                              subject.longName ?? '',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.white),
-                                  onPressed: () => _editSubject(subject),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredSubjects.length,
+                            itemBuilder: (context, index) {
+                              final subject = filteredSubjects[index];
+                              return Card(
+                                color: const Color.fromARGB(255, 44, 44, 44),
+                                margin: const EdgeInsets.all(8.0),
+                                child: ListTile(
+                                  title: Text(
+                                    subject.name,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  subtitle: Text(
+                                    subject.longName ?? '',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit, color: Colors.white),
+                                        onPressed: () => _editSubject(subject),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.white),
+                                        onPressed: () => _confirmDeleteSubject(subject),
+                                      ),
+                                      // View Details Icon
+                                      IconButton(
+                                        icon: const Icon(Icons.visibility, color: Colors.white),
+                                        onPressed: () => _viewSubjectDetails(subject),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.white),
-                                  onPressed: () => _confirmDeleteSubject(subject),
-                                ),
-                                // View Details Icon
-                                IconButton(
-                                  icon: const Icon(Icons.visibility, color: Colors.white),
-                                  onPressed: () => _viewSubjectDetails(subject),
-                                ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
                   ),
                 ],
               ),

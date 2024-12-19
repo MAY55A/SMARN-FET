@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smarn/models/teacher.dart';
 import 'package:smarn/pages/Teacher/Account%20Settings/account_settings.dart';
+import 'package:smarn/pages/Teacher/teacher_dashboard.dart';
 
 import 'package:smarn/pages/home.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/pages/Teacher/Manage%20Info/manage_personnel_information_form.dart';
 import 'package:smarn/services/auth_service.dart';
-
 
 class TeacherDrawer extends StatelessWidget {
   @override
@@ -16,10 +16,12 @@ class TeacherDrawer extends StatelessWidget {
 
     // Fetch the teacher data using TeacherService
     return FutureBuilder<Teacher?>(
-      future: TeacherService().fetchTeacherData(), // Fetch teacher data asynchronously
+      future: TeacherService()
+          .fetchTeacherData(), // Fetch teacher data asynchronously
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator()); // Show a loading indicator
+          return const Center(
+              child: CircularProgressIndicator()); // Show a loading indicator
         }
 
         if (snapshot.hasError || !snapshot.hasData) {
@@ -36,7 +38,8 @@ class TeacherDrawer extends StatelessWidget {
                 // Profile Section
                 DrawerHeader(
                   decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 70, 172, 255), // Top section background color
+                    color: Color.fromARGB(
+                        255, 70, 172, 255), // Top section background color
                   ),
                   child: SingleChildScrollView(
                     child: Column(
@@ -48,7 +51,8 @@ class TeacherDrawer extends StatelessWidget {
                         const SizedBox(height: 10),
                         Text(
                           teacher.name,
-                          style: const TextStyle(color: Colors.white, fontSize: 18),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 18),
                         ),
                         const SizedBox(height: 5),
                         Text(
@@ -62,7 +66,8 @@ class TeacherDrawer extends StatelessWidget {
                 ),
                 // Home Button
                 ListTile(
-                  leading: const Icon(Icons.home, color: Colors.blue), // Blue icon
+                  leading:
+                      const Icon(Icons.home, color: Colors.blue), // Blue icon
                   title: const Text(
                     'Home',
                     style: TextStyle(color: Colors.white),
@@ -70,7 +75,8 @@ class TeacherDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
+                      MaterialPageRoute(
+                          builder: (context) => const TeacherDashboard()),
                     );
                   },
                 ),
@@ -85,12 +91,13 @@ class TeacherDrawer extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ManagePersonnelInformationForm(),
+                        builder: (context) =>
+                            const ManagePersonnelInformationForm(),
                       ),
                     );
                   },
                 ),
-  /*               ListTile(
+                /*               ListTile(
    leading: const Icon(Icons.person, color: Colors.white),
    title: const Text(
      'Account Settings',
@@ -115,7 +122,8 @@ class TeacherDrawer extends StatelessWidget {
                   tileColor: Colors.blue, // Bottom section background color
                   onTap: () async {
                     await AuthService().signOut();
-                    Navigator.pushReplacementNamed(context, '/');
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/', (route) => false);
                   },
                 ),
               ],

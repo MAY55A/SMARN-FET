@@ -55,9 +55,19 @@ export interface Activity {
     tag: ActivityTag;
     isActive: boolean;
     duration: number;
+    day?: WorkDay;
     startTime?: string;
     endTime?: string;
     room?: string;
+}
+
+export enum WorkDay {
+    MONDAY = "Monday",
+    TUESDAY = "Tuesday",
+    WEDNESDAY = "Wednesday",
+    THURSDAY = "Thursday",
+    FRIDAY = "Friday",
+    SATURDAY = "Saturday",
 }
 
 export enum ActivityTag {

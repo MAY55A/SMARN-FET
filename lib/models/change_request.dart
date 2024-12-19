@@ -50,11 +50,20 @@ class ChangeRequest {
       content: map['content'],
       teacher: map['teacher'],
       submissionDate: map['submissionDate'],
-      status: ChangeRequestStatus.values.firstWhere((status) => status.name == map['status']),
+      status: ChangeRequestStatus.values
+          .firstWhere((status) => status.name == map['status']),
     );
   }
 
-  
+  bool equals(ChangeRequest other) {
+    return other.id == id &&
+        other.newTimeSlot == newTimeSlot &&
+        other.newRoom == newRoom &&
+        other.activity == activity &&
+        other.reason == reason &&
+        other.content == content;
+  }
+
   @override
   String toString() {
     return 'ChangeRequest{\nid: $id,\n newTimeSlot: $newTimeSlot,\n newRoom: $newRoom,\n activity: $activity,\n reason: $reason,\n content: $content,\n teacher: $teacher,\n submissionDate: $submissionDate,\n status: $status\n}';
