@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import the intl package
 import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/pages/widgets/dropDownMenu.dart';
 import 'package:smarn/services/activity_service.dart';
@@ -204,31 +203,6 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                         itemBuilder: (context, index) {
                           final activity = filteredActivities[index];
 
-                          // Format start and end times
-                          String formattedStartTime = activity['startTime'] ?? "??";
-                          String formattedEndTime = activity['endTime'] ?? "??";
-
-                          // Optional: If you want to format the time
-                          DateFormat inputFormat = DateFormat("HH:mm");
-                          DateFormat outputFormat = DateFormat("h:mm a");
-
-                          // Check if startTime and endTime are valid before parsing
-                          if (formattedStartTime != "??" && formattedStartTime.isNotEmpty) {
-                            try {
-                              formattedStartTime = outputFormat.format(inputFormat.parse(formattedStartTime));
-                            } catch (e) {
-                              formattedStartTime = "Invalid time";
-                            }
-                          }
-
-                          if (formattedEndTime != "??" && formattedEndTime.isNotEmpty) {
-                            try {
-                              formattedEndTime = outputFormat.format(inputFormat.parse(formattedEndTime));
-                            } catch (e) {
-                              formattedEndTime = "Invalid time";
-                            }
-                          }
-
                           return Card(
                             color: const Color.fromARGB(255, 34, 34, 34),
                             margin: const EdgeInsets.all(8.0),
@@ -237,7 +211,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                                   "${activity['subject']['longName']} - ${activity["studentsClass"]["name"]}",
                                   style: const TextStyle(color: Colors.white)),
                               subtitle: Text(
-                                'By ${activity["teacher"]["name"]}\nOn ${activity['day'] ?? "??"} $formattedStartTime --> $formattedEndTime',
+                                'Duration: ${activity['duration']} minutes\nTeacher: ${activity["teacher"]["name"]}',
                                 style: const TextStyle(color: Colors.white),
                               ),
                               trailing: Row(

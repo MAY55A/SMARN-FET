@@ -9,11 +9,11 @@ class Activity {
   bool isActive;
   // duration in minutes
   int duration;
-  String day;  // i changed from WorkDay to String cuz it make a prolem
-  String startTime;
-  String endTime;
+  String? day;  // i changed from WorkDay to String cuz it make a prolem
+  String? startTime;
+  String? endTime;
   ActivityTag tag;
-  String room;
+  String? room;
 
   // Constructor
   Activity({
@@ -23,10 +23,10 @@ class Activity {
     required this.studentsClass,
     required this.duration,
     required this.tag,
-    required this.day,
-    required this.startTime,
-    required this.endTime,
-    required this.room,
+    this.day,
+     this.startTime,
+     this.endTime,
+     this.room,
      this.isActive =true ,
   });
 

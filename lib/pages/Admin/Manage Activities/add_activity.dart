@@ -4,13 +4,11 @@ import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/models/class.dart';
 import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
-import 'package:smarn/models/room.dart';
 import 'package:smarn/pages/widgets/dropDownMenu.dart';
 import 'package:smarn/services/class_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/services/activity_service.dart';
-import 'package:smarn/services/room_service.dart';
 
 class AddActivity extends StatefulWidget {
   const AddActivity({Key? key}) : super(key: key);
@@ -22,8 +20,6 @@ class AddActivity extends StatefulWidget {
 class _AddActivityState extends State<AddActivity> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
-  final TextEditingController _startTimeController = TextEditingController();
-  final TextEditingController _endTimeController = TextEditingController();
 
   final List<String> _tags = ActivityTag.values.map((t) => t.name).toList();
 
@@ -31,21 +27,16 @@ class _AddActivityState extends State<AddActivity> {
   String? _selectedTag;
   Teacher? _selectedTeacher;
   Subject? _selectedSubject;
-  Room? _selectedRoom;
-  String? _selectedDay; // Changed to String instead of WorkDay
 
   List<Class> _classes = [];
   List<Teacher> _allTeachers = [];
   List<Subject> _allSubjects = [];
   List<Teacher> _teachers = [];
   List<Subject> _subjects = [];
-  List<Room> _rooms = [];
-  List<String> _days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]; // List of days as strings
 
   final TeacherService _teacherService = TeacherService();
   final SubjectService _subjectService = SubjectService();
   final ClassService _classService = ClassService();
-  final RoomService _roomService = RoomService();
 
   @override
   void initState() {
@@ -57,7 +48,6 @@ class _AddActivityState extends State<AddActivity> {
     await Future.wait([
       _fetchTeachers(),
       _fetchSubjects(),
-      _fetchRooms(),
       _fetchClasses(),
     ]);
   }
@@ -80,13 +70,6 @@ class _AddActivityState extends State<AddActivity> {
     });
   }
 
-  Future<void> _fetchRooms() async {
-    final roomsList = await _roomService.getAllRooms();
-    setState(() {
-      _rooms = roomsList;
-    });
-  }
-
   Future<void> _fetchClasses() async {
     final classesList = await _classService.getAllClasses();
     setState(() {
@@ -102,11 +85,7 @@ class _AddActivityState extends State<AddActivity> {
         studentsClass: _selectedClass!.id!,
         duration: int.parse(_durationController.text),
         tag: ActivityTag.values.firstWhere((e) => e.name == _selectedTag),
-        day: _selectedDay!,
-        startTime: _startTimeController.text,
-        endTime: _endTimeController.text,    
-        room: _selectedRoom!.id!,
-        isActive: true
+        isActive: true,
       );
 
       // Add the activity using the service
@@ -131,13 +110,9 @@ class _AddActivityState extends State<AddActivity> {
         _selectedTeacher != null &&
         _selectedClass != null &&
         _selectedTag != null &&
-        _selectedRoom != null &&
         _durationController.text.isNotEmpty &&
         int.tryParse(_durationController.text) != null &&
-        int.parse(_durationController.text) >= 60 &&
-        _selectedDay != null &&
-        _startTimeController.text.isNotEmpty &&
-        _endTimeController.text.isNotEmpty;
+        int.parse(_durationController.text) >= 60;
   }
 
   void _refreshSubjects() {
@@ -194,48 +169,6 @@ class _AddActivityState extends State<AddActivity> {
                   _selectedTag = newValue as String;
                 });
               }),
-              const SizedBox(height: 16),
-
-              // Room Dropdown
-              activityDropdownMenu("room", _selectedRoom, _rooms, (dynamic newValue) {
-                setState(() {
-                  _selectedRoom = newValue as Room;
-                });
-              }),
-              const SizedBox(height: 16),
-
-              // Day Dropdown
-              activityDropdownMenu("day", _selectedDay, _days, (dynamic newValue) {
-                setState(() {
-                  _selectedDay = newValue as String; // No need to convert to enum anymore
-                });
-              }),
-              const SizedBox(height: 16),
-
-              // Start Time TextField
-              TextField(
-                controller: _startTimeController,
-                style: const TextStyle(color: Colors.white),
-                keyboardType: TextInputType.datetime,
-                decoration: const InputDecoration(
-                  labelText: 'Start Time (HH:mm)',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // End Time TextField
-              TextField(
-                controller: _endTimeController,
-                style: const TextStyle(color: Colors.white),
-                keyboardType: TextInputType.datetime,
-                decoration: const InputDecoration(
-                  labelText: 'End Time (HH:mm)',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
-                ),
-              ),
               const SizedBox(height: 16),
 
               // Duration TextField

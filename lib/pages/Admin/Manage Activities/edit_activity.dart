@@ -4,13 +4,11 @@ import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/models/class.dart';
 import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
-import 'package:smarn/models/room.dart'; 
 import 'package:smarn/pages/widgets/dropDownMenu.dart';
 import 'package:smarn/services/class_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/services/activity_service.dart';
-import 'package:smarn/services/room_service.dart';
 
 class EditActivity extends StatefulWidget {
   final Map<String, dynamic> activity;
@@ -23,8 +21,6 @@ class EditActivity extends StatefulWidget {
 
 class _EditActivityState extends State<EditActivity> {
   final TextEditingController _durationController = TextEditingController();
-  final TextEditingController _startTimeController = TextEditingController();
-  final TextEditingController _endTimeController = TextEditingController();
 
   final List<String> _tags = ActivityTag.values.map((a) => a.name).toList();
 
@@ -32,21 +28,16 @@ class _EditActivityState extends State<EditActivity> {
   String? _selectedTag;
   Teacher? _selectedTeacher;
   Subject? _selectedSubject;
-  Room? _selectedRoom;
-  String? _selectedDay; // Changed to string
 
   List<Class> _classes = [];
   List<Teacher> _allTeachers = [];
   List<Subject> _allSubjects = [];
   List<Teacher> _teachers = [];
   List<Subject> _subjects = [];
-  List<Room> _rooms = [];
-  List<String> _days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']; // List of working days
 
   final TeacherService _teacherService = TeacherService();
   final SubjectService _subjectService = SubjectService();
   final ClassService _classService = ClassService();
-  final RoomService _roomService = RoomService();
 
   @override
   void initState() {
@@ -58,23 +49,16 @@ class _EditActivityState extends State<EditActivity> {
     await Future.wait([
       _fetchTeachers(),
       _fetchSubjects(),
-      _fetchRooms(),
       _fetchClasses(),
     ]);
 
     // Pre-fill fields with existing data
     setState(() {
       _durationController.text = widget.activity['duration']?.toString() ?? '';
-      _startTimeController.text = widget.activity['startTime'] ?? '';
-      _endTimeController.text = widget.activity['endTime'] ?? '';
       _selectedClass = _classes.firstWhere((c) => c.id == widget.activity['studentsClass']['id']);
       _selectedTag = widget.activity['tag'];
       _selectedTeacher = _allTeachers.firstWhere((t) => t.id == widget.activity['teacher']['id']);
       _selectedSubject = _allSubjects.firstWhere((s) => s.id == widget.activity['subject']['id']);
-      _selectedRoom = widget.activity['room'] != null
-          ? _rooms.firstWhere((r) => r.id == widget.activity['room']['id'])
-          : null;
-      _selectedDay = widget.activity['day']; // Assign string directly
     });
   }
 
@@ -93,13 +77,6 @@ class _EditActivityState extends State<EditActivity> {
     setState(() {
       _allSubjects = subjectsList;
       _subjects = subjectsList;
-    });
-  }
-
-  Future<void> _fetchRooms() async {
-    final roomsList = await _roomService.getAllRooms();
-    setState(() {
-      _rooms = roomsList;
     });
   }
 
@@ -135,10 +112,6 @@ class _EditActivityState extends State<EditActivity> {
         studentsClass: _selectedClass!.id!,
         duration: int.parse(_durationController.text),
         tag: ActivityTag.values.firstWhere((e) => e.name == _selectedTag),
-        room: _selectedRoom?.id ?? '',
-        day: _selectedDay ?? '', // Provide a default value if null
-        startTime: _startTimeController.text,
-        endTime: _endTimeController.text,
       );
 
       final result = await ActivityService().updateActivity(widget.activity['id'], updatedActivity);
@@ -161,10 +134,7 @@ class _EditActivityState extends State<EditActivity> {
         _selectedTag != null &&
         _durationController.text.isNotEmpty &&
         int.tryParse(_durationController.text) != null &&
-        int.parse(_durationController.text) >= 60 &&
-        _selectedDay != null &&
-        _startTimeController.text.isNotEmpty &&
-        _endTimeController.text.isNotEmpty;
+        int.parse(_durationController.text) >= 60;
   }
 
   @override
@@ -215,22 +185,6 @@ class _EditActivityState extends State<EditActivity> {
               }),
               const SizedBox(height: 16),
 
-              // Room Dropdown
-              activityDropdownMenu("room", _selectedRoom, _rooms, (dynamic newValue) {
-                setState(() {
-                  _selectedRoom = newValue as Room;
-                });
-              }),
-              const SizedBox(height: 16),
-
-              // Day Dropdown (using string list now)
-              activityDropdownMenu("day", _selectedDay, _days, (dynamic newValue) {
-                setState(() {
-                  _selectedDay = newValue as String; // Set the selected day as string
-                });
-              }),
-              const SizedBox(height: 16),
-
               // Duration TextField
               TextField(
                 controller: _durationController,
@@ -238,32 +192,6 @@ class _EditActivityState extends State<EditActivity> {
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   labelText: 'Duration (Minutes)',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Start Time TextField
-              TextField(
-                controller: _startTimeController,
-                style: const TextStyle(color: Colors.white),
-                keyboardType: TextInputType.datetime,
-                decoration: const InputDecoration(
-                  labelText: 'Start Time (HH:mm)',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // End Time TextField
-              TextField(
-                controller: _endTimeController,
-                style: const TextStyle(color: Colors.white),
-                keyboardType: TextInputType.datetime,
-                decoration: const InputDecoration(
-                  labelText: 'End Time (HH:mm)',
                   labelStyle: TextStyle(color: Colors.white),
                   border: OutlineInputBorder(),
                 ),
