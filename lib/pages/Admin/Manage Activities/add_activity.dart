@@ -18,7 +18,6 @@ class AddActivity extends StatefulWidget {
 }
 
 class _AddActivityState extends State<AddActivity> {
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
 
   final List<String> _tags = ActivityTag.values.map((t) => t.name).toList();
@@ -77,6 +76,24 @@ class _AddActivityState extends State<AddActivity> {
     });
   }
 
+  Future<void> _refreshTeachers() async {
+    final teachersList = _allTeachers
+        .where((teacher) => teacher.subjects.contains(_selectedSubject!.id))
+        .toList();
+    setState(() {
+      _teachers = teachersList;
+    });
+  }
+
+  Future<void> _refreshSubjects() async {
+    final subjectsList = _allSubjects
+        .where((s) => _selectedTeacher!.subjects.contains(s.id))
+        .toList();
+    setState(() {
+      _subjects = subjectsList;
+    });
+  }
+
   void _saveActivity() {
     if (_formIsValid()) {
       final activity = Activity(
@@ -85,7 +102,6 @@ class _AddActivityState extends State<AddActivity> {
         studentsClass: _selectedClass!.id!,
         duration: int.parse(_durationController.text),
         tag: ActivityTag.values.firstWhere((e) => e.name == _selectedTag),
-        isActive: true,
       );
 
       // Add the activity using the service
@@ -94,13 +110,15 @@ class _AddActivityState extends State<AddActivity> {
           Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error adding activity: ${result['message']}')),
+            SnackBar(content: Text(result['message'])),
           );
         }
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill out all fields and ensure the duration is at least 60 minutes.')),
+        const SnackBar(
+            content: Text(
+                'Please fill out all fields and ensure the duration is at least 60 minutes.')),
       );
     }
   }
@@ -113,15 +131,6 @@ class _AddActivityState extends State<AddActivity> {
         _durationController.text.isNotEmpty &&
         int.tryParse(_durationController.text) != null &&
         int.parse(_durationController.text) >= 60;
-  }
-
-  void _refreshSubjects() {
-    // Assuming this method filters subjects based on selected teacher
-    if (_selectedTeacher != null) {
-      setState(() {
-        _subjects = _allSubjects; // No filtering needed, as teachers are not linked to subjects
-      });
-    }
   }
 
   @override
@@ -139,24 +148,28 @@ class _AddActivityState extends State<AddActivity> {
           child: Column(
             children: [
               // Subject Dropdown
-              activityDropdownMenu("subject", _selectedSubject, _subjects, (dynamic newValue) {
+              activityDropdownMenu("subject", _selectedSubject, _subjects,
+                  (dynamic newValue) {
                 setState(() {
                   _selectedSubject = newValue as Subject;
+                  _refreshTeachers();
                 });
               }),
               const SizedBox(height: 16),
 
               // Teacher Dropdown
-              activityDropdownMenu("teacher", _selectedTeacher, _teachers, (dynamic newValue) {
+              activityDropdownMenu("teacher", _selectedTeacher, _teachers,
+                  (dynamic newValue) {
                 setState(() {
                   _selectedTeacher = newValue as Teacher;
-                  _refreshSubjects(); // Reset subjects to show all
+                  _refreshSubjects();
                 });
               }),
               const SizedBox(height: 16),
 
               // Class Dropdown
-              activityDropdownMenu("class", _selectedClass, _classes, (dynamic newValue) {
+              activityDropdownMenu("class", _selectedClass, _classes,
+                  (dynamic newValue) {
                 setState(() {
                   _selectedClass = newValue as Class;
                 });
@@ -164,7 +177,8 @@ class _AddActivityState extends State<AddActivity> {
               const SizedBox(height: 16),
 
               // Tag Dropdown
-              activityDropdownMenu("tag", _selectedTag, _tags, (dynamic newValue) {
+              activityDropdownMenu("tag", _selectedTag, _tags,
+                  (dynamic newValue) {
                 setState(() {
                   _selectedTag = newValue as String;
                 });
@@ -190,7 +204,8 @@ class _AddActivityState extends State<AddActivity> {
                 child: const Text('Save Activity'),
                 style: ButtonStyle(
                   foregroundColor: MaterialStateProperty.all(Colors.black),
-                  backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 129, 77, 139)),
+                  backgroundColor: MaterialStateProperty.all(
+                      const Color.fromARGB(255, 129, 77, 139)),
                 ),
               ),
             ],
