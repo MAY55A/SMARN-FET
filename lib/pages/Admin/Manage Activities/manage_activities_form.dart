@@ -99,8 +99,8 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                 .contains(filterName.toLowerCase());
         bool matchesClass = filterClass == 'All' ||
             activity["studentsClass"]["name"] == filterClass;
-        bool matchesTag = filterTag == 'All' ||
-            activity["tag"].toLowerCase() == filterTag;
+        bool matchesTag =
+            filterTag == 'All' || activity["tag"].toLowerCase() == filterTag;
         bool matchesTeacher = filterTeacher == 'All' ||
             activity["teacher"]["name"] == filterTeacher;
 
@@ -211,7 +211,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                                   "${activity['subject']['longName']} - ${activity["studentsClass"]["name"]}",
                                   style: const TextStyle(color: Colors.white)),
                               subtitle: Text(
-                                'Duration: ${activity['duration']} minutes\nTeacher: ${activity["teacher"]["name"]}',
+                                'By ${activity["teacher"]["name"]}\nOn ${activity['day'] ?? "??"} ${activity['startTime'] ?? "??"}h --> ${activity['endTime'] ?? "??"}h',
                                 style: const TextStyle(color: Colors.white),
                               ),
                               trailing: Row(
