@@ -9,7 +9,7 @@ class Activity {
   bool isActive;
   // duration in minutes
   int duration;
-  String? day;  // i changed from WorkDay to String cuz it make a prolem
+  WorkDay? day;
   String? startTime;
   String? endTime;
   ActivityTag tag;
@@ -24,10 +24,10 @@ class Activity {
     required this.duration,
     required this.tag,
     this.day,
-     this.startTime,
-     this.endTime,
-     this.room,
-     this.isActive =true ,
+    this.startTime,
+    this.endTime,
+    this.room,
+    this.isActive = true,
   });
 
   // Convert a Activity object into a Map
@@ -40,7 +40,7 @@ class Activity {
       'tag': tag.name,
       'duration': duration,
       'room': room,
-      'day': day,
+      'day': day?.name,
       'startTime': startTime,
       'endTime': endTime,
       'isActive': isActive,
@@ -61,7 +61,7 @@ class Activity {
                     ActivityTag.lecture, // Default to 'lecture' if invalid tag
               )
             : ActivityTag.lecture, // Default to 'lecture' if null
-        day: map['day'],
+        day: WorkDay.values.firstWhere((d) => d.name == map['day']),
         startTime: map['startTime'],
         endTime: map['endTime'],
         isActive: map['isActive'] ?? true, // Default to true if null
