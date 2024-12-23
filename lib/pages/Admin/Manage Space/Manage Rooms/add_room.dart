@@ -3,6 +3,7 @@ import 'package:smarn/models/building.dart';
 import 'package:smarn/models/room.dart';
 import 'package:smarn/models/room_type.dart';
 import 'package:smarn/services/room_service.dart';
+import 'package:smarn/services/building_service.dart';
 
 class AddRoom extends StatefulWidget {
   const AddRoom({super.key});
@@ -17,14 +18,36 @@ class _AddRoomState extends State<AddRoom> {
   String description = '';
   int? capacity;
   RoomType type = RoomType.lecture;
-  Building building =
-      Building(name: "b1", longName: "Building 1", description: "Main Building");
+  Building? selectedBuilding; // Selected building
   final RoomService _roomService = RoomService();
+  final BuildingService _buildingService = BuildingService();
 
+  List<Building> buildings = []; // List of buildings from the database
   bool isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBuildings();
+  }
+
+  // Fetch all buildings
+  Future<void> _loadBuildings() async {
+    List<Building> fetchedBuildings = await _buildingService.getAllBuildings();
+    setState(() {
+      buildings = fetchedBuildings;
+    });
+  }
 
   Future<void> _addRoom() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (selectedBuilding == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Building is required')),
+      );
+      return;
+    }
 
     setState(() {
       isSubmitting = true;
@@ -35,7 +58,7 @@ class _AddRoomState extends State<AddRoom> {
       type: type,
       description: description,
       capacity: capacity!,
-      building: building as String, // Adjust as per your model
+      building: selectedBuilding!.id!, // Building ID
     );
 
     final result = await _roomService.addRoom(newRoom);
@@ -45,7 +68,11 @@ class _AddRoomState extends State<AddRoom> {
     });
 
     if (result['success'] == true) {
-      Navigator.pop(context, newRoom);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Room added successfully')),
+      );
+      Navigator.pop(
+          context, newRoom); // This will return the new room to ManageRooms
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['message'] ?? 'Failed to add room')),
@@ -141,31 +168,40 @@ class _AddRoomState extends State<AddRoom> {
                           ))
                       .toList(),
                 ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<Building>(
+                  decoration: const InputDecoration(
+                    labelText: 'Building',
+                    labelStyle: TextStyle(color: Colors.white),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
+                  dropdownColor: Colors.black,
+                  style: const TextStyle(color: Colors.white),
+                  value: selectedBuilding,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedBuilding = value!;
+                    });
+                  },
+                  items: buildings.map((building) {
+                    return DropdownMenuItem<Building>(
+                      value: building,
+                      child: Text(building.name),
+                    );
+                  }).toList(),
+                ),
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: isSubmitting ? null : _addRoom,
-                  child: isSubmitting
-                      ? const CircularProgressIndicator(
-                          color: Colors.white,
-                        )
-                      : const Text(
-                          'Add Room',
-                          style: TextStyle(
-                            fontSize: 15, // Increased text size
-                             // Optional: Make text bold
-                          ),
-                        ),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 129, 77, 139),
-                    ),
-                    foregroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 254, 254, 254)),
-                    padding: MaterialStateProperty.all(
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 32), // Increased padding
-                    ),
-                    textStyle: MaterialStateProperty.all(
-                      const TextStyle(fontSize: 10), // Optional: Adjust text size here too
-                    ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+                    foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                   ),
+                  child: isSubmitting
+                      ? const CircularProgressIndicator()
+                      : const Text('Add Room'),
                 ),
               ],
             ),

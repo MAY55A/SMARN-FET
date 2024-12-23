@@ -4,7 +4,7 @@ import 'package:smarn/pages/Admin/Manage%20Classes/manage_classes.dart';
 import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Teachers/manage_teachers_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
-import 'package:smarn/pages/Admin/Manage%20Time%20Constarints/time_constraints_form.dart';
+import 'package:smarn/pages/Admin/Manage%20Constarints/constarints_selection_page.dart';
 import 'package:smarn/pages/Admin/Menu_admin.dart';
 import 'package:smarn/pages/widgets/AppBar.dart';
 import 'package:smarn/pages/widgets/dashboard_card.dart';
@@ -29,8 +29,8 @@ class AdminDashboard extends StatelessWidget {
                 Icons.group, const ManageClasses()),
             buildAnimatedDashboardCard(context, 'Manage Subjects',
                 Icons.book_outlined, const ManageSubjectsForm()),
-            buildAnimatedDashboardCard(context, 'Time Constraints',
-                Icons.timer_outlined, const TimeConstraintsForm()),
+            buildAnimatedDashboardCard(context, 'Constraints',
+                Icons.timer_outlined, const ConstraintsSelection()),
             buildAnimatedDashboardCard(context, 'Manage Space',
                 Icons.location_on_outlined, const SpaceConstraintsForm()),
             buildAnimatedDashboardCard(

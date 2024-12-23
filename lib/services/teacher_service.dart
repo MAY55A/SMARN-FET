@@ -191,10 +191,8 @@ class TeacherService {
   Future<List<Map<String, String>>> getTeachersBySubject(
       String subjectId) async {
     try {
-      final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('getTeachersBySubject');
-      final response =
-          await callable.call(<String, dynamic>{'subjectId': subjectId});
+      final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('getTeachersBySubject');
+      final response = await callable.call(<String, dynamic>{'subjectId': subjectId});
 
       // Ensure the response contains the list of teachers
       List<Map<String, String>> teachersList =
@@ -207,8 +205,8 @@ class TeacherService {
               .toList();
       return teachersList;
     } catch (e) {
-      print('Error fetching teachers teaching this subject : $e');
-      return [];
+      print('Error fetching teachers for subject: $e');
+      return []; // Return an empty list in case of error
     }
   }
 }

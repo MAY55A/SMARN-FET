@@ -4,7 +4,6 @@ import 'package:smarn/models/change_request.dart';
 import 'package:smarn/models/change_request_status.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/change_request_service.dart';
-import 'package:smarn/models/teacher.dart';
 import 'package:smarn/services/teacher_service.dart';
 
 class ViewChangeRequestDetails extends StatefulWidget {
@@ -34,8 +33,7 @@ class _ViewChangeRequestDetailsState extends State<ViewChangeRequestDetails> {
         final teacher = await teacherService.getTeacher(widget.request.teacher);
         if (teacher != null) {
           setState(() {
-            teacherName =
-                teacher.name; // Assuming Teacher model has a `name` field.
+            teacherName = teacher.name;
           });
         }
       } catch (e) {
@@ -106,9 +104,11 @@ class _ViewChangeRequestDetailsState extends State<ViewChangeRequestDetails> {
 
                   await ChangeRequestService().updateChangeRequest(
                       widget.request.id!, updatedRequest);
+                  setState(() {
+                    widget.request.status = ChangeRequestStatus.approved;
+                  });
                   Navigator.pop(context); // Close the confirmation dialog
                   Navigator.pop(context); // Close the details screen
-                  _showResultDialog('approved'); // Show success alert
                 } else if (action == 'reject') {
                   final updatedRequest = ChangeRequest(
                     id: widget.request.id,
@@ -124,9 +124,11 @@ class _ViewChangeRequestDetailsState extends State<ViewChangeRequestDetails> {
 
                   await ChangeRequestService().updateChangeRequest(
                       widget.request.id!, updatedRequest);
+                  setState(() {
+                    widget.request.status = ChangeRequestStatus.rejected;
+                  });
                   Navigator.pop(context); // Close the confirmation dialog
                   Navigator.pop(context); // Close the details screen
-                  _showResultDialog('rejected'); // Show success alert
                 }
               },
             ),
@@ -136,37 +138,16 @@ class _ViewChangeRequestDetailsState extends State<ViewChangeRequestDetails> {
     );
   }
 
-  /// Show an alert dialog indicating the result of the action (approve/reject).
-  Future<void> _showResultDialog(String action) async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.black,
-          title: Text(
-            action == 'approved' ? 'Request Approved' : 'Request Rejected',
-            style: const TextStyle(color: Colors.white),
-          ),
-          content: Text(
-            action == 'approved'
-                ? 'The change request has been approved.'
-                : 'The change request has been rejected.',
-            style: const TextStyle(color: Colors.white),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text(
-                'OK',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
+  /// Get the color and symbol based on the request's status.
+  Color getStatusColor(ChangeRequestStatus status) {
+    switch (status) {
+      case ChangeRequestStatus.approved:
+        return Colors.green;
+      case ChangeRequestStatus.rejected:
+        return Colors.red;
+      default:
+        return Colors.yellow;
+    }
   }
 
   @override
@@ -247,39 +228,53 @@ class _ViewChangeRequestDetailsState extends State<ViewChangeRequestDetails> {
 
             const SizedBox(height: 20),
 
-            // Show status only if it is not null
+            // Show status with color and symbol
             if (widget.request.status != null)
-              Text(
-                'Status: ${widget.request.status?.name}',
-                style: const TextStyle(color: Colors.white),
+              Row(
+                children: [
+                  Icon(
+                    widget.request.status == ChangeRequestStatus.approved
+                        ? Icons.check_circle
+                        : widget.request.status == ChangeRequestStatus.rejected
+                            ? Icons.cancel
+                            : Icons.pending,
+                    color: getStatusColor(widget.request.status!),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Status: ${widget.request.status?.name ?? 'N/A'}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ],
               ),
 
             const SizedBox(height: 20),
 
-            // Approve and Reject Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    showConfirmationDialog('approve'); // Show confirmation dialog for approval
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+            // Show approve and reject buttons only for pending requests
+            if (widget.request.status == ChangeRequestStatus.pending)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      showConfirmationDialog('approve');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                    ),
+                    child: const Text('Approve'),
                   ),
-                  child: const Text('Approve'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    showConfirmationDialog('reject'); // Show confirmation dialog for rejection
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                  ElevatedButton(
+                    onPressed: () {
+                      showConfirmationDialog('reject');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    child: const Text('Reject'),
                   ),
-                  child: const Text('Reject'),
-                ),
-              ],
-            ),
+                ],
+              ),
           ],
         ),
       ),

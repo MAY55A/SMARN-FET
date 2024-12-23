@@ -2,9 +2,9 @@ class Teacher {
   String? id;
   String name;
   String? email;
-  String phone;
+  String? phone;
   String picture;
-  int nbHours;
+  int? nbHours;
   List<String> subjects;
 
   // Constructor

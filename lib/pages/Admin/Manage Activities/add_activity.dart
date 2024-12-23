@@ -9,9 +9,6 @@ import 'package:smarn/services/class_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/services/activity_service.dart';
-import 'package:smarn/services/room_service.dart';
-import 'package:smarn/models/room.dart';
-import 'package:smarn/pages/widgets/canstants.dart';
 
 class AddActivity extends StatefulWidget {
   const AddActivity({Key? key}) : super(key: key);
@@ -30,19 +27,16 @@ class _AddActivityState extends State<AddActivity> {
   String? _selectedTag;
   Teacher? _selectedTeacher;
   Subject? _selectedSubject;
-  Room? _selectedRoom;
 
   List<Class> _classes = [];
   List<Teacher> _allTeachers = [];
   List<Subject> _allSubjects = [];
   List<Teacher> _teachers = [];
   List<Subject> _subjects = [];
-  List<Room> _rooms = [];
 
   final TeacherService _teacherService = TeacherService();
   final SubjectService _subjectService = SubjectService();
   final ClassService _classService = ClassService();
-  final RoomService _roomService = RoomService();
 
   @override
   void initState() {
@@ -54,8 +48,7 @@ class _AddActivityState extends State<AddActivity> {
     await Future.wait([
       _fetchTeachers(),
       _fetchSubjects(),
-      _fetchRooms(),
-      _fetchClasses(), // Add dynamic class fetching if applicable
+      _fetchClasses(),
     ]);
   }
 
@@ -77,31 +70,6 @@ class _AddActivityState extends State<AddActivity> {
     });
   }
 
-  Future<void> _refreshTeachers() async {
-    final teachersList = _allTeachers
-        .where((teacher) => teacher.subjects.contains(_selectedSubject!.id))
-        .toList();
-    setState(() {
-      _teachers = teachersList;
-    });
-  }
-
-  Future<void> _refreshSubjects() async {
-    final subjectsList = _allSubjects
-        .where((s) => _selectedTeacher!.subjects.contains(s.id))
-        .toList();
-    setState(() {
-      _subjects = subjectsList;
-    });
-  }
-
-  Future<void> _fetchRooms() async {
-    final roomsList = await _roomService.getAllRooms();
-    setState(() {
-      _rooms = roomsList;
-    });
-  }
-
   Future<void> _fetchClasses() async {
     final classesList = await _classService.getAllClasses();
     setState(() {
@@ -117,29 +85,43 @@ class _AddActivityState extends State<AddActivity> {
         studentsClass: _selectedClass!.id!,
         duration: int.parse(_durationController.text),
         tag: ActivityTag.values.firstWhere((e) => e.name == _selectedTag),
-        room: _selectedRoom!.id!,
+        isActive: true,
       );
-      ActivityService().addActivity(activity);
-      Navigator.pop(context);
+
+      // Add the activity using the service
+      ActivityService().addActivity(activity).then((result) {
+        if (result['success']) {
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error adding activity: ${result['message']}')),
+          );
+        }
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Please fill out all fields and ensure the duration is at least 60 minutes.')),
+        const SnackBar(content: Text('Please fill out all fields and ensure the duration is at least 60 minutes.')),
       );
     }
   }
 
   bool _formIsValid() {
-    return _nameController.text.isNotEmpty &&
-        _selectedSubject != null &&
+    return _selectedSubject != null &&
         _selectedTeacher != null &&
         _selectedClass != null &&
         _selectedTag != null &&
-        _selectedRoom != null &&
         _durationController.text.isNotEmpty &&
         int.tryParse(_durationController.text) != null &&
         int.parse(_durationController.text) >= 60;
+  }
+
+  void _refreshSubjects() {
+    // Assuming this method filters subjects based on selected teacher
+    if (_selectedTeacher != null) {
+      setState(() {
+        _subjects = _allSubjects; // No filtering needed, as teachers are not linked to subjects
+      });
+    }
   }
 
   @override
@@ -157,48 +139,34 @@ class _AddActivityState extends State<AddActivity> {
           child: Column(
             children: [
               // Subject Dropdown
-              activityDropdownMenu("subject", _selectedSubject, _subjects,
-                  (dynamic newValue) {
+              activityDropdownMenu("subject", _selectedSubject, _subjects, (dynamic newValue) {
                 setState(() {
                   _selectedSubject = newValue as Subject;
-                  _refreshTeachers();
                 });
               }),
               const SizedBox(height: 16),
 
               // Teacher Dropdown
-              activityDropdownMenu("teacher", _selectedTeacher, _teachers,
-                  (dynamic newValue) {
+              activityDropdownMenu("teacher", _selectedTeacher, _teachers, (dynamic newValue) {
                 setState(() {
                   _selectedTeacher = newValue as Teacher;
-                  _refreshSubjects();
+                  _refreshSubjects(); // Reset subjects to show all
                 });
               }),
               const SizedBox(height: 16),
 
               // Class Dropdown
-              activityDropdownMenu("class", _selectedClass, _classes,
-                  (dynamic newValue) {
+              activityDropdownMenu("class", _selectedClass, _classes, (dynamic newValue) {
                 setState(() {
                   _selectedClass = newValue as Class;
                 });
               }),
               const SizedBox(height: 16),
 
-              // Tag Dropdown,
-              activityDropdownMenu("tag", _selectedTag, _tags,
-                  (dynamic newValue) {
+              // Tag Dropdown
+              activityDropdownMenu("tag", _selectedTag, _tags, (dynamic newValue) {
                 setState(() {
                   _selectedTag = newValue as String;
-                });
-              }),
-              const SizedBox(height: 16),
-
-              // Room Dropdown
-              activityDropdownMenu("room", _selectedRoom, _rooms,
-                  (dynamic newValue) {
-                setState(() {
-                  _selectedRoom = newValue as Room;
                 });
               }),
               const SizedBox(height: 16),
@@ -222,8 +190,7 @@ class _AddActivityState extends State<AddActivity> {
                 child: const Text('Save Activity'),
                 style: ButtonStyle(
                   foregroundColor: MaterialStateProperty.all(Colors.black),
-                  backgroundColor: MaterialStateProperty.all(
-                      const Color.fromARGB(255, 129, 77, 139)),
+                  backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 129, 77, 139)),
                 ),
               ),
             ],

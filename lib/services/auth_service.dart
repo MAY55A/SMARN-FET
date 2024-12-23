@@ -46,7 +46,7 @@ class AuthService {
       return null;
     }
   }
-
+    // Update credentials method (email & password)
   Future<String> updateUserCredentials({
     String? newEmail,
     String? newPassword,

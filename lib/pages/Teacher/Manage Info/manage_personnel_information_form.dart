@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smarn/models/teacher.dart';
+import 'package:smarn/pages/Teacher/Account%20Settings/account_settings.dart';
 import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/teacher_service.dart';
-import 'edit_personal_information_form.dart';
 
 class ManagePersonnelInformationForm extends StatefulWidget {
   const ManagePersonnelInformationForm({super.key});
@@ -19,7 +19,7 @@ class _ManagePersonnelInformationFormState
   String personnelName = "";
   String personnelId = "";
   String email = "";
-  String phoneNumber = "";
+  String? phoneNumber = "";
   bool loading = true;
 
   // Teacher data
@@ -123,7 +123,7 @@ class _ManagePersonnelInformationFormState
                         const SizedBox(height: 10),
                         _buildInfoRow(Icons.email, "Email :", email),
                         const SizedBox(height: 10),
-                        _buildInfoRow(Icons.phone, "Phone :", phoneNumber),
+                        _buildInfoRow(Icons.phone, "Phone :", phoneNumber!),
                         const SizedBox(height: 10),
                         _buildInfoRow(
                             Icons.access_time_filled,
@@ -135,18 +135,9 @@ class _ManagePersonnelInformationFormState
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    EditPersonnelInformationForm(
-                                        teacher: currentTeacher!,
-                                        teacherId: currentUser!.uid),
+                                builder: (context) => AccountSettingsPage()
                               ),
-                            ).then((result) {
-                              if (result == true) {
-                                setState(() {
-                                  _fetchPersonnelInfo();
-                                });
-                              }
-                            });
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,

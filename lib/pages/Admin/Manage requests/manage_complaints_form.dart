@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For date formatting
+import 'package:intl/intl.dart'; 
+import 'package:smarn/models/change_request_status.dart';
 import 'package:smarn/pages/Admin/Manage%20requests/view_change_request_details.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/models/change_request.dart';
@@ -49,6 +50,19 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
       return DateFormat('MMMM dd, yyyy - hh:mm a').format(parsedDate);
     } catch (e) {
       return 'Invalid date';
+    }
+  }
+
+  /// Get the status color based on the status.
+  Color getStatusColor(ChangeRequestStatus? status) {
+    switch (status) {
+      case ChangeRequestStatus.approved:
+        return Colors.green;
+      case ChangeRequestStatus.rejected:
+        return Colors.red;
+      case ChangeRequestStatus.pending:
+      default:
+        return Colors.yellow;
     }
   }
 
@@ -114,9 +128,25 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                               style: const TextStyle(color: Colors.white),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              'Status: ${request.status?.name ?? 'N/A'}',
-                              style: const TextStyle(color: Colors.white),
+                            Row(
+                              children: [
+                                Text(
+                                  'Status: ${request.status?.name ?? 'N/A'}',
+                                  style: TextStyle(
+                                    color: getStatusColor(request.status),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  request.status == ChangeRequestStatus.approved
+                                      ? Icons.check_circle
+                                      : request.status == ChangeRequestStatus.rejected
+                                          ? Icons.cancel
+                                          : Icons.pending,
+                                  color: getStatusColor(request.status),
+                                ),
+                              ],
                             ),
                           ],
                         ),

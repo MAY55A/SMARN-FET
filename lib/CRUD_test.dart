@@ -145,7 +145,7 @@ void roomCrud() async {
   print(await roomService.getRoomsByBuilding("BLD001"));
 }
 
-void activityCrud() async {
+/*void activityCrud() async {
   // Example of CRUD operations on activities
   Activity a = Activity(
     subject: 'SUB001',
@@ -157,8 +157,8 @@ void activityCrud() async {
   var res = await activityService.addActivity(a);
   print(res["message"]);
   print(await activityService.getActivityDetails("ACT001"));
-
-  Activity updatedAct = Activity(
+*/
+ /* Activity updatedAct = Activity(
       subject: 'SUB001',
       studentsClass: 'CLA001',
       teacher: 'TEA003',
@@ -166,7 +166,7 @@ void activityCrud() async {
       duration: 120,
       isActive: false);
   print(await activityService.updateActivity("ACT001", updatedAct));
-}
+}*/
 
 void requestCrud() async {
   // Example of CRUD operations on change requests

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smarn/models/teacher.dart';
+import 'package:smarn/pages/Teacher/Account%20Settings/account_settings.dart';
 import 'package:smarn/pages/Teacher/teacher_dashboard.dart';
+
 import 'package:smarn/pages/home.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/pages/Teacher/Manage%20Info/manage_personnel_information_form.dart';
@@ -95,6 +97,21 @@ class TeacherDrawer extends StatelessWidget {
                     );
                   },
                 ),
+                /*               ListTile(
+   leading: const Icon(Icons.person, color: Colors.white),
+   title: const Text(
+     'Account Settings',
+     style: TextStyle(color: Colors.white),
+   ),
+   onTap: () {
+     Navigator.push(
+       context,
+       MaterialPageRoute(
+         builder: (context) => const AccountSettingsPage(),
+       ),
+     );
+   },
+ ),*/
                 // Logout Button
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.white),

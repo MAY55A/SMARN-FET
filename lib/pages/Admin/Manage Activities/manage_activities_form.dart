@@ -97,14 +97,11 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
             activity["subject"]["name"]
                 .toLowerCase()
                 .contains(filterName.toLowerCase());
-        bool matchesClass = filterClass == null ||
-            filterClass == 'All' ||
+        bool matchesClass = filterClass == 'All' ||
             activity["studentsClass"]["name"] == filterClass;
-        bool matchesTag = filterTag == null ||
-            filterTag == 'All' ||
+        bool matchesTag = filterTag == 'All' ||
             activity["tag"].toLowerCase() == filterTag;
-        bool matchesTeacher = filterTeacher == null ||
-            filterTeacher == 'All' ||
+        bool matchesTeacher = filterTeacher == 'All' ||
             activity["teacher"]["name"] == filterTeacher;
 
         return matchesName && matchesClass && matchesTeacher && matchesTag;
@@ -205,6 +202,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                         itemCount: filteredActivities.length,
                         itemBuilder: (context, index) {
                           final activity = filteredActivities[index];
+
                           return Card(
                             color: const Color.fromARGB(255, 34, 34, 34),
                             margin: const EdgeInsets.all(8.0),
@@ -213,7 +211,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                                   "${activity['subject']['longName']} - ${activity["studentsClass"]["name"]}",
                                   style: const TextStyle(color: Colors.white)),
                               subtitle: Text(
-                                'By ${activity["teacher"]["name"]}\nOn ${activity['day'] ?? "??"} ${activity['startTime'] ?? "??"}h --> ${activity['endTime'] ?? "??"}h',
+                                'Duration: ${activity['duration']} minutes\nTeacher: ${activity["teacher"]["name"]}',
                                 style: const TextStyle(color: Colors.white),
                               ),
                               trailing: Row(
