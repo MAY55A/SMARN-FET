@@ -54,7 +54,6 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
 
   Future<List<Map<String, dynamic>>> _filterTeachers() async {
     var filteredTeachers = await _teachersFuture;
-    ;
     if (_selectedSubject != null && _selectedSubject!.isNotEmpty) {
       filteredTeachers = filteredTeachers.where((teacherData) {
         final teacher = teacherData['teacher'] as Teacher;
@@ -71,8 +70,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
     }).toList();
   }
 
-  Future<void> _confirmDeleteTeacher(
-      String teacherId, String teacherName) async {
+  Future<void> _confirmDeleteTeacher(String teacherId, String teacherName) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) {
@@ -103,7 +101,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
       );
 
       if (result['success']) {
-        _refreshTeachers();
+        _refreshTeachers(); // Refresh the list after deletion
       }
     }
   }
@@ -210,13 +208,6 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                       final teacherDocId = teacherData["id"];
                       final teacherName = teacher.name ?? 'No name provided';
                       final teacherEmail = teacher.email ?? 'No email provided';
-                      final teacherPhone = teacher.phone ?? 'Not provided';
-                      final teacherSubjects = teacher.subjects.isNotEmpty ==
-                              true
-                          ? teacher.subjects
-                              .map((subjectId) => getSubjectNameById(subjectId))
-                              .join(', ')
-                          : 'No subjects available';
 
                       return Card(
                         color: Colors.grey[850],
@@ -224,23 +215,13 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                         child: ListTile(
                           title: Text(teacherName,
                               style: const TextStyle(color: Colors.white)),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Email: $teacherEmail",
-                                  style: const TextStyle(color: Colors.white)),
-                              Text("Phone: $teacherPhone",
-                                  style: const TextStyle(color: Colors.white)),
-                              Text("Subjects: $teacherSubjects",
-                                  style: const TextStyle(color: Colors.white)),
-                            ],
-                          ),
+                          subtitle: Text("Email: $teacherEmail",
+                              style: const TextStyle(color: Colors.white)),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.white),
+                                icon: const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
@@ -249,30 +230,16 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                                           teacher: teacher,
                                           refreshTeachers: _refreshTeachers),
                                     ),
-                                  );
+                                  ).then((_) => _refreshTeachers()); // Refresh after edit
                                 },
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete,
-                                    color: Colors.white),
+                                icon: const Icon(Icons.delete, color: Colors.red), // Change color to red
                                 onPressed: () => _confirmDeleteTeacher(
                                     teacherDocId, teacherName),
                               ),
-                              // View details icon
                               IconButton(
-                                icon: const Icon(Icons.visibility, color: Colors.white),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ViewTeacherDetailsForm(teacher: teacher),
-                                    ),
-                                  );
-                                },
-                              ),
-                              // View details icon
-                              IconButton(
-                                icon: const Icon(Icons.visibility, color: Colors.white),
+                                icon: const Icon(Icons.arrow_forward, color: Colors.white),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
@@ -302,7 +269,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
               builder: (context) =>
                   AddTeacherForm(refreshTeachers: _refreshTeachers),
             ),
-          );
+          ).then((_) => _refreshTeachers()); // Refresh after adding
         },
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
         child: const Icon(Icons.add),

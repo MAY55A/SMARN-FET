@@ -7,6 +7,7 @@ import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/constarints_selection_page.dart';
 import 'package:smarn/pages/Admin/Menu_admin.dart';
 import 'package:smarn/pages/widgets/AppBar.dart';
+import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/pages/widgets/dashboard_card.dart';
 
 class AdminDashboard extends StatelessWidget {
@@ -26,18 +27,18 @@ class AdminDashboard extends StatelessWidget {
           mainAxisSpacing: 16,
           children: [
             buildAnimatedDashboardCard(context, 'Manage Classes',
-                Icons.group, const ManageClasses()),
+                Icons.group, const ManageClasses(),AppColors.appBarColor),
             buildAnimatedDashboardCard(context, 'Manage Subjects',
-                Icons.book_outlined, const ManageSubjectsForm()),
+                Icons.book_outlined, const ManageSubjectsForm(),AppColors.appBarColor),
             buildAnimatedDashboardCard(context, 'Constraints',
-                Icons.timer_outlined, const ConstraintsSelection()),
+                Icons.timer_outlined, const ConstraintsSelection(),AppColors.appBarColor),
             buildAnimatedDashboardCard(context, 'Manage Space',
-                Icons.location_on_outlined, const SpaceConstraintsForm()),
+                Icons.location_on_outlined, const SpaceConstraintsForm(),AppColors.appBarColor),
             buildAnimatedDashboardCard(
                 context,
                 'Manage Activities',
                 Icons.assignment,
-                const ManageActivitiesForm()), // New dashboard card
+                const ManageActivitiesForm(),AppColors.appBarColor), // New dashboard card
           ],
         ),
       ),

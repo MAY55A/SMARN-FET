@@ -153,129 +153,142 @@ class _ViewChangeRequestDetailsState extends State<ViewChangeRequestDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: const Text("Change Request Details"),
         backgroundColor: AppColors.appBarColor,
       ),
-      body: Container(
-        color: Colors.black,
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Show teacher ID and name
-            if (widget.request.teacher != null)
-              Column(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            color:AppColors.formColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Teacher ID: ${widget.request.teacher}',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                  const SizedBox(height: 4),
-                  if (teacherName != null)
+                  // Show teacher ID and name
+                  if (widget.request.teacher != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Teacher ID: ${widget.request.teacher}',
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                        const SizedBox(height: 8),
+                        if (teacherName != null)
+                          Text(
+                            'Teacher Name: $teacherName',
+                            style: const TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                      ],
+                    ),
+                  const SizedBox(height: 8),
+
+                  // Show newTimeSlot only if it is not null
+                  if (widget.request.newTimeSlot != null)
                     Text(
-                      'Teacher Name: $teacherName',
-                      style: const TextStyle(color: Colors.white, fontSize: 18),
+                      'New Time Slot: ${widget.request.newTimeSlot}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+
+                  // Show newRoom only if it is not null
+                  if (widget.request.newRoom != null)
+                    Text(
+                      'New Room: ${widget.request.newRoom}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+
+                  // Show activity only if it is not null
+                  if (widget.request.activity != null)
+                    Text(
+                      'Activity: ${widget.request.activity}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+
+                  const SizedBox(height: 8),
+
+                  // Show reason only if it is not null
+                  if (widget.request.reason != null)
+                    Text(
+                      'Reason: ${widget.request.reason}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(height: 10),
+
+                  // Show content only if it is not null
+                  if (widget.request.content != null)
+                    Text(
+                      'Content: ${widget.request.content}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+
+                  // Show submissionDate only if it is not null
+                  if (widget.request.submissionDate != null)
+                    Text(
+                      'Date Submitted: ${formatDate(widget.request.submissionDate)}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+
+                  const SizedBox(height: 20),
+
+                  // Show status with color and symbol
+                  if (widget.request.status != null)
+                    Row(
+                      children: [
+                        Icon(
+                          widget.request.status == ChangeRequestStatus.approved
+                              ? Icons.check_circle
+                              : widget.request.status == ChangeRequestStatus.rejected
+                                  ? Icons.cancel
+                                  : Icons.pending,
+                          color: getStatusColor(widget.request.status!),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Status: ${widget.request.status?.name ?? 'N/A'}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+
+                  const SizedBox(height: 20),
+
+                  // Show approve and reject buttons only for pending requests
+                  if (widget.request.status == ChangeRequestStatus.pending)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            showConfirmationDialog('approve');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                          ),
+                          child: const Text('Approve'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            showConfirmationDialog('reject');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                          ),
+                          child: const Text('Reject'),
+                        ),
+                      ],
                     ),
                 ],
               ),
-            const SizedBox(height: 8),
-
-            // Show newTimeSlot only if it is not null
-            if (widget.request.newTimeSlot != null)
-              Text(
-                'New Time Slot: ${widget.request.newTimeSlot}',
-                style: const TextStyle(color: Colors.white),
-              ),
-
-            // Show newRoom only if it is not null
-            if (widget.request.newRoom != null)
-              Text(
-                'New Room: ${widget.request.newRoom}',
-                style: const TextStyle(color: Colors.white),
-              ),
-
-            // Show activity only if it is not null
-            if (widget.request.activity != null)
-              Text(
-                'Activity: ${widget.request.activity}',
-                style: const TextStyle(color: Colors.white),
-              ),
-
-            const SizedBox(height: 8),
-
-            // Show reason only if it is not null
-            if (widget.request.reason != null)
-              Text(
-                'Reason: ${widget.request.reason}',
-                style: const TextStyle(color: Colors.white),
-              ),
-
-            // Show content only if it is not null
-            if (widget.request.content != null)
-              Text(
-                'Content: ${widget.request.content}',
-                style: const TextStyle(color: Colors.white),
-              ),
-
-            // Show submissionDate only if it is not null
-            if (widget.request.submissionDate != null)
-              Text(
-                'Date Submitted: ${formatDate(widget.request.submissionDate)}',
-                style: const TextStyle(color: Colors.white),
-              ),
-
-            const SizedBox(height: 20),
-
-            // Show status with color and symbol
-            if (widget.request.status != null)
-              Row(
-                children: [
-                  Icon(
-                    widget.request.status == ChangeRequestStatus.approved
-                        ? Icons.check_circle
-                        : widget.request.status == ChangeRequestStatus.rejected
-                            ? Icons.cancel
-                            : Icons.pending,
-                    color: getStatusColor(widget.request.status!),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Status: ${widget.request.status?.name ?? 'N/A'}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-
-            const SizedBox(height: 20),
-
-            // Show approve and reject buttons only for pending requests
-            if (widget.request.status == ChangeRequestStatus.pending)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      showConfirmationDialog('approve');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                    ),
-                    child: const Text('Approve'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      showConfirmationDialog('reject');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                    ),
-                    child: const Text('Reject'),
-                  ),
-                ],
-              ),
-          ],
+            ),
+          ),
         ),
       ),
     );

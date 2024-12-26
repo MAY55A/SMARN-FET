@@ -6,6 +6,7 @@ import 'package:smarn/services/class_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'add_activity.dart';
 import 'edit_activity.dart';
+import 'view_activity.dart'; // Import the new ViewActivity page
 
 class ManageActivitiesForm extends StatefulWidget {
   const ManageActivitiesForm({Key? key}) : super(key: key);
@@ -84,7 +85,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
         teachers = fetchedTeachers;
       });
     } catch (e) {
-      print('Error fetching classes: $e');
+      print('Error fetching teachers: $e');
     }
   }
 
@@ -116,21 +117,70 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
     );
 
     if (updated != null && updated) {
-      setState(() {
-        _fetchActivities();
-      });
+      // Refresh the data after editing
+      await _fetchActivities();
     }
   }
 
-  void _deleteActivity(Map<String, dynamic> activity) async {
-    final result = await _activityService.deleteActivity(activity["id"]);
-    if (result['success']) {
-      setState(() {
-        activities.remove(activity);
-        filteredActivities.remove(activity);
-      });
+  // Function to confirm and delete the activity
+  void _confirmDeleteActivity(Map<String, dynamic> activity) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const Text('Do you want to delete this activity?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final result = await _activityService.deleteActivity(activity["id"]);
+                Navigator.of(context).pop(); // Close the dialog
+                if (result['success']) {
+                  // Refresh the data after deletion
+                  await _fetchActivities();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Activity deleted successfully'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  print('Error deleting activity: ${result['message']}');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Failed to delete activity'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _viewActivityDetails(Map<String, dynamic> activity) async {
+    final activityId = activity["id"];
+    final activityDetails = await _activityService.getActivityDetails(activityId);
+
+    if (activityDetails != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ViewActivity(activity: activityDetails),
+        ),
+      );
     } else {
-      print('Error deleting activity: ${result['message']}');
+      print("Error fetching activity details");
     }
   }
 
@@ -211,7 +261,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                                   "${activity['subject']['longName']} - ${activity["studentsClass"]["name"]}",
                                   style: const TextStyle(color: Colors.white)),
                               subtitle: Text(
-                                'Duration: ${activity['duration']} minutes\nTeacher: ${activity["teacher"]["name"]}',
+                                'Duration: ${activity['duration']} minutes',
                                 style: const TextStyle(color: Colors.white),
                               ),
                               trailing: Row(
@@ -224,8 +274,13 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete,
+                                        color: Color.fromARGB(255, 255, 45, 45)),
+                                    onPressed: () => _confirmDeleteActivity(activity),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_forward,
                                         color: Colors.white),
-                                    onPressed: () => _deleteActivity(activity),
+                                    onPressed: () => _viewActivityDetails(activity),
                                   ),
                                 ],
                               ),
@@ -237,9 +292,15 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AddActivity()));
+        onPressed: () async {
+          final added = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddActivity()),
+          );
+          if (added != null && added) {
+            // Refresh the data after adding a new activity
+            await _fetchActivities();
+          }
         },
         child: const Icon(Icons.add),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),

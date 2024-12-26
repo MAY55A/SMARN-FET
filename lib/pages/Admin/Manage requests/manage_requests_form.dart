@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; 
 import 'package:smarn/models/change_request_status.dart';
-import 'package:smarn/pages/Admin/Manage%20requests/view_change_request_details.dart';
+import 'package:smarn/pages/Admin/Manage%20requests/view_request_details.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/models/change_request.dart';
 import 'package:smarn/services/change_request_service.dart';
@@ -23,7 +23,6 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
     _changeRequests = fetchChangeRequestsWithTeacherNames();
   }
 
-  /// Fetch change requests and attach teacher names based on their IDs.
   Future<List<ChangeRequest>> fetchChangeRequestsWithTeacherNames() async {
     final changeRequests = await ChangeRequestService().getAllChangeRequests();
     final teacherService = TeacherService();
@@ -32,7 +31,7 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
       if (request.teacher != null) {
         try {
           final teacher = await teacherService.getTeacher(request.teacher!);
-          request.teacher = teacher?.name ?? request.teacher; // Replace ID with name if available.
+          request.teacher = teacher?.name ?? request.teacher;
         } catch (e) {
           print("Error fetching teacher name for ID ${request.teacher}: $e");
         }
@@ -42,7 +41,6 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
     return changeRequests;
   }
 
-  /// Formats the date to a readable format.
   String formatDate(String? dateString) {
     if (dateString == null || dateString.isEmpty) return 'N/A';
     try {
@@ -53,7 +51,6 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
     }
   }
 
-  /// Get the status color based on the status.
   Color getStatusColor(ChangeRequestStatus? status) {
     switch (status) {
       case ChangeRequestStatus.approved:
@@ -63,6 +60,23 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
       case ChangeRequestStatus.pending:
       default:
         return Colors.yellow;
+    }
+  }
+
+  // Delete change request method
+  Future<void> deleteChangeRequest(String requestId) async {
+    final result = await ChangeRequestService().deleteChangeRequest(requestId);
+    if (result['success'] == true) {
+      setState(() {
+        _changeRequests = fetchChangeRequestsWithTeacherNames();  // Refresh the list
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Request deleted successfully')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${result['message']}')),
+      );
     }
   }
 
@@ -104,7 +118,7 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                   itemBuilder: (context, index) {
                     final request = changeRequests[index];
                     return Card(
-                      color: AppColors.formColor, // Set the card's background color to blue.
+                      color: AppColors.formColor,
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
                         title: Text(
@@ -150,23 +164,61 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                             ),
                           ],
                         ),
-                        trailing: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ViewChangeRequestDetails(request: request),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ViewChangeRequestDetails(request: request),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.appBarColor,
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                          ),
-                          child: const Text(
-                            'View Details',
-                            style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                          ),
+                              child: const Text(
+                                'View Details',
+                                style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+                                
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                // Confirmation dialog before deleting
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Confirm Deletion'),
+                                    content: const Text(
+                                        'Are you sure you want to delete this request?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          deleteChangeRequest(request.id!);
+                                        },
+                                        child: const Text('Delete'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     );

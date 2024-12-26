@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smarn/pages/Teacher/Activities/view_activities.dart';
 import 'package:smarn/pages/Teacher/Manage%20qualified%20subjects/manage_qualified_subjects_form.dart';
 import 'package:smarn/pages/Teacher/Request/view_requests.dart';
-import 'package:smarn/pages/Teacher/timetable/view_complaints_or_print_timetable.dart';
+import 'package:smarn/pages/Teacher/timetable/view_timetable.dart';
 import 'package:smarn/pages/Teacher/Teacher_menu.dart';
 import 'package:smarn/pages/widgets/dashboard_card.dart';
 import 'package:smarn/services/auth_service.dart';
@@ -13,7 +13,7 @@ class TeacherDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 30, 30, 30),
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       appBar: AppBar(
         title: const Text("Teacher Dashboard"),
         backgroundColor: Colors.blue,
@@ -28,13 +28,13 @@ class TeacherDashboard extends StatelessWidget {
             mainAxisSpacing: 16,
             children: [
               buildAnimatedDashboardCard(context, 'Timetable', Icons.schedule,
-                  const ViewComplaintsOrPrintTimetable()),
+                  const ViewComplaintsOrPrintTimetable(),Colors.blue),
               buildAnimatedDashboardCard(context, 'Subjects',
-                  Icons.book_outlined, ManageQualifiedSubjectsForm()),
+                  Icons.book_outlined, ManageQualifiedSubjectsForm(),Colors.blue),
               buildAnimatedDashboardCard(context, 'Activities',
-                  Icons.assignment, const ViewActivities()),
+                  Icons.assignment, const ViewActivities(),Colors.blue),
               buildAnimatedDashboardCard(context, 'Change Requests',
-                  Icons.location_on_outlined, const ViewRequests()),
+                  Icons.location_on_outlined, const ViewRequests(),Colors.blue),
             ],
           ),
         ),

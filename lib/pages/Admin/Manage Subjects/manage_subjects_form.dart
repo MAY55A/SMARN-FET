@@ -201,12 +201,12 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
                                         onPressed: () => _editSubject(subject),
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.white),
+                                        icon: const Icon(Icons.delete, color: Colors.red), // Changer la couleur en rouge
                                         onPressed: () => _confirmDeleteSubject(subject),
                                       ),
-                                      // View Details Icon
+                                      // Remplacer l'icône de vue par une flèche
                                       IconButton(
-                                        icon: const Icon(Icons.visibility, color: Colors.white),
+                                        icon: const Icon(Icons.arrow_forward, color: Colors.white), // Icône de flèche
                                         onPressed: () => _viewSubjectDetails(subject),
                                       ),
                                     ],

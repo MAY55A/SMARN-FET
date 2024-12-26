@@ -8,6 +8,7 @@ class ManageTimetable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Manage Timetable '),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),

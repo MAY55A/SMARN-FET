@@ -9,8 +9,8 @@ class ViewComplaintsOrPrintTimetable extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Timetable"),
-        backgroundColor: const Color.fromARGB(
-            255, 129, 77, 139), // Purple to match the image
+        backgroundColor:Colors.blue,
+            // Purple to match the image
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {

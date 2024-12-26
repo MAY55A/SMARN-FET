@@ -3,6 +3,7 @@ import 'package:smarn/models/class.dart';
 import 'package:smarn/services/class_service.dart'; // Import ClassService
 import 'add_class.dart'; // Import the AddClass screen
 import 'edit_class.dart'; // Import the EditClass screen
+import 'view_class.dart'; // Import the ViewClass screen (new page)
 
 class ManageClasses extends StatefulWidget {
   const ManageClasses({super.key});
@@ -182,11 +183,31 @@ class _ManageClassesState extends State<ManageClasses> {
                                     const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () => _editClass(classItem),
                               ),
-                              // Delete Icon with Confirmation
+                              // Delete Icon with Confirmation in Red
                               IconButton(
                                 icon: const Icon(Icons.delete,
-                                    color: Colors.white),
+                                    color: Colors.red), // Red color for delete icon
                                 onPressed: () => _confirmDelete(classItem),
+                              ),
+                              // View Icon (Arrow to view the class details)
+                              IconButton(
+                                icon: const Icon(Icons.arrow_forward,
+                                    color: Colors.white),
+                                onPressed: () async {
+                                  // Navigate to ViewClass screen
+                                  final classDetails = await _classService
+                                      .getClassDetails(
+                                          classItem.name, classItem.accessKey!);
+                                  if (classDetails != null) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ViewClass(classItem: classDetails),
+                                      ),
+                                    );
+                                  }
+                                },
                               ),
                             ],
                           ),
