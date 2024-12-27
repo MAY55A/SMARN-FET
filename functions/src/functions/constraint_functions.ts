@@ -308,7 +308,7 @@ export const createSchedulingRule = functions.https.onCall(async (request) => {
   }
 
   if (constraintData.type == SchedulingRuleType.workPeriod || constraintData.type == SchedulingRuleType.breakPeriod) {
-    if (!constraintData.startime || !constraintData.endTime || !constraintData.applicableDays) {
+    if (!constraintData.startTime || !constraintData.endTime || !constraintData.applicableDays) {
       throw new functions.https.HttpsError(
         "invalid-argument",
         "Missing required parameters: startTime, endTime and applicableDays"
@@ -325,7 +325,7 @@ export const createSchedulingRule = functions.https.onCall(async (request) => {
         const constraintSnapshot = await db
           .collection("constraints")
           .where("type", "==", constraintData.type)
-          .where("availableDays", "array-contains-any", constraintData.availableDays)
+          .where("applicableDays", "array-contains-any", constraintData.applicableDays)
           .get();
         if (!constraintSnapshot.empty) {
           throw new functions.https.HttpsError(
@@ -365,7 +365,7 @@ export const createSchedulingRule = functions.https.onCall(async (request) => {
     await db.collection("constraints").doc(constraintId).set(newConstraint);
 
     return {
-      message: "Space constraint created successfully!",
+      message: "Scheduling Rule created successfully!",
       success: true,
     };
   } catch (error) {
