@@ -103,7 +103,7 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
                 hint: const Text("Select Constraint Type",
                     style: TextStyle(color: Colors.white)),
                 items: TimeConstraintType.values.map((type) {
-                  return DropdownMenuItem<TimeConstraintType>(
+                  return DropdownMenuItem<TimeConstraintType>( 
                     value: type,
                     child: Text(type.name,
                         style: const TextStyle(color: Colors.white)),
@@ -114,6 +114,8 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
                     _selectedType = value;
                   });
                 },
+                style: const TextStyle(color: Colors.white),
+                dropdownColor: Colors.grey[800],
               ),
               const SizedBox(height: 16),
               // Start time field
@@ -173,7 +175,7 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
                             ? _teachers.map<DropdownMenuItem<String>>((teacher) {
                                 return DropdownMenuItem<String>(
                                   value: teacher['id'],
-                                  child: Text(teacher['teacher'].name ?? 'Unknown', 
+                                  child: Text(teacher['teacher'].id ?? 'Unknown', 
                                       style: const TextStyle(color: Colors.white)),
                                 );
                               }).toList()
@@ -183,6 +185,8 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
                             _selectedTeacherId = value;
                           });
                         },
+                        style: const TextStyle(color: Colors.white),
+                        dropdownColor: Colors.grey[800],
                       ),
               if (_selectedType == TimeConstraintType.classAvailability)
                 _classes.isEmpty
@@ -195,7 +199,7 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
                             ? _classes.map<DropdownMenuItem<String>>((classItem) {
                                 return DropdownMenuItem<String>(
                                   value: classItem.id,
-                                  child: Text(classItem.name,
+                                  child: Text(classItem.id!,
                                       style: const TextStyle(color: Colors.white)),
                                 );
                               }).toList()
@@ -205,6 +209,8 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
                             _selectedClassId = value;
                           });
                         },
+                        style: const TextStyle(color: Colors.white),
+                        dropdownColor: Colors.grey[800],
                       ),
               if (_selectedType == TimeConstraintType.roomAvailability)
                 _rooms.isEmpty
@@ -227,6 +233,8 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
                             _selectedRoomId = value;
                           });
                         },
+                        style: const TextStyle(color: Colors.white),
+                        dropdownColor: Colors.grey[800],
                       ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -248,6 +256,7 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
     if (_selectedType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a constraint type.')),
+
       );
       return;
     }
@@ -255,35 +264,37 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
     if (_startTimeController.text.isEmpty || _endTimeController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter start and end times.')),
+
       );
       return;
     }
 
     if (_selectedDays.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one available day.')),
+        const SnackBar(content: Text('Please select at least one day.')),
+
       );
       return;
     }
 
+    // Create a new time constraint
     final newConstraint = TimeConstraint(
-      id: UniqueKey().toString(), 
-      type: _selectedType ?? TimeConstraintType.classAvailability, 
-      startTime: _startTimeController.text.isNotEmpty ? _startTimeController.text : 'default_start_time',
-      endTime: _endTimeController.text.isNotEmpty ? _endTimeController.text : 'default_end_time',
-      availableDays: _selectedDays.isNotEmpty ? _selectedDays : [WorkDay.Monday], 
-      teacherId: _selectedTeacherId ?? 'default_teacher_id',
-      classId: _selectedClassId ?? 'default_class_id',
-      roomId: _selectedRoomId ?? 'default_room_id',
+      id: 'AUTO_GENERATED_ID', 
+      type: _selectedType!,
+      startTime: _startTimeController.text,
+      endTime: _endTimeController.text,
+      availableDays:  _selectedDays,
+      teacherId: _selectedType == TimeConstraintType.teacherAvailability ? _selectedTeacherId : null,
+      classId: _selectedType == TimeConstraintType.classAvailability ? _selectedClassId : null,
+      roomId: _selectedType == TimeConstraintType.roomAvailability ? _selectedRoomId : null,
     );
 
+    // Call the service to add the constraint
     final result = await _constraintService.createTimeConstraint(newConstraint);
     if (result['success']) {
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'])),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'])));
     }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smarn/models/constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Scheduling%20Rules%20Constraints/add_scheduling_constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Scheduling%20Rules%20Constraints/edit_scheduling_constraint.dart';
+import 'package:smarn/pages/Admin/Manage%20Constarints/Scheduling%20Rules%20Constraints/scheduling_details.dart';
 import 'package:smarn/services/constraint_service.dart';
 
 class SchedulingRulesView extends StatefulWidget {
@@ -18,49 +19,62 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
   @override
   void initState() {
     super.initState();
-    _schedulingRules = _constraintService.getAllConstraints().then((constraints) {
-      // Filter to only get scheduling rules
-      return constraints.where((c) => c is SchedulingRule).toList() as List<SchedulingRule>;
+    _fetchSchedulingRules();
+  }
+
+  void _fetchSchedulingRules() {
+    setState(() {
+      _schedulingRules = _constraintService.getAllConstraints().then((constraints) {
+        return constraints
+            .whereType<SchedulingRule>() // Ensure filtering is based on type
+            .toList();
+      });
     });
   }
 
-  void _AddSchedulingRule(SchedulingRule rule) {
-    // Navigate to the add scheduling rule form
+  void _navigateToAdd() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AddSchedulingRuleForm(),
       ),
-    );
+    ).then((_) => _fetchSchedulingRules()); // Refresh after adding
   }
 
-  void _EditSchedulingRule(SchedulingRule rule) {
-    // Navigate to the edit form, passing the scheduling rule
+  void _navigateToEdit(SchedulingRule rule) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EditSchedulingRuleForm(schedulingRule: rule),
       ),
-    );
+    ).then((_) => _fetchSchedulingRules()); // Refresh after editing
   }
 
   void _deleteSchedulingRule(String ruleId) async {
-    final result = await _constraintService.deleteConstraint(ruleId);
-    if (result['success']) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Scheduling Rule deleted successfully')));
-      setState(() {
-        _schedulingRules = _constraintService.getAllConstraints().then((constraints) {
-          return constraints.where((c) => c is SchedulingRule).toList() as List<SchedulingRule>;
-        });
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete Scheduling Rule')));
+    try {
+      final result = await _constraintService.deleteConstraint(ruleId);
+      if (result['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Scheduling Rule deleted successfully.')),
+        );
+        _fetchSchedulingRules(); // Refresh the list
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to delete Scheduling Rule.')),
+        );
+      }
+    } catch (e) {
+      print('Error deleting scheduling rule: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error occurred while deleting.')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text("Scheduling Rules"),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
@@ -73,15 +87,21 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+              child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)),
+            );
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No scheduling rules available.'));
+            return const Center(
+              child: Text(
+                'No scheduling rules available.',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            );
           }
 
           final schedulingRules = snapshot.data!;
-
           return Container(
             color: Colors.black,
             child: Padding(
@@ -94,10 +114,23 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
                     title: 'Scheduling Rule ${index + 1}',
                     icon: Icons.calendar_today,
                     onTap: () {
-                      // Navigate to edit scheduling rule
-                      _EditSchedulingRule(rule);
+                      _navigateToEdit(rule);
                     },
-                    onDelete: () => _deleteSchedulingRule(rule.id),
+                    onDelete: () {
+                      if (rule.id != null) {
+                        _deleteSchedulingRule(rule.id!);
+                      }
+                    },
+                    onDetailsTap: () {
+                      // Navigate to scheduling rule details
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SchedulingRuleDetails(rule: rule),
+                        ),
+                      );
+                    },
+                    rule: rule, // Pass the SchedulingRule to the card
                   );
                 },
               ),
@@ -106,13 +139,7 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to add scheduling rule form
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddSchedulingRuleForm()),
-          );
-        },
+        onPressed: _navigateToAdd,
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
         child: const Icon(Icons.add),
       ),
@@ -124,6 +151,8 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
     required IconData icon,
     required VoidCallback onTap,
     required VoidCallback onDelete,
+    required VoidCallback onDetailsTap,
+    required SchedulingRule rule, // Pass the SchedulingRule to this method
   }) {
     return InkWell(
       onTap: onTap,
@@ -136,13 +165,35 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
               Icon(icon, color: Colors.white, size: 32),
               const SizedBox(width: 16),
               Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title of the rule
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Display the ID and Type of the rule
+                    Text(
+                      'ID: ${rule.id ?? "Unknown"}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      'Type: ${rule.type.toString().split('.').last}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Row(
@@ -150,11 +201,16 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.edit, color: Colors.white),
-                    onPressed: onTap, // Edit functionality
+                    onPressed: onTap,
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.white),
-                    onPressed: onDelete, // Delete functionality
+                    onPressed: onDelete,
+                  ),
+                  // Arrow icon to navigate to details
+                  IconButton(
+                    icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                    onPressed: onDetailsTap,
                   ),
                 ],
               ),

@@ -47,7 +47,7 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
   @override
   void initState() {
     super.initState();
-    _idController.text = widget.constraint.id;
+    _idController.text = widget.constraint.id!;
     _selectedActivityType = widget.constraint.activityType;
     _selectedRoomId = widget.constraint.roomId;
     _selectedTeacherId = widget.constraint.teacherId;
@@ -142,6 +142,8 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                     }
                   });
                 },
+                style: const TextStyle(color: Colors.white),
+                dropdownColor: Colors.grey[800],  // Gray color for the dropdown
               ),
               const SizedBox(height: 16),
 
@@ -163,6 +165,8 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                       _selectedActivityType = value;
                     });
                   },
+                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: Colors.grey[800],  // Gray color for the dropdown
                 ),
               const SizedBox(height: 16),
 
@@ -184,6 +188,8 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                       _selectedRoomType = value;
                     });
                   },
+                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: Colors.grey[800],  // Gray color for the dropdown
                 ),
               const SizedBox(height: 16),
 
@@ -202,6 +208,8 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                       _selectedRoomId = value;
                     });
                   },
+                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: Colors.grey[800],  // Gray color for the dropdown
                 ),
                 const SizedBox(height: 16),
                 DropdownButton<String?>(
@@ -217,6 +225,8 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                       _selectedTeacherId = value;
                     });
                   },
+                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: Colors.grey[800],  // Gray color for the dropdown
                 ),
                 const SizedBox(height: 16),
                 DropdownButton<String?>(
@@ -232,6 +242,8 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                       _selectedClassId = value;
                     });
                   },
+                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: Colors.grey[800],  // Gray color for the dropdown
                 ),
                 const SizedBox(height: 16),
                 DropdownButton<String?>(
@@ -247,6 +259,8 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                       _selectedSubjectId = value;
                     });
                   },
+                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: Colors.grey[800],  // Gray color for the dropdown
                 ),
               ],
               const SizedBox(height: 16),

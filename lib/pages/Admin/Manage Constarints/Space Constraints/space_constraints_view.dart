@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smarn/models/constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Space%20Constraints/add_space_constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Space%20Constraints/edit_space_constraint.dart';
+import 'package:smarn/pages/Admin/Manage%20Constarints/Space%20Constraints/space_constraint_details.dart'; // Import the details page
 import 'package:smarn/services/constraint_service.dart';
 
 class SpaceConstraintsView extends StatefulWidget {
@@ -22,8 +23,14 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
   }
 
   Future<void> _fetchConstraints() async {
-    _constraints = (await _constraintService.getAllConstraints()).cast<SpaceConstraint>();
-    setState(() {});
+    var allConstraints = await _constraintService.getAllConstraints();
+    setState(() {
+      // Filter the constraints to include only SpaceConstraint
+      _constraints = allConstraints
+          .where((constraint) => constraint is SpaceConstraint)
+          .cast<SpaceConstraint>()
+          .toList();
+    });
   }
 
   @override
@@ -47,15 +54,15 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
                     return _buildConstraintCard(
                       constraint: _constraints[index],
                       onTap: () {
-                        // Navigate to edit space constraint
+                        // Navigate to space constraint details
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EditSpaceConstraintView(
+                            builder: (context) => SpaceConstraintDetails(
                               constraint: _constraints[index],
                             ),
                           ),
-                        ).then((_) => _fetchConstraints());
+                        );
                       },
                     );
                   },
@@ -96,13 +103,35 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
               const Icon(Icons.location_on, color: Colors.white, size: 32),
               const SizedBox(width: 16),
               Expanded(
-                child: Text(
-                  'Space Constraint: ${constraint.type.name}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title of the constraint
+                    Text(
+                      'Space Constraint: ${constraint.type.name}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Display the ID and Type of the constraint
+                    Text(
+                      'ID: ${constraint.id ?? "Unknown"}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      'Type: ${constraint.type.toString().split('.').last}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Row(
@@ -118,11 +147,10 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
                       // Delete constraint logic here
                     },
                   ),
+                  // Replaced eye icon with an arrow to view the constraint details
                   IconButton(
-                    icon: const Icon(Icons.remove_red_eye, color: Colors.white),
-                    onPressed: () {
-                      // View constraint details logic here
-                    },
+                    icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                    onPressed: onTap,
                   ),
                 ],
               ),

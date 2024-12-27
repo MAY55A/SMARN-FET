@@ -20,12 +20,17 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Scheduling Rule')),
+      appBar: AppBar(
+        title: const Text('Add Scheduling Rule'),
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+      ),
+      backgroundColor: Colors.black,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DropdownButtonFormField<SchedulingRuleType>(
                 value: _selectedType,
@@ -35,87 +40,150 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                   });
                 },
                 items: SchedulingRuleType.values
-                    .map((type) => DropdownMenuItem(
-                          value: type,
-                          child: Text(type.name),
-                        ))
-                    .toList(),
-                decoration: InputDecoration(labelText: 'Scheduling Type'),
-              ),
-              TextFormField(
-                controller: _durationController,
-                decoration: InputDecoration(labelText: 'Duration'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter duration';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _startTimeController,
-                decoration: InputDecoration(labelText: 'Start Time'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter start time';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _endTimeController,
-                decoration: InputDecoration(labelText: 'End Time'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter end time';
-                  }
-                  return null;
-                },
-              ),
-              GestureDetector(
-                onTap: () => _selectDays(context),  // Open multi-select dialog
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Select Applicable Days: ${_selectedDays.map((e) => e.name).join(', ')}",
-                        style: const TextStyle(color: Colors.white),
+                    .map(
+                      (type) => DropdownMenuItem(
+                        value: type,
+                        child: Text(
+                          type.name,
+                          style: const TextStyle(color: Colors.white),
+                        ),
                       ),
-                      const Icon(Icons.arrow_drop_down, color: Colors.white),
-                    ],
+                    )
+                    .toList(),
+                dropdownColor: Colors.grey[800],
+                decoration: InputDecoration(
+                  labelText: 'Scheduling Type',
+                  labelStyle: const TextStyle(color: Colors.white),
+                  filled: true,
+                  fillColor: Colors.grey[800],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 16),
+              if (_selectedType == SchedulingRuleType.minActivityDuration)
+                TextFormField(
+                  controller: _durationController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Duration',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    filled: true,
+                    fillColor: Colors.grey[800],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter duration';
+                    }
+                    return null;
+                  },
+                ),
+              if (_selectedType == SchedulingRuleType.workPeriod ||
+                  _selectedType == SchedulingRuleType.breakPeriod) ...[
+                TextFormField(
+                  controller: _startTimeController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Start Time',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    filled: true,
+                    fillColor: Colors.grey[800],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter start time';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _endTimeController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'End Time',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    filled: true,
+                    fillColor: Colors.grey[800],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter end time';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () => _selectDays(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[800],
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Select Applicable Days: ${_selectedDays.map((e) => e.name).join(', ')}",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        const Icon(Icons.arrow_drop_down, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState?.validate() ?? false) {
                     final newSchedulingRule = SchedulingRule(
-                      id: '',  // Generate or set the ID
+                      id: '', // Generate or set the ID
                       type: _selectedType,
-                      duration: _durationController.text,
-                      startTime: _startTimeController.text,
-                      endTime: _endTimeController.text,
-                      applicableDays: _selectedDays,
+                      duration: _selectedType == SchedulingRuleType.minActivityDuration
+                          ? int.tryParse(_durationController.text)
+                          : null,
+                      startTime: _selectedType != SchedulingRuleType.minActivityDuration
+                          ? _startTimeController.text
+                          : null,
+                      endTime: _selectedType != SchedulingRuleType.minActivityDuration
+                          ? _endTimeController.text
+                          : null,
+                      applicableDays: _selectedType != SchedulingRuleType.minActivityDuration
+                          ? _selectedDays
+                          : [],
                     );
 
-                    ConstraintService().createSchedulingRule(newSchedulingRule)
-                        .then((response) {
-                          if (response['success'] == true) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Scheduling Rule added successfully')));
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add Scheduling Rule')));
-                          }
-                        });
+                    ConstraintService().createSchedulingRule(newSchedulingRule).then((response) {
+                      if (response['success'] == true) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Scheduling Rule added successfully')),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Failed to add Scheduling Rule')),
+                        );
+                      }
+                    });
                   }
                 },
-                child: Text('Submit'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+                  foregroundColor:  const Color.fromARGB(255, 255, 255, 255)
+                ),
+                child: const Text('Submit'),
               ),
             ],
           ),
@@ -124,7 +192,6 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
     );
   }
 
-  // Method to select days using the multi-select dialog
   Future<void> _selectDays(BuildContext context) async {
     final selectedDays = await showDialog<List<String>>(
       context: context,

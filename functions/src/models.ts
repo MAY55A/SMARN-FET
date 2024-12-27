@@ -124,9 +124,9 @@ export interface SpaceConstraint extends Constraint {
 
 export interface SchedulingRule extends Constraint {
     type: SchedulingRuleType;
-    startTime: String;
-    endTime: String;
-    applicableDays: WorkDay[];
+    startTime?: String;
+    endTime?: String;
+    applicableDays?: WorkDay[];
     duration?: number;
 }
 

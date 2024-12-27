@@ -66,24 +66,27 @@ class ConstraintService {
     }
   }
 
-  Future<List<Constraint>> getAllConstraints() async {
-    try {
-      final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('getAllConstraints');
-      final response = await callable.call();
+ Future<List<Constraint>> getAllConstraints() async {
+  try {
+    final HttpsCallable callable =
+        FirebaseFunctions.instance.httpsCallable('getAllConstraints');
+    final response = await callable.call();
 
-      // Ensure the response contains the list of Constraintes
-      List<Constraint> constraintsList = (response.data["constraints"] as List)
-          .map((item) => Map<String, dynamic>.from(item as Map))
-          .map((c) => Constraint.fromMap(c))
-          .toList();
+    print('Response data: ${response.data}'); // Debugging line
 
-      return constraintsList;
-    } catch (e) {
-      print('Error fetching all constraints: $e');
-      return [];
-    }
+    // Ensure the response contains the list of constraints
+    List<Constraint> constraintsList = (response.data["constraints"] as List)
+        .map((item) => Map<String, dynamic>.from(item as Map))
+        .map((c) => Constraint.fromMap(c))
+        .toList();
+
+    return constraintsList;
+  } catch (e) {
+    print('Error fetching all constraints: $e');
+    return [];
   }
+}
+
 
   Future<List<Constraint>> getActiveConstraints() async {
     try {

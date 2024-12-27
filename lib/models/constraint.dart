@@ -1,15 +1,14 @@
-import 'package:smarn/models/Constraint.dart';
 import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/models/room_type.dart';
 import 'package:smarn/models/work_day.dart';
 
 abstract class Constraint {
-  final String id;
+  final String? id;
   final ConstraintCategory category;
   final bool isActive;
 
   Constraint({
-    required this.id,
+    this.id,
     required this.category,
     this.isActive = true,
   });
@@ -36,6 +35,11 @@ abstract class Constraint {
       return SchedulingRule.fromMap(map);
     }
   }
+
+  @override
+  String toString() {
+    return 'Constraint: $id, Category: $category, Active: $isActive';
+  }
 }
 
 class TimeConstraint extends Constraint {
@@ -48,7 +52,7 @@ class TimeConstraint extends Constraint {
   final String? roomId;
 
   TimeConstraint({
-    required super.id,
+    super.id,
     required this.type,
     this.startTime,
     this.endTime,
@@ -83,7 +87,7 @@ class TimeConstraint extends Constraint {
       startTime: map['startTime'],
       endTime: map['endTime'],
       availableDays: map['availableDays']
-          .map((dayName) =>
+          .map<WorkDay>((dayName) =>
               WorkDay.values.firstWhere((day) => day.name == dayName))
           .toList(),
       teacherId: map['teacherId'],
@@ -92,6 +96,12 @@ class TimeConstraint extends Constraint {
       isActive: map['isActive'],
     );
   }
+
+  @override
+  String toString() {
+    return '${super.toString()}, Type: ${type.name}, Start Time: $startTime, End Time: $endTime, Available Days: ${availableDays.join(', ')}, Teacher ID: $teacherId, Class ID: $classId, Room ID: $roomId';
+  }
+
 }
 
 class SpaceConstraint extends Constraint {
@@ -104,7 +114,7 @@ class SpaceConstraint extends Constraint {
   final RoomType? requiredRoomType;
 
   SpaceConstraint({
-    required super.id,
+    super.id,
     required this.type,
     this.activityType,
     this.teacherId,
@@ -134,32 +144,37 @@ class SpaceConstraint extends Constraint {
   factory SpaceConstraint.fromMap(Map<String, dynamic> map) {
     return SpaceConstraint(
       id: map['id'],
-      type: SpaceConstraintType.values
-          .firstWhere((type) => type.name == map['type']),
-      activityType: map['activityType']?.let((activityTypeName) => ActivityTag
-          .values
-          .firstWhere((activityType) => activityType.name == activityTypeName)),
+      type: SpaceConstraintType.values.firstWhere((type) => type.name == map['type']),
+      activityType: map['activityType'] != null
+          ? ActivityTag.values.firstWhere((activityType) => activityType.name == map['activityType'])
+          : null, // Fix for the error
       teacherId: map['teacherId'],
       classId: map['classId'],
       subjectId: map['subjectId'],
       roomId: map['roomId'],
-      requiredRoomType: map['requiredRoomType']?.let((roomTypeName) => RoomType
-          .values
-          .firstWhere((roomType) => roomType.name == roomTypeName)),
+      requiredRoomType: map['requiredRoomType'] != null
+          ? RoomType.values.firstWhere((roomType) => roomType.name == map['requiredRoomType'])
+          : null,
       isActive: map['isActive'],
     );
   }
+
+  @override
+  String toString() {
+    return '${super.toString()}, Activity Type: ${activityType?.name}, Room ID: $roomId, Teacher ID: $teacherId, Class ID: $classId, Subject ID: $subjectId, Required Room Type : ${requiredRoomType?.name}';
+  }
 }
+
 
 class SchedulingRule extends Constraint {
   final SchedulingRuleType type;
-  final String? duration;
+  final int? duration;
   final String? startTime;
   final String? endTime;
   final List<WorkDay>? applicableDays;
 
   SchedulingRule({
-    required super.id,
+    super.id,
     required this.type,
     this.duration,
     this.startTime,
@@ -191,11 +206,16 @@ class SchedulingRule extends Constraint {
       startTime: map['startTime'],
       endTime: map['endTime'],
       applicableDays: map['applicableDays']
-          ?.map((dayName) =>
+          ?.map<WorkDay>((dayName) =>
               WorkDay.values.firstWhere((day) => day.name == dayName))
           .toList(),
       isActive: map['isActive'],
     );
+  }
+
+  @override
+  String toString() {
+    return '${super.toString()}, Duration: $duration, Start Time: $startTime, End Time: $endTime, Applicable Days: ${applicableDays?.join(', ')}';
   }
 }
 
@@ -207,7 +227,7 @@ enum TimeConstraintType {
   roomAvailability,
 }
 
-enum SpaceConstraintType { roomType, preferredRoom, classAvailability }
+enum SpaceConstraintType { roomType, preferredRoom }
 
 enum SchedulingRuleType {
   workPeriod,

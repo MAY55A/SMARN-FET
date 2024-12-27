@@ -39,13 +39,35 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   @override
   void initState() {
     super.initState();
-    _startTimeController = TextEditingController(text: (widget.constraint as TimeConstraint).startTime);
-    _endTimeController = TextEditingController(text: (widget.constraint as TimeConstraint).endTime);
-    _selectedType = (widget.constraint as TimeConstraint).type;
-    _selectedTeacherId = (widget.constraint as TimeConstraint).teacherId;
-    _selectedClassId = (widget.constraint as TimeConstraint).classId;
-    _selectedRoomId = (widget.constraint as TimeConstraint).roomId;
-    _selectedDays = (widget.constraint as TimeConstraint).availableDays;
+
+    // Ensure that widget.constraint is of type TimeConstraint
+    if (widget.constraint is TimeConstraint) {
+      TimeConstraint timeConstraint = widget.constraint as TimeConstraint;
+
+      // Initialize controllers after type check
+      _startTimeController = TextEditingController(text: timeConstraint.startTime);
+      _endTimeController = TextEditingController(text: timeConstraint.endTime);
+      _selectedType = timeConstraint.type;
+      _selectedTeacherId = timeConstraint.teacherId;
+      _selectedClassId = timeConstraint.classId;
+      _selectedRoomId = timeConstraint.roomId;
+      _selectedDays = timeConstraint.availableDays;
+    } else {
+      // Handle invalid constraint type and show error message
+      print("Invalid constraint type: ${widget.constraint.runtimeType}");
+      
+      // Use post-frame callback to show snackbar after initState is completed
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Invalid constraint type: ${widget.constraint.runtimeType}")),
+        );
+      });
+      
+      // Initialize to prevent null errors
+      _startTimeController = TextEditingController();
+      _endTimeController = TextEditingController();
+    }
+
     _fetchTeachers();
     _fetchClasses();
     _fetchRooms();
@@ -72,8 +94,7 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   }
 
   Future<void> _fetchTeachers() async {
-    List<Map<String, dynamic>> teachers =
-        await _teacherService.getAllTeachers();
+    List<Map<String, dynamic>> teachers = await _teacherService.getAllTeachers();
     setState(() {
       _teachers = teachers;
     });
@@ -123,8 +144,11 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                     _selectedType = value;
                   });
                 },
+                style: const TextStyle(color: Colors.white),
+                dropdownColor: Colors.grey[800],  // Gray color for the dropdown
               ),
               const SizedBox(height: 16),
+              // Start time field
               TextField(
                 controller: _startTimeController,
                 style: const TextStyle(color: Colors.white),
@@ -135,6 +159,7 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                 ),
               ),
               const SizedBox(height: 16),
+              // End time field
               TextField(
                 controller: _endTimeController,
                 style: const TextStyle(color: Colors.white),
@@ -145,72 +170,85 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                 ),
               ),
               const SizedBox(height: 16),
-              _teachers.isEmpty
-                  ? const CircularProgressIndicator()
-                  : DropdownButton<String>(
-                      value: _selectedTeacherId,
-                      hint: const Text("Select Teacher",
-                          style: TextStyle(color: Colors.white)),
-                      items: _teachers.isNotEmpty
-                          ? _teachers.map<DropdownMenuItem<String>>((teacher) {
-                              return DropdownMenuItem<String>(
-                                value: teacher['id'],
-                                child: Text(teacher['teacher'].name ?? 'Unknown',
-                                    style: const TextStyle(color: Colors.white)),
-                              );
-                            }).toList()
-                          : [],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedTeacherId = value;
-                        });
-                      },
-                    ),
+              // Only show Teacher dropdown if the selected type requires it
+              if (_selectedType == TimeConstraintType.teacherAvailability)
+                _teachers.isEmpty
+                    ? const CircularProgressIndicator()
+                    : DropdownButton<String>(
+                        value: _selectedTeacherId,
+                        hint: const Text("Select Teacher",
+                            style: TextStyle(color: Colors.white)),
+                        items: _teachers.isNotEmpty
+                            ? _teachers.map<DropdownMenuItem<String>>((teacher) {
+                                return DropdownMenuItem<String>(
+                                  value: teacher['id'],
+                                  child: Text(teacher['teacher'].name ?? 'Unknown',
+                                      style: const TextStyle(color: Colors.white)),
+                                );
+                              }).toList()
+                            : [],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedTeacherId = value;
+                          });
+                        },
+                        style: const TextStyle(color: Colors.white),
+                        dropdownColor: Colors.grey[800],  // Gray color for the dropdown
+                      ),
               const SizedBox(height: 16),
-              _classes.isEmpty
-                  ? const CircularProgressIndicator()
-                  : DropdownButton<String>(
-                      value: _selectedClassId,
-                      hint: const Text("Select Class",
-                          style: TextStyle(color: Colors.white)),
-                      items: _classes.isNotEmpty
-                          ? _classes.map<DropdownMenuItem<String>>((classItem) {
-                              return DropdownMenuItem<String>(
-                                value: classItem.id,
-                                child: Text(classItem.name,
-                                    style: const TextStyle(color: Colors.white)),
-                              );
-                            }).toList()
-                          : [],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedClassId = value;
-                        });
-                      },
-                    ),
+              // Only show Class dropdown if the selected type requires it
+              if (_selectedType == TimeConstraintType.classAvailability)
+                _classes.isEmpty
+                    ? const CircularProgressIndicator()
+                    : DropdownButton<String>(
+                        value: _selectedClassId,
+                        hint: const Text("Select Class",
+                            style: TextStyle(color: Colors.white)),
+                        items: _classes.isNotEmpty
+                            ? _classes.map<DropdownMenuItem<String>>((classItem) {
+                                return DropdownMenuItem<String>(
+                                  value: classItem.id,
+                                  child: Text(classItem.name,
+                                      style: const TextStyle(color: Colors.white)),
+                                );
+                              }).toList()
+                            : [],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedClassId = value;
+                          });
+                        },
+                        style: const TextStyle(color: Colors.white),
+                        dropdownColor: Colors.grey[800],  // Gray color for the dropdown
+                      ),
               const SizedBox(height: 16),
-              _rooms.isEmpty
-                  ? const CircularProgressIndicator()
-                  : DropdownButton<String>(
-                      value: _selectedRoomId,
-                      hint: const Text("Select Room",
-                          style: TextStyle(color: Colors.white)),
-                      items: _rooms.isNotEmpty
-                          ? _rooms.map<DropdownMenuItem<String>>((room) {
-                              return DropdownMenuItem<String>(
-                                value: room.id,
-                                child: Text(room.name ?? 'Unknown',
-                                    style: const TextStyle(color: Colors.white)),
-                              );
-                            }).toList()
-                          : [],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedRoomId = value;
-                        });
-                      },
-                    ),
+              // Only show Room dropdown if the selected type requires it
+              if (_selectedType == TimeConstraintType.roomAvailability)
+                _rooms.isEmpty
+                    ? const CircularProgressIndicator()
+                    : DropdownButton<String>(
+                        value: _selectedRoomId,
+                        hint: const Text("Select Room",
+                            style: TextStyle(color: Colors.white)),
+                        items: _rooms.isNotEmpty
+                            ? _rooms.map<DropdownMenuItem<String>>((room) {
+                                return DropdownMenuItem<String>(
+                                  value: room.id,
+                                  child: Text(room.name ?? 'Unknown',
+                                      style: const TextStyle(color: Colors.white)),
+                                );
+                              }).toList()
+                            : [],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedRoomId = value;
+                          });
+                        },
+                        style: const TextStyle(color: Colors.white),
+                        dropdownColor: Colors.grey[800],  // Gray color for the dropdown
+                      ),
               const SizedBox(height: 16),
+              // Select Available Days
               GestureDetector(
                 onTap: () => _selectDays(context),
                 child: Container(
@@ -233,6 +271,7 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                 ),
               ),
               const SizedBox(height: 16),
+              // Save Changes Button
               ElevatedButton(
                 onPressed: _editConstraint,
                 child: const Text('Save Changes'),
@@ -260,7 +299,7 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
       roomId: _selectedRoomId ?? 'default_room_id',
     );
 
-    final result = await _constraintService.updateConstraint(widget.constraint.id, updatedConstraint);
+    final result = await _constraintService.updateConstraint(widget.constraint.id!, updatedConstraint);
     if (result['success']) {
       Navigator.pop(context);
     } else {

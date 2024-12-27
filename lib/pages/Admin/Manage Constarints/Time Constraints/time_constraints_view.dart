@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:smarn/models/constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Time%20Constraints/add_time_constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Time%20Constraints/edit_time_constraint.dart';
+import 'package:smarn/pages/Admin/Manage%20Constarints/Time%20Constraints/time_constaint.details.dart';
 import 'package:smarn/services/constraint_service.dart';
-
-
 
 class TimeConstraintsView extends StatefulWidget {
   const TimeConstraintsView({super.key});
@@ -15,35 +14,58 @@ class TimeConstraintsView extends StatefulWidget {
 
 class _TimeConstraintsViewState extends State<TimeConstraintsView> {
   final ConstraintService _constraintService = ConstraintService();
-  List<Constraint> _constraints = [];
+  List<TimeConstraint> _timeConstraints = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchConstraints();
+    _fetchTimeConstraints();
   }
 
-  Future<void> _fetchConstraints() async {
-    List<Constraint> constraints = await _constraintService.getAllConstraints();
-    setState(() {
-      _constraints = constraints;
-    });
+  Future<void> _fetchTimeConstraints() async {
+    try {
+      List<Constraint> constraints = await _constraintService.getAllConstraints();
+      // Filter only timeConstraints
+      List<TimeConstraint> timeConstraints = constraints
+          .where((constraint) =>
+              constraint.category == ConstraintCategory.timeConstraint)
+          .cast<TimeConstraint>()
+          .toList();
+
+      if (mounted) {
+        setState(() {
+          _timeConstraints = timeConstraints;
+        });
+      }
+    } catch (e) {
+      print('Error fetching constraints: $e');
+    }
   }
 
   void _navigateToAdd() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AddTimeConstraintView()),
-    ).then((_) => _fetchConstraints()); // Refresh data after adding
+    ).then((_) => _fetchTimeConstraints()); // Refresh data after adding
   }
 
-  void _navigateToEdit(Constraint constraint) {
+  void _navigateToEdit(TimeConstraint constraint) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EditTimeConstraintView(constraint: constraint),
       ),
-    ).then((_) => _fetchConstraints()); // Refresh data after editing
+    ).then((_) => _fetchTimeConstraints()); // Refresh data after editing
+  }
+
+  // Navigate to TimeConstraintDetails
+  void _navigateToDetails(TimeConstraint constraint) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TimeConstraintDetails(constraint: constraint),
+      ),
+    );
   }
 
   @override
@@ -62,10 +84,10 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
             children: [
               Expanded(
                 child: ListView.builder(
-                  itemCount: _constraints.length,
+                  itemCount: _timeConstraints.length,
                   itemBuilder: (context, index) {
                     return _buildConstraintCard(
-                      constraint: _constraints[index],
+                      constraint: _timeConstraints[index],
                     );
                   },
                 ),
@@ -82,7 +104,7 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
     );
   }
 
-  Widget _buildConstraintCard({required Constraint constraint}) {
+  Widget _buildConstraintCard({required TimeConstraint constraint}) {
     return InkWell(
       onTap: () {
         _navigateToEdit(constraint);
@@ -93,35 +115,59 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Icon(Icons.access_time, color: Colors.white, size: 32),
+              const Icon(Icons.access_time, color: Colors.white, size: 32),
               const SizedBox(width: 16),
               Expanded(
-                child: Text(
-                  'Time Constraint: ${constraint.id}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title of the constraint
+                    Text(
+                      'Time Constraint: ${constraint.id ?? "Unknown"}', // Handle null id
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Display the ID and Type of the constraint
+                    Text(
+                      'ID: ${constraint.id ?? "Unknown"}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      'Type: ${constraint.type.toString().split('.').last}',  // Convert enum to string
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.edit, color: Colors.white),
-                onPressed: () {
-                  _navigateToEdit(constraint);
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.white),
-                onPressed: () {
-                  // Implement delete functionality
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.remove_red_eye, color: Colors.white),
-                onPressed: () {
-                  // View constraint details
-                },
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                    onPressed: () {
+                      _navigateToEdit(constraint);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.white),
+                    onPressed: () {
+                      // Implement delete functionality
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_forward_ios, color: Colors.white), // Replace eye icon with arrow
+                    onPressed: () {
+                      _navigateToDetails(constraint); // Navigate to details screen
+                    },
+                  ),
+                ],
               ),
             ],
           ),
