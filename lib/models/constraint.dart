@@ -101,6 +101,7 @@ class TimeConstraint extends Constraint {
   String toString() {
     return '${super.toString()}, Type: ${type.name}, Start Time: $startTime, End Time: $endTime, Available Days: ${availableDays.join(', ')}, Teacher ID: $teacherId, Class ID: $classId, Room ID: $roomId';
   }
+
 }
 
 class SpaceConstraint extends Constraint {
@@ -163,6 +164,7 @@ class SpaceConstraint extends Constraint {
   String toString() {
     return '${super.toString()}, Activity Type: ${activityType?.name}, Room ID: $roomId, Teacher ID: $teacherId, Class ID: $classId, Subject ID: $subjectId, Required Room Type : ${requiredRoomType?.name}';
   }
+
 }
 
 class SchedulingRule extends Constraint {
