@@ -14,7 +14,7 @@ class ViewSubjectDetails extends StatefulWidget {
 class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
   final TeacherService _teacherService = TeacherService();
   bool _isLoading = true;
-  List<Teacher> _teachers = [];
+  List<Map<String, String>> _teachers = [];
   String _errorMessage = '';
 
   @override
@@ -25,28 +25,29 @@ class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
 
   Future<void> _loadTeachersForSubject() async {
     try {
-      final teachersList =
+      // Fetch the list of teachers who teach the subject
+      var teachersList =
           await _teacherService.getTeachersBySubject(widget.subject.id!);
 
-      setState(() {
-        _teachers = teachersList
-            .map((teacherData) =>
-                Teacher.fromMap(Map<String, dynamic>.from(teacherData)))
-            .toList();
-        _isLoading = false;
-      });
+      // Check if the teachersList is not empty
+      if (teachersList.isNotEmpty) {
+        setState(() {
+          _teachers = teachersList;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _errorMessage = 'No teachers found for this subject';
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error fetching teachers: $e';
+        // Catch the error and display it in the UI
+        _errorMessage = 'Error fetching teachers for this subject: $e';
         _isLoading = false;
       });
     }
-  }
-
-  Future<List<Teacher>> _filterTeachers(String subjectId) async {
-    return _teachers.where((teacher) {
-      return teacher.subjects.contains(subjectId);
-    }).toList();
   }
 
   @override
@@ -54,99 +55,64 @@ class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text(
-          "Subject Details",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("Subject Details",
+            style: TextStyle(color: Colors.white)),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            color: Colors.grey[850],
-            elevation: 8,
-            margin: const EdgeInsets.all(16.0),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Name: ${widget.subject.name}',
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Long Name: ${widget.subject.longName ?? 'Not Provided'}',
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Description: ${widget.subject.description ?? 'Not Provided'}',
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Teachers:',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: FutureBuilder<List<Teacher>>(
-                      future: _filterTeachers(widget.subject.id!),
-                      builder: (context, snapshot) {
-                        if (_isLoading) {
-                          return const Center(child: CircularProgressIndicator());
-                        } else if (_errorMessage.isNotEmpty) {
-                          return Center(
-                            child: Text(
-                              _errorMessage,
-                              style: const TextStyle(color: Colors.red),
+      body: Container(
+        color: Colors.black,
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Name: ${widget.subject.name}',
+                style: const TextStyle(color: Colors.white, fontSize: 18)),
+            const SizedBox(height: 10),
+            Text('Long Name: ${widget.subject.longName ?? 'Not Provided'}',
+                style: const TextStyle(color: Colors.white, fontSize: 18)),
+            const SizedBox(height: 10),
+            Text('Description: ${widget.subject.description ?? 'Not Provided'}',
+                style: const TextStyle(color: Colors.white, fontSize: 18)),
+            const SizedBox(height: 20),
+            const Text('Teachers:',
+                style: TextStyle(color: Colors.white, fontSize: 20)),
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _errorMessage.isNotEmpty
+                      ? Center(
+                          child: Text(_errorMessage,
+                              style: const TextStyle(color: Colors.red)))
+                      : _teachers.isEmpty
+                          ? const Center(
+                              child: Text('No teachers found for this subject.',
+                                  style: TextStyle(color: Colors.white)))
+                          : ListView.builder(
+                              itemCount: _teachers.length,
+                              itemBuilder: (context, index) {
+                                final teacher = _teachers[index];
+                                return ListTile(
+                                  contentPadding:
+                                      const EdgeInsets.symmetric(vertical: 5),
+                                  title: Text(teacher["name"]!,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                  subtitle: Text(teacher["id"]!,
+                                      style:
+                                          const TextStyle(color: Colors.grey)),
+                                  /*
+                                  leading: teacher.picture.isNotEmpty
+                                      ? CircleAvatar(
+                                          backgroundImage:
+                                              NetworkImage(teacher.picture))
+                                      : const CircleAvatar(
+                                          child: Icon(Icons.person)),
+                                          */
+                                );
+                              },
                             ),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text(
-                              "Error: ${snapshot.error}",
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          );
-                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              'No teachers found for this subject.',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          );
-                        }
-
-                        final filteredTeachers = snapshot.data!;
-                        return ListView.builder(
-                          itemCount: filteredTeachers.length,
-                          itemBuilder: (context, index) {
-                            final teacher = filteredTeachers[index];
-                            return ListTile(
-                              title: Text(
-                                teacher.name.isNotEmpty
-                                    ? teacher.name
-                                    : 'No Name Provided',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                              subtitle: Text(
-                                "Email: ${teacher.email ?? 'No Email Provided'}",
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
             ),
-          ),
+          ],
         ),
       ),
     );

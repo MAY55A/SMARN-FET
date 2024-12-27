@@ -249,6 +249,18 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                                   );
                                 },
                               ),
+                              // View details icon
+                              IconButton(
+                                icon: const Icon(Icons.visibility, color: Colors.white),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ViewTeacherDetailsForm(teacher: teacher),
+                                    ),
+                                  );
+                                },
+                              ),
                             ],
                           ),
                         ),

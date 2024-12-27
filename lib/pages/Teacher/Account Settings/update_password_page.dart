@@ -21,7 +21,9 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
     final confirmPassword = _newPasswordConfirmController.text.trim();
 
     // Validation
-    if (currentPassword.isEmpty || newPassword.isEmpty || confirmPassword.isEmpty) {
+    if (currentPassword.isEmpty ||
+        newPassword.isEmpty ||
+        confirmPassword.isEmpty) {
       _showError('All fields are required.');
       return;
     }

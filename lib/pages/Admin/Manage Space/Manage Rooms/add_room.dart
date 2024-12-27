@@ -4,6 +4,7 @@ import 'package:smarn/models/room.dart';
 import 'package:smarn/models/room_type.dart';
 import 'package:smarn/services/room_service.dart';
 import 'package:smarn/services/building_service.dart';
+import 'package:smarn/services/building_service.dart';
 
 class AddRoom extends StatefulWidget {
   const AddRoom({super.key});
@@ -19,11 +20,13 @@ class _AddRoomState extends State<AddRoom> {
   int? capacity;
   RoomType type = RoomType.lecture;
   Building? selectedBuilding; // Selected building
+ // Selected building
   final RoomService _roomService = RoomService();
   final BuildingService _buildingService = BuildingService();
-
   List<Building> buildings = []; // List of buildings from the database
   bool isSubmitting = false;
+
+
 
   @override
   void initState() {
@@ -49,6 +52,13 @@ class _AddRoomState extends State<AddRoom> {
       return;
     }
 
+    if (selectedBuilding == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Building is required')),
+      );
+      return;
+    }
+
     setState(() {
       isSubmitting = true;
     });
@@ -59,6 +69,7 @@ class _AddRoomState extends State<AddRoom> {
       description: description,
       capacity: capacity!,
       building: selectedBuilding!.id!, // Building ID
+      
     );
 
     final result = await _roomService.addRoom(newRoom);

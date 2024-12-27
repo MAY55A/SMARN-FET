@@ -5,6 +5,7 @@ import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Teachers/manage_teachers_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/constarints_selection_page.dart';
+import 'package:smarn/pages/Admin/Manage%20Constarints/constarints_selection_page.dart';
 import 'package:smarn/pages/Admin/Menu_admin.dart';
 import 'package:smarn/pages/widgets/AppBar.dart';
 import 'package:smarn/pages/widgets/canstants.dart';

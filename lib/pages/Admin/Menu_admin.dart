@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/Admin/Account%20Settings/account_setting.dart';
+import 'package:smarn/pages/Admin/Account%20Settings/account_setting.dart';
 import 'package:smarn/pages/Admin/Manage%20Activities/manage_activities_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Classes/manage_classes.dart';
 import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
@@ -72,6 +73,9 @@ class _AdminMenuState extends State<AdminMenu> {
                  ManageTimetable()),
             _buildMenuItem(context, Icons.report_problem_outlined,
                 'Manage Requests', const ManageComplaintsForm()),
+                _buildMenuItem(
+  context, Icons.account_circle, 'Account Settings', const AccountSettingsPage()),
+                
                 _buildMenuItem(
   context, Icons.account_circle, 'Account Settings', const AccountSettingsPage()),
                 

@@ -39,6 +39,10 @@ class _EditActivityState extends State<EditActivity> {
   final SubjectService _subjectService = SubjectService();
   final ClassService _classService = ClassService();
 
+  late Activity _oldActivity;
+
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +50,10 @@ class _EditActivityState extends State<EditActivity> {
   }
 
   Future<void> _fetchData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     await Future.wait([
       _fetchTeachers(),
       _fetchSubjects(),
@@ -55,11 +63,26 @@ class _EditActivityState extends State<EditActivity> {
     // Pre-fill fields with existing data
     setState(() {
       _durationController.text = widget.activity['duration']?.toString() ?? '';
-      _selectedClass = _classes.firstWhere((c) => c.id == widget.activity['studentsClass']['id']);
+      _selectedClass = _classes
+          .firstWhere((c) => c.id == widget.activity['studentsClass']['id']);
       _selectedTag = widget.activity['tag'];
-      _selectedTeacher = _allTeachers.firstWhere((t) => t.id == widget.activity['teacher']['id']);
-      _selectedSubject = _allSubjects.firstWhere((s) => s.id == widget.activity['subject']['id']);
+      _selectedTeacher = _allTeachers
+          .firstWhere((t) => t.id == widget.activity['teacher']['id']);
+      _selectedSubject = _allSubjects
+          .firstWhere((s) => s.id == widget.activity['subject']['id']);
+      _oldActivity = fillActivity();
+      _isLoading = false;
     });
+  }
+
+  Activity fillActivity() {
+    return Activity(
+        id: widget.activity['id'],
+        subject: _selectedSubject!.id!,
+        teacher: _selectedTeacher!.id!,
+        studentsClass: _selectedClass!.id!,
+        duration: int.parse(_durationController.text),
+        tag: ActivityTag.values.firstWhere((t) => t.name == _selectedTag));
   }
 
   Future<void> _fetchTeachers() async {
@@ -90,7 +113,9 @@ class _EditActivityState extends State<EditActivity> {
   void _refreshTeachers() {
     if (_selectedSubject != null) {
       setState(() {
-        _teachers = _allTeachers.where((teacher) => teacher.subjects.contains(_selectedSubject!.id)).toList();
+        _teachers = _allTeachers
+            .where((teacher) => teacher.subjects.contains(_selectedSubject!.id))
+            .toList();
       });
     }
   }
@@ -98,32 +123,37 @@ class _EditActivityState extends State<EditActivity> {
   void _refreshSubjects() {
     if (_selectedTeacher != null) {
       setState(() {
-        _subjects = _allSubjects.where((subject) => _selectedTeacher!.subjects.contains(subject.id)).toList();
+        _subjects = _allSubjects
+            .where((subject) => _selectedTeacher!.subjects.contains(subject.id))
+            .toList();
       });
     }
   }
 
   void _saveActivity() async {
     if (_formIsValid()) {
-      final updatedActivity = Activity(
-        id: widget.activity['id'],
-        subject: _selectedSubject!.id!,
-        teacher: _selectedTeacher!.id!,
-        studentsClass: _selectedClass!.id!,
-        duration: int.parse(_durationController.text),
-        tag: ActivityTag.values.firstWhere((e) => e.name == _selectedTag),
-      );
-
-      final result = await ActivityService().updateActivity(widget.activity['id'], updatedActivity);
-
-      if (result['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Activity updated successfully')));
-        Navigator.pop(context, true);
+      final updatedActivity = fillActivity();
+      if (_oldActivity.equals(updatedActivity)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No changes were made to the activity')),
+        );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating activity: ${result['message']}')));
+        final result = await ActivityService()
+            .updateActivity(widget.activity['id'], updatedActivity);
+
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Activity updated successfully')));
+          Navigator.pop(context, true);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('Error updating activity: ${result['message']}')));
+        }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill out all fields and ensure the duration is at least 60 minutes.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Please fill out all fields and ensure the duration is at least 60 minutes.')));
     }
   }
 
@@ -146,71 +176,88 @@ class _EditActivityState extends State<EditActivity> {
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Subject Dropdown
-              activityDropdownMenu("subject", _selectedSubject, _subjects, (dynamic newValue) {
-                setState(() {
-                  _selectedSubject = newValue as Subject;
-                  _refreshTeachers(); // Refresh teachers based on selected subject
-                });
-              }),
-              const SizedBox(height: 16),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Center(
+              child: Card(
+                color: const Color.fromARGB(255, 34, 34, 34),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                elevation: 8.0,
+                margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Subject Dropdown
+                        activityDropdownMenu("subject", _selectedSubject, _subjects,
+                            (dynamic newValue) {
+                          setState(() {
+                            _selectedSubject = newValue as Subject;
+                            _refreshTeachers(); // Refresh teachers based on selected subject
+                          });
+                        }),
+                        const SizedBox(height: 16),
 
-              // Teacher Dropdown
-              activityDropdownMenu("teacher", _selectedTeacher, _teachers, (dynamic newValue) {
-                setState(() {
-                  _selectedTeacher = newValue as Teacher;
-                  _refreshSubjects(); // Refresh subjects based on selected teacher
-                });
-              }),
-              const SizedBox(height: 16),
+                        // Teacher Dropdown
+                        activityDropdownMenu("teacher", _selectedTeacher, _teachers,
+                            (dynamic newValue) {
+                          setState(() {
+                            _selectedTeacher = newValue as Teacher;
+                            _refreshSubjects(); // Refresh subjects based on selected teacher
+                          });
+                        }),
+                        const SizedBox(height: 16),
 
-              // Class Dropdown
-              activityDropdownMenu("class", _selectedClass, _classes, (dynamic newValue) {
-                setState(() {
-                  _selectedClass = newValue as Class;
-                });
-              }),
-              const SizedBox(height: 16),
+                        // Class Dropdown
+                        activityDropdownMenu("class", _selectedClass, _classes,
+                            (dynamic newValue) {
+                          setState(() {
+                            _selectedClass = newValue as Class;
+                          });
+                        }),
+                        const SizedBox(height: 16),
 
-              // Tag Dropdown
-              activityDropdownMenu("tag", _selectedTag, _tags, (dynamic newValue) {
-                setState(() {
-                  _selectedTag = newValue as String;
-                });
-              }),
-              const SizedBox(height: 16),
+                        // Tag Dropdown
+                        activityDropdownMenu("tag", _selectedTag, _tags,
+                            (dynamic newValue) {
+                          setState(() {
+                            _selectedTag = newValue as String;
+                          });
+                        }),
+                        const SizedBox(height: 16),
 
-              // Duration TextField
-              TextField(
-                controller: _durationController,
-                style: const TextStyle(color: Colors.white),
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Duration (Minutes)',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
+                        // Duration TextField
+                        TextField(
+                          controller: _durationController,
+                          style: const TextStyle(color: Colors.white),
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Duration (Minutes)',
+                            labelStyle: TextStyle(color: Colors.white),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Save Button
+                        ElevatedButton(
+                          onPressed: _saveActivity,
+                          child: const Text('Save Activity'),
+                          style: ButtonStyle(
+                            foregroundColor: MaterialStateProperty.all(Colors.black),
+                            backgroundColor: MaterialStateProperty.all(
+                                const Color.fromARGB(255, 129, 77, 139)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
-
-              // Save Button
-              ElevatedButton(
-                onPressed: _saveActivity,
-                child: const Text('Save Activity'),
-                style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all(Colors.black),
-                  backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 129, 77, 139)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

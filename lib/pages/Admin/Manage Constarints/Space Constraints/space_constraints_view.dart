@@ -1,18 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/models/constraint.dart';
+import 'package:smarn/pages/Admin/Manage%20Constarints/Space%20Constraints/add_space_constraint.dart';
+import 'package:smarn/pages/Admin/Manage%20Constarints/Space%20Constraints/edit_space_constraint.dart';
+import 'package:smarn/services/constraint_service.dart';
 
-class TimeConstraintsView extends StatefulWidget {
-  const TimeConstraintsView({super.key});
+class SpaceConstraintsView extends StatefulWidget {
+  const SpaceConstraintsView({super.key});
 
   @override
-  _TimeConstraintsViewState createState() => _TimeConstraintsViewState();
+  _SpaceConstraintsViewState createState() => _SpaceConstraintsViewState();
 }
 
-class _TimeConstraintsViewState extends State<TimeConstraintsView> {
+class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
+  final ConstraintService _constraintService = ConstraintService();
+  List<SpaceConstraint> _constraints = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchConstraints();
+  }
+
+  Future<void> _fetchConstraints() async {
+    _constraints = (await _constraintService.getAllConstraints()).cast<SpaceConstraint>();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Time Constraints"),
+        title: const Text("Space Constraints"),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Container(
@@ -22,16 +40,22 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // List of time constraints
               Expanded(
                 child: ListView.builder(
-                  itemCount: 3,
+                  itemCount: _constraints.length,
                   itemBuilder: (context, index) {
                     return _buildConstraintCard(
-                      title: 'Time Constraint ${index + 1}',
-                      icon: Icons.access_time,
+                      constraint: _constraints[index],
                       onTap: () {
-                        // Navigate to view/edit time constraint
+                        // Navigate to edit space constraint
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditSpaceConstraintView(
+                              constraint: _constraints[index],
+                            ),
+                          ),
+                        ).then((_) => _fetchConstraints());
                       },
                     );
                   },
@@ -43,7 +67,13 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigate to add time constraint form
+          // Navigate to add space constraint form
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddSpaceConstraintView(),
+            ),
+          ).then((_) => _fetchConstraints());
         },
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
         child: const Icon(Icons.add),
@@ -52,8 +82,7 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
   }
 
   Widget _buildConstraintCard({
-    required String title,
-    required IconData icon,
+    required SpaceConstraint constraint,
     required VoidCallback onTap,
   }) {
     return InkWell(
@@ -64,11 +93,11 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Icon(icon, color: Colors.white, size: 32),
+              const Icon(Icons.location_on, color: Colors.white, size: 32),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  title,
+                  'Space Constraint: ${constraint.type.name}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -81,20 +110,18 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.edit, color: Colors.white),
-                    onPressed: () {
-                      // Navigate to edit constraint
-                    },
+                    onPressed: onTap,
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.white),
                     onPressed: () {
-                      // Delete constraint
+                      // Delete constraint logic here
                     },
                   ),
                   IconButton(
                     icon: const Icon(Icons.remove_red_eye, color: Colors.white),
                     onPressed: () {
-                      // View constraint details
+                      // View constraint details logic here
                     },
                   ),
                 ],

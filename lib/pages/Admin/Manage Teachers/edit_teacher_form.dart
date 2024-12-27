@@ -84,7 +84,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
           if (response['success'] == true) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(response['message'] ?? 'Teacher updated successfully!'),
+                content: Text(
+                    response['message'] ?? 'Teacher updated successfully!'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -93,14 +94,16 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(response['message'] ?? 'Failed to update teacher.'),
+                content:
+                    Text(response['message'] ?? 'Failed to update teacher.'),
                 backgroundColor: Colors.red,
               ),
             );
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No changes were made to the teacher.')),
+            const SnackBar(
+                content: Text('No changes were made to the teacher.')),
           );
         }
       } catch (e) {
@@ -140,11 +143,13 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
             color: Colors.grey[850], // Couleur de la carte
             elevation: 8,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Reduced vertical padding
+              padding: const EdgeInsets.symmetric(
+                  vertical: 8.0, horizontal: 16.0), // Reduced vertical padding
               child: Form(
                 key: _formKey,
                 child: ListView(
-                  shrinkWrap: true, // Ensures the ListView takes only the needed space
+                  shrinkWrap:
+                      true, // Ensures the ListView takes only the needed space
                   children: [
                     TextFormField(
                       controller: _nameController,
@@ -210,7 +215,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                         if (value == null || value.isEmpty) {
                           return "Number of target hours is required.";
                         }
-                        if (int.tryParse(value)! <= 0 || int.tryParse(value)! > 40) {
+                        if (int.tryParse(value)! <= 0 ||
+                            int.tryParse(value)! > 40) {
                           return "Number of target hours must be between 1 and 40.";
                         }
                         return null;
@@ -257,13 +263,16 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                       children: [
                         ElevatedButton(
                           style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(AppColors.appBarColor),
+                            backgroundColor: MaterialStateProperty.all(
+                                AppColors.appBarColor),
                           ),
-                          onPressed: _isLoading ? null : _updateTeacher, // Disable button when loading
+                          onPressed: _isLoading
+                              ? null
+                              : _updateTeacher, // Disable button when loading
                           child: _isLoading
                               ? const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.black),
                                 )
                               : const Text(
                                   "Update Teacher",
@@ -272,7 +281,8 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
                         ),
                         ElevatedButton(
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.grey),
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.grey),
                           ),
                           onPressed: _cancelUpdates,
                           child: const Text(

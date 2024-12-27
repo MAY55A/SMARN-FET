@@ -4,30 +4,30 @@ import 'package:smarn/models/room.dart';
 import 'package:smarn/models/room_type.dart';
 import 'package:smarn/services/room_service.dart';
 import 'package:smarn/services/building_service.dart';
+import 'package:smarn/services/room_service.dart';
+import 'package:smarn/services/building_service.dart';
 
 class EditRoom extends StatefulWidget {
   final Room roomItem;
-
   const EditRoom({super.key, required this.roomItem});
-
   @override
   State<EditRoom> createState() => _EditRoomState();
 }
-
 class _EditRoomState extends State<EditRoom> {
   final _formKey = GlobalKey<FormState>();
   final RoomService _roomService = RoomService();
   final BuildingService _buildingService = BuildingService();
-
   late String name;
   late String description;
   late int capacity;
   late RoomType type;
   late Building selectedBuilding;
+ 
   bool isLoading = false;
   bool isBuildingsLoading = true;
-
   List<Building> buildings = [];
+  
+
 
   @override
   void initState() {
@@ -40,6 +40,7 @@ class _EditRoomState extends State<EditRoom> {
     // Load buildings
     _loadBuildings();
   }
+
 
   Future<void> _loadBuildings() async {
     List<Building> fetchedBuildings = await _buildingService.getAllBuildings();
@@ -68,15 +69,17 @@ class _EditRoomState extends State<EditRoom> {
         description: description,
         capacity: capacity,
         building: selectedBuilding.id!, // Use the ID of the selected building
+       
       );
 
       if (!updatedRoom.equals(widget.roomItem)) {
         final result = await _roomService.updateRoom(widget.roomItem.id!, updatedRoom);
-
+      
         if (result['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Room updated successfully!')),
           );
+          Navigator.pop(context, updatedRoom);
           Navigator.pop(context, updatedRoom);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -107,6 +110,7 @@ class _EditRoomState extends State<EditRoom> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: isLoading || isBuildingsLoading
+       
             ? const Center(child: CircularProgressIndicator())
             : Center(
                 child: SingleChildScrollView(
