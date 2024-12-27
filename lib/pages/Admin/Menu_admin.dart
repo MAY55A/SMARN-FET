@@ -76,8 +76,7 @@ class _AdminMenuState extends State<AdminMenu> {
                 _buildMenuItem(
   context, Icons.account_circle, 'Account Settings', const AccountSettingsPage()),
                 
-                _buildMenuItem(
-  context, Icons.account_circle, 'Account Settings', const AccountSettingsPage()),
+
                 
 
             // Spacer for alignment
