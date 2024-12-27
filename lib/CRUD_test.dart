@@ -3,14 +3,17 @@ import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/models/building.dart';
 import 'package:smarn/models/change_request.dart';
 import 'package:smarn/models/class.dart';
+import 'package:smarn/models/constraint.dart';
 import 'package:smarn/models/room.dart';
 import 'package:smarn/models/room_type.dart';
 import 'package:smarn/models/subject.dart';
+import 'package:smarn/models/work_day.dart';
 import 'package:smarn/services/activity_service.dart';
 import 'package:smarn/services/admin_service.dart';
 import 'package:smarn/services/building_service.dart';
 import 'package:smarn/services/change_request_service.dart';
 import 'package:smarn/services/class_service.dart';
+import 'package:smarn/services/constraint_service.dart';
 import 'package:smarn/services/room_service.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/services/teacher_service.dart';
@@ -26,6 +29,20 @@ final buildingService = BuildingService();
 final roomService = RoomService();
 final activityService = ActivityService();
 final changeRequestService = ChangeRequestService();
+final constraintService = ConstraintService();
+
+void constraintCrud() async {
+  print(await constraintService.getAllConstraints());
+  SchedulingRule constraint = SchedulingRule(
+    type: SchedulingRuleType.workPeriod,
+    startTime: "08:00",
+    endTime: "18:00",
+    applicableDays: WorkDay.values,
+  );
+  //print(constraint);
+  print(await constraintService.createSchedulingRule(constraint));
+  print(await constraintService.getAllConstraints());
+}
 
 void addTeacher() async {
   // Example of adding a teacher
@@ -158,7 +175,7 @@ void roomCrud() async {
   print(res["message"]);
   print(await activityService.getActivityDetails("ACT001"));
 */
- /* Activity updatedAct = Activity(
+/* Activity updatedAct = Activity(
       subject: 'SUB001',
       studentsClass: 'CLA001',
       teacher: 'TEA003',
@@ -184,8 +201,8 @@ void teacherCrud() async {
   print(await teacherService.getTeachersBySubject("SUB001"));
 
   print(await teacherService.deleteTeacher("or4OKe8jyDMWpUGsrL9AqaoChL83"));
-
 }
+
 void deleteTeacherTest1() async {
   // Test: Deleting teacher with ID drM5ToiveZd2M7CwN0gsn5yfv913
   String teacherId = "drM5ToiveZd2M7CwN0gsn5yfv913";
