@@ -42,6 +42,7 @@ class _EditActivityState extends State<EditActivity> {
   late Activity _oldActivity;
 
   bool _isLoading = true;
+  bool _isActive = true; // New field for active state
 
   @override
   void initState() {
@@ -71,6 +72,7 @@ class _EditActivityState extends State<EditActivity> {
       _selectedSubject = _allSubjects
           .firstWhere((s) => s.id == widget.activity['subject']['id']);
       _oldActivity = fillActivity();
+      _isActive = widget.activity['isActive'] ?? true; // Set initial active state
       _isLoading = false;
     });
   }
@@ -82,7 +84,8 @@ class _EditActivityState extends State<EditActivity> {
         teacher: _selectedTeacher!.id!,
         studentsClass: _selectedClass!.id!,
         duration: int.parse(_durationController.text),
-        tag: ActivityTag.values.firstWhere((t) => t.name == _selectedTag));
+        tag: ActivityTag.values.firstWhere((t) => t.name == _selectedTag),
+        isActive: _isActive); // Include active state
   }
 
   Future<void> _fetchTeachers() async {
@@ -239,6 +242,27 @@ class _EditActivityState extends State<EditActivity> {
                             labelStyle: TextStyle(color: Colors.white),
                             border: OutlineInputBorder(),
                           ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Active Toggle
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Active',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            Switch(
+                              value: _isActive,
+                              onChanged: (value) {
+                                setState(() {
+                                  _isActive = value;
+                                });
+                              },
+                              activeColor: const Color.fromARGB(255, 129, 77, 139),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
 

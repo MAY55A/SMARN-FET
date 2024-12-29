@@ -31,6 +31,7 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   String? _selectedTeacherId;
   String? _selectedClassId;
   String? _selectedRoomId;
+  bool _isActive = true; // Active toggle state
 
   List<Map<String, dynamic>> _teachers = [];
   List<Class> _classes = [];
@@ -40,11 +41,9 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   void initState() {
     super.initState();
 
-    // Ensure that widget.constraint is of type TimeConstraint
     if (widget.constraint is TimeConstraint) {
       TimeConstraint timeConstraint = widget.constraint as TimeConstraint;
 
-      // Initialize controllers after type check
       _startTimeController = TextEditingController(text: timeConstraint.startTime);
       _endTimeController = TextEditingController(text: timeConstraint.endTime);
       _selectedType = timeConstraint.type;
@@ -52,18 +51,14 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
       _selectedClassId = timeConstraint.classId;
       _selectedRoomId = timeConstraint.roomId;
       _selectedDays = timeConstraint.availableDays;
+      _isActive = timeConstraint.isActive; // Initialize active state
     } else {
-      // Handle invalid constraint type and show error message
       print("Invalid constraint type: ${widget.constraint.runtimeType}");
-      
-      // Use post-frame callback to show snackbar after initState is completed
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Invalid constraint type: ${widget.constraint.runtimeType}")),
         );
       });
-      
-      // Initialize to prevent null errors
       _startTimeController = TextEditingController();
       _endTimeController = TextEditingController();
     }
@@ -145,10 +140,9 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                   });
                 },
                 style: const TextStyle(color: Colors.white),
-                dropdownColor: Colors.grey[800],  // Gray color for the dropdown
+                dropdownColor: Colors.grey[800],
               ),
               const SizedBox(height: 16),
-              // Start time field
               TextField(
                 controller: _startTimeController,
                 style: const TextStyle(color: Colors.white),
@@ -159,7 +153,6 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                 ),
               ),
               const SizedBox(height: 16),
-              // End time field
               TextField(
                 controller: _endTimeController,
                 style: const TextStyle(color: Colors.white),
@@ -170,7 +163,6 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Only show Teacher dropdown if the selected type requires it
               if (_selectedType == TimeConstraintType.teacherAvailability)
                 _teachers.isEmpty
                     ? const CircularProgressIndicator()
@@ -178,25 +170,22 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                         value: _selectedTeacherId,
                         hint: const Text("Select Teacher",
                             style: TextStyle(color: Colors.white)),
-                        items: _teachers.isNotEmpty
-                            ? _teachers.map<DropdownMenuItem<String>>((teacher) {
-                                return DropdownMenuItem<String>(
-                                  value: teacher['id'],
-                                  child: Text(teacher['teacher'].name ?? 'Unknown',
-                                      style: const TextStyle(color: Colors.white)),
-                                );
-                              }).toList()
-                            : [],
+                        items: _teachers.map<DropdownMenuItem<String>>((teacher) {
+                          return DropdownMenuItem<String>(
+                            value: teacher['id'],
+                            child: Text(teacher['teacher'].name ?? 'Unknown',
+                                style: const TextStyle(color: Colors.white)),
+                          );
+                        }).toList(),
                         onChanged: (value) {
                           setState(() {
                             _selectedTeacherId = value;
                           });
                         },
                         style: const TextStyle(color: Colors.white),
-                        dropdownColor: Colors.grey[800],  // Gray color for the dropdown
+                        dropdownColor: Colors.grey[800],
                       ),
               const SizedBox(height: 16),
-              // Only show Class dropdown if the selected type requires it
               if (_selectedType == TimeConstraintType.classAvailability)
                 _classes.isEmpty
                     ? const CircularProgressIndicator()
@@ -204,25 +193,22 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                         value: _selectedClassId,
                         hint: const Text("Select Class",
                             style: TextStyle(color: Colors.white)),
-                        items: _classes.isNotEmpty
-                            ? _classes.map<DropdownMenuItem<String>>((classItem) {
-                                return DropdownMenuItem<String>(
-                                  value: classItem.id,
-                                  child: Text(classItem.name,
-                                      style: const TextStyle(color: Colors.white)),
-                                );
-                              }).toList()
-                            : [],
+                        items: _classes.map<DropdownMenuItem<String>>((classItem) {
+                          return DropdownMenuItem<String>(
+                            value: classItem.id,
+                            child: Text(classItem.name,
+                                style: const TextStyle(color: Colors.white)),
+                          );
+                        }).toList(),
                         onChanged: (value) {
                           setState(() {
                             _selectedClassId = value;
                           });
                         },
                         style: const TextStyle(color: Colors.white),
-                        dropdownColor: Colors.grey[800],  // Gray color for the dropdown
+                        dropdownColor: Colors.grey[800],
                       ),
               const SizedBox(height: 16),
-              // Only show Room dropdown if the selected type requires it
               if (_selectedType == TimeConstraintType.roomAvailability)
                 _rooms.isEmpty
                     ? const CircularProgressIndicator()
@@ -230,25 +216,22 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                         value: _selectedRoomId,
                         hint: const Text("Select Room",
                             style: TextStyle(color: Colors.white)),
-                        items: _rooms.isNotEmpty
-                            ? _rooms.map<DropdownMenuItem<String>>((room) {
-                                return DropdownMenuItem<String>(
-                                  value: room.id,
-                                  child: Text(room.name ?? 'Unknown',
-                                      style: const TextStyle(color: Colors.white)),
-                                );
-                              }).toList()
-                            : [],
+                        items: _rooms.map<DropdownMenuItem<String>>((room) {
+                          return DropdownMenuItem<String>(
+                            value: room.id,
+                            child: Text(room.name ?? 'Unknown',
+                                style: const TextStyle(color: Colors.white)),
+                          );
+                        }).toList(),
                         onChanged: (value) {
                           setState(() {
                             _selectedRoomId = value;
                           });
                         },
                         style: const TextStyle(color: Colors.white),
-                        dropdownColor: Colors.grey[800],  // Gray color for the dropdown
+                        dropdownColor: Colors.grey[800],
                       ),
               const SizedBox(height: 16),
-              // Select Available Days
               GestureDetector(
                 onTap: () => _selectDays(context),
                 child: Container(
@@ -271,13 +254,32 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Save Changes Button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Active:",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Switch(
+                    value: _isActive,
+                    onChanged: (value) {
+                      setState(() {
+                        _isActive = value;
+                      });
+                    },
+                    activeColor: const Color.fromARGB(255, 129, 77, 139),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _editConstraint,
                 child: const Text('Save Changes'),
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(
                       const Color.fromARGB(255, 129, 77, 139)),
+                      foregroundColor: MaterialStateProperty.all(Colors.white),
                 ),
               ),
             ],
@@ -288,6 +290,43 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   }
 
   void _editConstraint() async {
+    // Show confirmation dialog
+    bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirm Edit'),
+          content: const Text('Are you sure you want to save these changes?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false), // Cancel
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true), // Confirm
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // If user cancels, do nothing
+    if (confirm != true) {
+      return;
+    }
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
     final updatedConstraint = TimeConstraint(
       id: widget.constraint.id,
       type: _selectedType ?? TimeConstraintType.classAvailability,
@@ -297,11 +336,26 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
       teacherId: _selectedTeacherId ?? 'default_teacher_id',
       classId: _selectedClassId ?? 'default_class_id',
       roomId: _selectedRoomId ?? 'default_room_id',
+      isActive: _isActive, // Include active state in the updated constraint
     );
 
     final result = await _constraintService.updateConstraint(widget.constraint.id!, updatedConstraint);
+
+    // Close loading indicator
+    Navigator.pop(context);
+
+    // Show success or error message
     if (result['success']) {
-      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Constraint edited successfully!'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pop(context); // Close the page after success
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['message'])),

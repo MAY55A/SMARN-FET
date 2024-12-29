@@ -122,9 +122,9 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title of the constraint
-                    Text(
-                      'Time Constraint: ${constraint.id ?? "Unknown"}', // Handle null id
-                      style: const TextStyle(
+                    const Text(
+                      'Time Constraint', // Handle null id
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -156,7 +156,7 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.white),
+                    icon: const Icon(Icons.delete, color: Color.fromARGB(255, 255, 79, 79)),
                     onPressed: () {
                       // Implement delete functionality
                     },

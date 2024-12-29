@@ -15,11 +15,19 @@ class TimeConstraintDetails extends StatelessWidget {
       ),
       body: Container(
         color: Colors.black,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildDetails(),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              color: Colors.grey[850],
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: _buildDetails(),
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -55,6 +63,8 @@ class TimeConstraintDetails extends StatelessWidget {
     if (constraint.roomId != null) {
       details.add(_buildDetailRow('Room ID:', constraint.roomId!));
     }
+    // Add active status field
+    details.add(_buildDetailRow('Active:', constraint.isActive ? 'Yes' : 'No'));
 
     return details;
   }

@@ -9,17 +9,43 @@ class SpaceConstraintDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Space Constraint Details'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        elevation: 0, // Remove app bar shadow for cleaner look
       ),
-      body: Container(
-        color: Colors.black,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildDetails(),
+      body: Center(
+        child: SizedBox(
+          height: 400, // Adjusted height for better fit with active field
+          width: 380, // Slightly adjusted width for better proportion
+          child: Card(
+            elevation: 10, // Add shadow for a raised card effect
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0), // Smoother rounded corners
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.0), // Ensure content is clipped with rounded corners
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color.fromARGB(255, 45, 45, 45), // Dark background color
+                      const Color.fromARGB(255, 34, 34, 34), // Slightly lighter
+                    ],
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0), // Increased padding for more spacious feel
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _buildDetails(),
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -56,13 +82,16 @@ class SpaceConstraintDetails extends StatelessWidget {
       details.add(_buildDetailRow('Required Room Type:', constraint.requiredRoomType!.name));
     }
 
+    // Add Active field
+    details.add(_buildDetailRow('Active:', constraint.isActive ? 'Yes' : 'No'));
+
     return details;
   }
 
   // Builds a row for displaying each detail
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0), // Slightly more space between rows
       child: Row(
         children: [
           Text(
@@ -70,15 +99,18 @@ class SpaceConstraintDetails extends StatelessWidget {
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontSize: 15, // Slightly larger text size for readability
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15, // Matching font size for consistency
+              ),
+              overflow: TextOverflow.ellipsis, // Handle long text gracefully
             ),
           ),
         ],

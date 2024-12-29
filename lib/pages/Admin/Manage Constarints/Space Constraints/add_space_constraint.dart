@@ -278,6 +278,7 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(
                         const Color.fromARGB(255, 129, 77, 139)),
+                        foregroundColor: MaterialStateProperty.all(Colors.white)
                   ),
                 ),
               ],

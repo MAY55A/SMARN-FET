@@ -34,6 +34,8 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
   List<Class> _classes = [];
   List<Room> _rooms = [];
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -87,176 +89,189 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text("Add Time Constraint"),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
-      body: Container(
-        color: Colors.black,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DropdownButton<TimeConstraintType>(
-                value: _selectedType,
-                hint: const Text("Select Constraint Type",
-                    style: TextStyle(color: Colors.white)),
-                items: TimeConstraintType.values.map((type) {
-                  return DropdownMenuItem<TimeConstraintType>( 
-                    value: type,
-                    child: Text(type.name,
-                        style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedType = value;
-                  });
-                },
-                style: const TextStyle(color: Colors.white),
-                dropdownColor: Colors.grey[800],
-              ),
-              const SizedBox(height: 16),
-              // Start time field
-              TextField(
-                controller: _startTimeController,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: 'Start Time',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // End time field
-              TextField(
-                controller: _endTimeController,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: 'End Time',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Select Available Days
-              GestureDetector(
-                onTap: () => _selectDays(context),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(5),
+      body: Center(
+        child: Card(
+          color: Colors.grey[900],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          elevation: 5,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DropdownButton<TimeConstraintType>(
+                    value: _selectedType,
+                    hint: const Text("Select Constraint Type",
+                        style: TextStyle(color: Colors.white)),
+                    items: TimeConstraintType.values.map((type) {
+                      return DropdownMenuItem<TimeConstraintType>(
+                        value: type,
+                        child: Text(type.name,
+                            style: const TextStyle(color: Colors.white)),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedType = value;
+                      });
+                    },
+                    style: const TextStyle(color: Colors.white),
+                    dropdownColor: Colors.grey[800],
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Select Available Days: ${_selectedDays.map((e) => e.name).join(', ')}",
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const Icon(Icons.arrow_drop_down, color: Colors.white),
-                    ],
+                  const SizedBox(height: 16),
+                  // Start time field
+                  TextField(
+                    controller: _startTimeController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: 'Start Time',
+                      labelStyle: TextStyle(color: Colors.white),
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  // End time field
+                  TextField(
+                    controller: _endTimeController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: 'End Time',
+                      labelStyle: TextStyle(color: Colors.white),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Select Available Days
+                  GestureDetector(
+                    onTap: () => _selectDays(context),
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Select Available Days: ${_selectedDays.map((e) => e.name).join(', ')}",
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const Icon(Icons.arrow_drop_down, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Conditionally show fields based on selected type
+                  if (_selectedType == TimeConstraintType.teacherAvailability)
+                    _teachers.isEmpty
+                        ? const CircularProgressIndicator()
+                        : DropdownButton<String>(
+                            value: _selectedTeacherId,
+                            hint: const Text("Select Teacher",
+                                style: TextStyle(color: Colors.white)),
+                            items: _teachers.isNotEmpty
+                                ? _teachers.map<DropdownMenuItem<String>>((teacher) {
+                                    return DropdownMenuItem<String>(
+                                      value: teacher['id'],
+                                      child: Text(teacher['teacher']?.id ?? 'Unknown',
+                                          style: const TextStyle(color: Colors.white)),
+                                    );
+                                  }).toList()
+                                : [],
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedTeacherId = value;
+                              });
+                            },
+                            style: const TextStyle(color: Colors.white),
+                            dropdownColor: Colors.grey[800],
+                          ),
+                  if (_selectedType == TimeConstraintType.classAvailability)
+                    _classes.isEmpty
+                        ? const CircularProgressIndicator()
+                        : DropdownButton<String>(
+                            value: _selectedClassId,
+                            hint: const Text("Select Class",
+                                style: TextStyle(color: Colors.white)),
+                            items: _classes.isNotEmpty
+                                ? _classes.map<DropdownMenuItem<String>>((classItem) {
+                                    return DropdownMenuItem<String>(
+                                      value: classItem.id,
+                                      child: Text(classItem.id!,
+                                          style: const TextStyle(color: Colors.white)),
+                                    );
+                                  }).toList()
+                                : [],
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedClassId = value;
+                              });
+                            },
+                            style: const TextStyle(color: Colors.white),
+                            dropdownColor: Colors.grey[800],
+                          ),
+                  if (_selectedType == TimeConstraintType.roomAvailability)
+                    _rooms.isEmpty
+                        ? const CircularProgressIndicator()
+                        : DropdownButton<String>(
+                            value: _selectedRoomId,
+                            hint: const Text("Select Room",
+                                style: TextStyle(color: Colors.white)),
+                            items: _rooms.isNotEmpty
+                                ? _rooms.map<DropdownMenuItem<String>>((room) {
+                                    return DropdownMenuItem<String>(
+                                      value: room.id,
+                                      child: Text(room.name ?? 'Unknown',
+                                          style: const TextStyle(color: Colors.white)),
+                                    );
+                                  }).toList()
+                                : [],
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedRoomId = value;
+                              });
+                            },
+                            style: const TextStyle(color: Colors.white),
+                            dropdownColor: Colors.grey[800],
+                          ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _addConstraint,
+                    child: _isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : const Text('Add Constraint'),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color.fromARGB(255, 129, 77, 139)),
+                          foregroundColor: MaterialStateProperty.all(Colors.white),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              // Conditionally show fields based on selected type
-              if (_selectedType == TimeConstraintType.teacherAvailability)
-                _teachers.isEmpty
-                    ? const CircularProgressIndicator()
-                    : DropdownButton<String>(
-                        value: _selectedTeacherId,
-                        hint: const Text("Select Teacher",
-                            style: TextStyle(color: Colors.white)),
-                        items: _teachers.isNotEmpty
-                            ? _teachers.map<DropdownMenuItem<String>>((teacher) {
-                                return DropdownMenuItem<String>(
-                                  value: teacher['id'],
-                                  child: Text(teacher['teacher'].id ?? 'Unknown', 
-                                      style: const TextStyle(color: Colors.white)),
-                                );
-                              }).toList()
-                            : [],
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedTeacherId = value;
-                          });
-                        },
-                        style: const TextStyle(color: Colors.white),
-                        dropdownColor: Colors.grey[800],
-                      ),
-              if (_selectedType == TimeConstraintType.classAvailability)
-                _classes.isEmpty
-                    ? const CircularProgressIndicator()
-                    : DropdownButton<String>(
-                        value: _selectedClassId,
-                        hint: const Text("Select Class",
-                            style: TextStyle(color: Colors.white)),
-                        items: _classes.isNotEmpty
-                            ? _classes.map<DropdownMenuItem<String>>((classItem) {
-                                return DropdownMenuItem<String>(
-                                  value: classItem.id,
-                                  child: Text(classItem.id!,
-                                      style: const TextStyle(color: Colors.white)),
-                                );
-                              }).toList()
-                            : [],
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedClassId = value;
-                          });
-                        },
-                        style: const TextStyle(color: Colors.white),
-                        dropdownColor: Colors.grey[800],
-                      ),
-              if (_selectedType == TimeConstraintType.roomAvailability)
-                _rooms.isEmpty
-                    ? const CircularProgressIndicator()
-                    : DropdownButton<String>(
-                        value: _selectedRoomId,
-                        hint: const Text("Select Room",
-                            style: TextStyle(color: Colors.white)),
-                        items: _rooms.isNotEmpty
-                            ? _rooms.map<DropdownMenuItem<String>>((room) {
-                                return DropdownMenuItem<String>(
-                                  value: room.id,
-                                  child: Text(room.name ?? 'Unknown',
-                                      style: const TextStyle(color: Colors.white)),
-                                );
-                              }).toList()
-                            : [],
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedRoomId = value;
-                          });
-                        },
-                        style: const TextStyle(color: Colors.white),
-                        dropdownColor: Colors.grey[800],
-                      ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _addConstraint,
-                child: const Text('Add Constraint'),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                      const Color.fromARGB(255, 129, 77, 139)),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  void _addConstraint() async {
+  Future<void> _addConstraint() async {
     if (_selectedType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a constraint type.')),
-
       );
       return;
     }
@@ -264,7 +279,6 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
     if (_startTimeController.text.isEmpty || _endTimeController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter start and end times.')),
-
       );
       return;
     }
@@ -272,29 +286,68 @@ class _AddTimeConstraintViewState extends State<AddTimeConstraintView> {
     if (_selectedDays.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select at least one day.')),
-
       );
       return;
     }
 
-    // Create a new time constraint
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Confirm Constraint Addition"),
+          content: const Text("Are you sure you want to add this constraint?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text("Confirm"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm != true) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
     final newConstraint = TimeConstraint(
-      id: 'AUTO_GENERATED_ID', 
+      id: 'AUTO_GENERATED_ID',
       type: _selectedType!,
       startTime: _startTimeController.text,
       endTime: _endTimeController.text,
-      availableDays:  _selectedDays,
-      teacherId: _selectedType == TimeConstraintType.teacherAvailability ? _selectedTeacherId : null,
-      classId: _selectedType == TimeConstraintType.classAvailability ? _selectedClassId : null,
-      roomId: _selectedType == TimeConstraintType.roomAvailability ? _selectedRoomId : null,
+      availableDays: _selectedDays,
+      teacherId: _selectedType == TimeConstraintType.teacherAvailability
+          ? _selectedTeacherId
+          : null,
+      classId: _selectedType == TimeConstraintType.classAvailability
+          ? _selectedClassId
+          : null,
+      roomId: _selectedType == TimeConstraintType.roomAvailability
+          ? _selectedRoomId
+          : null,
     );
 
-    // Call the service to add the constraint
     final result = await _constraintService.createTimeConstraint(newConstraint);
+
+    setState(() {
+      _isLoading = false;
+    });
+
     if (result['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Constraint added successfully.')),
+      );
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'])));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'])),
+      );
     }
   }
 }

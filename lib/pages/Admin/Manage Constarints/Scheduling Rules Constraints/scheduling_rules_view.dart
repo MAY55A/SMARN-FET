@@ -71,6 +71,36 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
     }
   }
 
+  void _showDeleteConfirmationDialog(VoidCallback onDelete) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this scheduling rule?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close dialog without deleting
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Close dialog
+                onDelete(); // Execute delete action
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,7 +148,7 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
                     },
                     onDelete: () {
                       if (rule.id != null) {
-                        _deleteSchedulingRule(rule.id!);
+                        _showDeleteConfirmationDialog(() => _deleteSchedulingRule(rule.id!));
                       }
                     },
                     onDetailsTap: () {
@@ -204,10 +234,9 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
                     onPressed: onTap,
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.white),
+                    icon: const Icon(Icons.delete, color: Colors.red), // Red delete icon
                     onPressed: onDelete,
                   ),
-                  // Arrow icon to navigate to details
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
                     onPressed: onDetailsTap,

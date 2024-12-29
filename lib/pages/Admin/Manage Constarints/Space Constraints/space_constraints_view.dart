@@ -33,6 +33,44 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
     });
   }
 
+  void _navigateToEdit(SpaceConstraint constraint) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditSpaceConstraintView(constraint: constraint),
+      ),
+    ).then((_) => _fetchConstraints()); // Refresh data after editing
+  }
+
+  void _deleteConstraint(SpaceConstraint constraint) async {
+    // Show confirmation dialog before deleting
+    final confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Constraint'),
+          content: const Text('Are you sure you want to delete this constraint?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete == true) {
+      // Proceed with deletion
+      await _constraintService.deleteConstraint(constraint.id!); // Assuming deleteConstraint is implemented in the service
+      _fetchConstraints(); // Refresh the list after deletion
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,17 +91,8 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
                   itemBuilder: (context, index) {
                     return _buildConstraintCard(
                       constraint: _constraints[index],
-                      onTap: () {
-                        // Navigate to space constraint details
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SpaceConstraintDetails(
-                              constraint: _constraints[index],
-                            ),
-                          ),
-                        );
-                      },
+                      onEdit: () => _navigateToEdit(_constraints[index]),
+                      onDelete: () => _deleteConstraint(_constraints[index]),
                     );
                   },
                 ),
@@ -90,10 +119,21 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
 
   Widget _buildConstraintCard({
     required SpaceConstraint constraint,
-    required VoidCallback onTap,
+    required VoidCallback onEdit,
+    required VoidCallback onDelete,
   }) {
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        // Navigate to space constraint details
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SpaceConstraintDetails(
+              constraint: constraint,
+            ),
+          ),
+        );
+      },
       child: Card(
         color: const Color.fromARGB(255, 34, 34, 34),
         child: Padding(
@@ -139,18 +179,25 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.edit, color: Colors.white),
-                    onPressed: onTap,
+                    onPressed: onEdit,
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.white),
-                    onPressed: () {
-                      // Delete constraint logic here
-                    },
+                    icon: const Icon(Icons.delete, color: Color.fromARGB(255, 248, 52, 52)),
+                    onPressed: onDelete,
                   ),
-                  // Replaced eye icon with an arrow to view the constraint details
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
-                    onPressed: onTap,
+                    onPressed: () {
+                      // Navigate to details
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SpaceConstraintDetails(
+                            constraint: constraint,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

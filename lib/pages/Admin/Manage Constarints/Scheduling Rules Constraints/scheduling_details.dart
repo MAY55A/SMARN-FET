@@ -15,23 +15,32 @@ class SchedulingRuleDetails extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Container(
-        
-        height:800,
+        height: 800,
         color: Colors.black,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView( // Make the entire content scrollable
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildDetailRow('ID:', rule.id ?? 'Unknown'),
-                _buildDetailRow('Type:', rule.type.toString().split('.').last),
-                if (rule.duration != null) _buildDetailRow('Duration:', rule.duration.toString()),
-                if (rule.startTime != null) _buildDetailRow('Start Time:', rule.startTime ?? 'Not Available'),
-                if (rule.endTime != null) _buildDetailRow('End Time:', rule.endTime ?? 'Not Available'),
-                if (rule.applicableDays != null && rule.applicableDays!.isNotEmpty) 
-                  _buildWorkDaysSection(rule.applicableDays!),
-              ],
+        child: Center( // Center the card in the body
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              color: Colors.grey[850], // Card background color
+              elevation: 8, // Shadow effect
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView( // Make the entire content scrollable
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDetailRow('ID:', rule.id ?? 'Unknown'),
+                      _buildDetailRow('Type:', rule.type.toString().split('.').last),
+                      if (rule.duration != null) _buildDetailRow('Duration:', rule.duration.toString()),
+                      if (rule.startTime != null) _buildDetailRow('Start Time:', rule.startTime ?? 'Not Available'),
+                      if (rule.endTime != null) _buildDetailRow('End Time:', rule.endTime ?? 'Not Available'),
+                      if (rule.applicableDays != null && rule.applicableDays!.isNotEmpty) 
+                        _buildWorkDaysSection(rule.applicableDays!),
+                      _buildDetailRow('Active:', rule.isActive ? 'Yes' : 'No'), // New row for active state
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ),
