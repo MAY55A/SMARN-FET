@@ -49,13 +49,17 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Constraint'),
-          content: const Text('Are you sure you want to delete this constraint?'),
+          content:
+              const Text('Are you sure you want to delete this constraint?'),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Cancel'),
             ),
             TextButton(
+              style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.red),
+                  foregroundColor: WidgetStatePropertyAll(Colors.white)),
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text('Delete'),
             ),
@@ -66,7 +70,8 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
 
     if (confirmDelete == true) {
       // Proceed with deletion
-      await _constraintService.deleteConstraint(constraint.id!); // Assuming deleteConstraint is implemented in the service
+      await _constraintService.deleteConstraint(constraint
+          .id!); // Assuming deleteConstraint is implemented in the service
       _fetchConstraints(); // Refresh the list after deletion
     }
   }
@@ -182,11 +187,13 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
                     onPressed: onEdit,
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Color.fromARGB(255, 248, 52, 52)),
+                    icon: const Icon(Icons.delete,
+                        color: Color.fromARGB(255, 248, 52, 52)),
                     onPressed: onDelete,
                   ),
                   IconButton(
-                    icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                    icon: const Icon(Icons.arrow_forward_ios,
+                        color: Colors.white),
                     onPressed: () {
                       // Navigate to details
                       Navigator.push(

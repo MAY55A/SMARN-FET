@@ -70,19 +70,24 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
     }).toList();
   }
 
-  Future<void> _confirmDeleteTeacher(String teacherId, String teacherName) async {
+  Future<void> _confirmDeleteTeacher(
+      String teacherId, String teacherName) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text("Confirm Deletion"),
-          content: Text("Are you sure you want to delete $teacherName?"),
+          content: Text(
+              "Are you sure you want to delete $teacherName's account and their associated activities ?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: const Text("Cancel"),
             ),
             TextButton(
+              style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.red),
+                  foregroundColor: WidgetStatePropertyAll(Colors.white)),
               onPressed: () => Navigator.pop(context, true),
               child: const Text("Delete"),
             ),
@@ -221,7 +226,8 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
@@ -230,37 +236,30 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                                           teacher: teacher,
                                           refreshTeachers: _refreshTeachers),
                                     ),
-                                  ).then((_) => _refreshTeachers()); // Refresh after edit
+                                  ).then((_) =>
+                                      _refreshTeachers()); // Refresh after edit
                                 },
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red), // Change color to red
+                                icon: const Icon(Icons.delete,
+                                    color: Colors.red), // Change color to red
                                 onPressed: () => _confirmDeleteTeacher(
                                     teacherDocId, teacherName),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                                icon: const Icon(Icons.arrow_forward,
+                                    color: Colors.white),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ViewTeacherDetailsForm(teacher: teacher),
+                                      builder: (context) =>
+                                          ViewTeacherDetailsForm(
+                                              teacher: teacher),
                                     ),
                                   );
                                 },
-                              ),
-                              // View details icon
-                              IconButton(
-                                icon: const Icon(Icons.visibility, color: Colors.white),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ViewTeacherDetailsForm(teacher: teacher),
-                                    ),
-                                  );
-                                },
-                              ),
+                              )
                             ],
                           ),
                         ),

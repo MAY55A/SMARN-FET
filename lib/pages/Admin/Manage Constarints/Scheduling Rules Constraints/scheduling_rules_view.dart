@@ -24,7 +24,8 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
 
   void _fetchSchedulingRules() {
     setState(() {
-      _schedulingRules = _constraintService.getAllConstraints().then((constraints) {
+      _schedulingRules =
+          _constraintService.getAllConstraints().then((constraints) {
         return constraints
             .whereType<SchedulingRule>() // Ensure filtering is based on type
             .toList();
@@ -55,7 +56,8 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
       final result = await _constraintService.deleteConstraint(ruleId);
       if (result['success']) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Scheduling Rule deleted successfully.')),
+          const SnackBar(
+              content: Text('Scheduling Rule deleted successfully.')),
         );
         _fetchSchedulingRules(); // Refresh the list
       } else {
@@ -77,7 +79,8 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Confirm Delete'),
-          content: const Text('Are you sure you want to delete this scheduling rule?'),
+          content: const Text(
+              'Are you sure you want to delete this scheduling rule?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -90,9 +93,9 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
                 Navigator.pop(context); // Close dialog
                 onDelete(); // Execute delete action
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
+              style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.red),
+                  foregroundColor: WidgetStatePropertyAll(Colors.white)),
               child: const Text('Delete'),
             ),
           ],
@@ -118,7 +121,8 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
 
           if (snapshot.hasError) {
             return Center(
-              child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)),
+              child: Text('Error: ${snapshot.error}',
+                  style: const TextStyle(color: Colors.red)),
             );
           }
 
@@ -148,7 +152,8 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
                     },
                     onDelete: () {
                       if (rule.id != null) {
-                        _showDeleteConfirmationDialog(() => _deleteSchedulingRule(rule.id!));
+                        _showDeleteConfirmationDialog(
+                            () => _deleteSchedulingRule(rule.id!));
                       }
                     },
                     onDetailsTap: () {
@@ -156,7 +161,8 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SchedulingRuleDetails(rule: rule),
+                          builder: (context) =>
+                              SchedulingRuleDetails(rule: rule),
                         ),
                       );
                     },
@@ -234,11 +240,13 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
                     onPressed: onTap,
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red), // Red delete icon
+                    icon: const Icon(Icons.delete,
+                        color: Colors.red), // Red delete icon
                     onPressed: onDelete,
                   ),
                   IconButton(
-                    icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                    icon: const Icon(Icons.arrow_forward_ios,
+                        color: Colors.white),
                     onPressed: onDetailsTap,
                   ),
                 ],
