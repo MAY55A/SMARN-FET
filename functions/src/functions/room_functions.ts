@@ -267,6 +267,7 @@ export async function deleteRoomAndUpdateActivities(
 
   Promise<void> {
   const activitiesRef = db.collection("activities");
+  const constraintsRef = db.collection("constraints");
 
   await db.runTransaction(async (transaction) => {
     // Find all activities with the room reference
@@ -278,6 +279,16 @@ export async function deleteRoomAndUpdateActivities(
     activitiesSnapshot.forEach((activityDoc) => {
       transaction.update(activityDoc.ref, {room: null});
     });
+    
+      // Find all constraints with the room reference
+      const constraintsSnapshot = await constraintsRef
+        .where("roomId", "==", roomDoc.data()?.id)
+        .get();
+
+      // delete the constraints
+      constraintsSnapshot.forEach((constraintDoc) => {
+        transaction.delete(constraintDoc.ref);
+      });
 
     // Delete the room document
     transaction.delete(roomDoc.ref);

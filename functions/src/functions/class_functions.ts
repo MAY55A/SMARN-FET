@@ -256,6 +256,7 @@ export const deleteClass = functions.https.onCall(async (request) => {
   try {
     const classRef = db.collection("classes").doc(classId);
     const activitiesRef = db.collection("activities");
+    const constraintsRef = db.collection("constraints");
 
     await db.runTransaction(async (transaction) => {
       // Find all activities with the class reference
@@ -266,6 +267,16 @@ export const deleteClass = functions.https.onCall(async (request) => {
       // delete the activities
       activitiesSnapshot.forEach((activityDoc) => {
         transaction.delete(activityDoc.ref);
+      });
+
+      // Find all constraints with the class reference
+      const constraintsSnapshot = await constraintsRef
+        .where("classId", "==", classId)
+        .get();
+
+      // delete the constraints
+      constraintsSnapshot.forEach((constraintDoc) => {
+        transaction.delete(constraintDoc.ref);
       });
 
       // Delete the class's Firestore document
