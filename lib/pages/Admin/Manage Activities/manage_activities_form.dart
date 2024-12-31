@@ -130,7 +130,8 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Confirm Deletion'),
-          content: const Text('Are you sure you want to delete this activity?'),
+          content:
+              const Text('Are you sure you want to delete this activity ?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -139,6 +140,9 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
               child: const Text('Cancel'),
             ),
             TextButton(
+              style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.red),
+                  foregroundColor: WidgetStatePropertyAll(Colors.white)),
               onPressed: () {
                 Navigator.of(context).pop(true); // Confirm the deletion
               },
@@ -260,7 +264,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                                 style: const TextStyle(color: Colors.white),
                               ),
                               subtitle: Text(
-                                'By ${activity["teacher"]["name"]}',
+                                'By ${activity["teacher"]["name"]}\nOn ${activity['day'] ?? "??"} ${activity['startTime'] ?? "??"}h --> ${activity['endTime'] ?? "??"}h',
                                 style: const TextStyle(color: Colors.white),
                               ),
                               trailing: Row(

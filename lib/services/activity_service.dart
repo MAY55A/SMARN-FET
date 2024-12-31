@@ -50,6 +50,22 @@ class ActivityService {
     }
   }
 
+  Future<List<Activity>> getActiveActivities() async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getActiveActivities');
+      final response = await callable.call();
+      List<Activity> activitiesList = (response.data["activities"] as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .map((c) => Activity.fromMap(c))
+          .toList();
+      return activitiesList;
+    } catch (e) {
+      print('Error fetching active activities: $e');
+      return [];
+    }
+  }
+
   Future<Map<String, dynamic>> updateActivity(
       String activityId, Activity activity) async {
     try {

@@ -58,7 +58,8 @@ class _ManageRoomsState extends State<ManageRooms> {
 
     if (updatedRoom != null) {
       try {
-        final result = await _roomService.updateRoom(updatedRoom.id, updatedRoom);
+        final result =
+            await _roomService.updateRoom(updatedRoom.id, updatedRoom);
         if (result['success']) {
           setState(() {
             int index = rooms.indexWhere((r) => r.id == updatedRoom.id);
@@ -81,14 +82,16 @@ class _ManageRoomsState extends State<ManageRooms> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ViewRoom(roomItem: roomItem), // Navigate to ViewRoom page
+        builder: (context) =>
+            ViewRoom(roomItem: roomItem), // Navigate to ViewRoom page
       ),
     );
   }
 
   // Handle deleting a room with confirmation
   void _deleteRoom(Room roomItem) async {
-    final confirm = await _showConfirmationAlert('Delete Room', 'Are you sure you want to delete ${roomItem.name}?');
+    final confirm = await _showConfirmationAlert(
+        'Delete Room', 'Are you sure you want to delete ${roomItem.name} ?');
     if (confirm) {
       try {
         final result = await _roomService.deleteRoom(roomItem.id!);
@@ -136,8 +139,11 @@ class _ManageRoomsState extends State<ManageRooms> {
             child: const Text('Cancel'),
           ),
           TextButton(
+            style: const ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(Colors.red),
+                foregroundColor: WidgetStatePropertyAll(Colors.white)),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirm'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -192,7 +198,8 @@ class _ManageRoomsState extends State<ManageRooms> {
                         margin: const EdgeInsets.all(8.0),
                         color: const Color.fromARGB(255, 34, 34, 34),
                         child: ListTile(
-                          title: Text(roomItem.name, style: const TextStyle(color: Colors.white)),
+                          title: Text(roomItem.name,
+                              style: const TextStyle(color: Colors.white)),
                           subtitle: Text(
                             'Capacity: ${roomItem.capacity}, Type: ${roomItem.type.name}, Building: ${roomItem.building ?? 'Unknown Building'}',
                             style: const TextStyle(color: Colors.white),
@@ -202,18 +209,22 @@ class _ManageRoomsState extends State<ManageRooms> {
                             children: [
                               // Edit icon
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () => _editRoom(roomItem),
                               ),
                               // Delete icon (red)
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () => _deleteRoom(roomItem),
                               ),
                               // View icon (arrow) after delete icon
                               IconButton(
-                                icon: const Icon(Icons.arrow_forward, color: Colors.white),
-                                onPressed: () => _viewRoom(roomItem), // Navigate to view room details
+                                icon: const Icon(Icons.arrow_forward,
+                                    color: Colors.white),
+                                onPressed: () => _viewRoom(
+                                    roomItem), // Navigate to view room details
                               ),
                             ],
                           ),

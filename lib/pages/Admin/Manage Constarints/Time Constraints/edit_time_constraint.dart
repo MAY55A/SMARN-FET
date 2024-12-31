@@ -10,9 +10,10 @@ import 'package:smarn/services/room_service.dart';
 import 'package:smarn/pages/widgets/multi_select_dialog.dart';
 
 class EditTimeConstraintView extends StatefulWidget {
-  final Constraint constraint;
+  final TimeConstraint constraint;
 
-  const EditTimeConstraintView({Key? key, required this.constraint}) : super(key: key);
+  const EditTimeConstraintView({Key? key, required this.constraint})
+      : super(key: key);
 
   @override
   _EditTimeConstraintViewState createState() => _EditTimeConstraintViewState();
@@ -26,7 +27,6 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
 
   late TextEditingController _startTimeController;
   late TextEditingController _endTimeController;
-  TimeConstraintType? _selectedType;
   List<WorkDay> _selectedDays = [];
   String? _selectedTeacherId;
   String? _selectedClassId;
@@ -41,27 +41,14 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   void initState() {
     super.initState();
 
-    if (widget.constraint is TimeConstraint) {
-      TimeConstraint timeConstraint = widget.constraint as TimeConstraint;
-
-      _startTimeController = TextEditingController(text: timeConstraint.startTime);
-      _endTimeController = TextEditingController(text: timeConstraint.endTime);
-      _selectedType = timeConstraint.type;
-      _selectedTeacherId = timeConstraint.teacherId;
-      _selectedClassId = timeConstraint.classId;
-      _selectedRoomId = timeConstraint.roomId;
-      _selectedDays = timeConstraint.availableDays;
-      _isActive = timeConstraint.isActive; // Initialize active state
-    } else {
-      print("Invalid constraint type: ${widget.constraint.runtimeType}");
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Invalid constraint type: ${widget.constraint.runtimeType}")),
-        );
-      });
-      _startTimeController = TextEditingController();
-      _endTimeController = TextEditingController();
-    }
+    _startTimeController =
+        TextEditingController(text: widget.constraint.startTime);
+    _endTimeController = TextEditingController(text: widget.constraint.endTime);
+    _selectedTeacherId = widget.constraint.teacherId;
+    _selectedClassId = widget.constraint.classId;
+    _selectedRoomId = widget.constraint.roomId;
+    _selectedDays = widget.constraint.availableDays;
+    _isActive = widget.constraint.isActive; // Initialize active state
 
     _fetchTeachers();
     _fetchClasses();
@@ -89,7 +76,8 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   }
 
   Future<void> _fetchTeachers() async {
-    List<Map<String, dynamic>> teachers = await _teacherService.getAllTeachers();
+    List<Map<String, dynamic>> teachers =
+        await _teacherService.getAllTeachers();
     setState(() {
       _teachers = teachers;
     });
@@ -123,25 +111,8 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DropdownButton<TimeConstraintType>(
-                value: _selectedType,
-                hint: const Text("Select Constraint Type",
-                    style: TextStyle(color: Colors.white)),
-                items: TimeConstraintType.values.map((type) {
-                  return DropdownMenuItem<TimeConstraintType>(
-                    value: type,
-                    child: Text(type.name,
-                        style: const TextStyle(color: Colors.white)),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedType = value;
-                  });
-                },
-                style: const TextStyle(color: Colors.white),
-                dropdownColor: Colors.grey[800],
-              ),
+              Text(widget.constraint.type.name,
+                  style: const TextStyle(color: Colors.white)),
               const SizedBox(height: 16),
               TextField(
                 controller: _startTimeController,
@@ -163,14 +134,16 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                 ),
               ),
               const SizedBox(height: 16),
-              if (_selectedType == TimeConstraintType.teacherAvailability)
+              if (widget.constraint.type ==
+                  TimeConstraintType.teacherAvailability)
                 _teachers.isEmpty
                     ? const CircularProgressIndicator()
                     : DropdownButton<String>(
                         value: _selectedTeacherId,
                         hint: const Text("Select Teacher",
                             style: TextStyle(color: Colors.white)),
-                        items: _teachers.map<DropdownMenuItem<String>>((teacher) {
+                        items:
+                            _teachers.map<DropdownMenuItem<String>>((teacher) {
                           return DropdownMenuItem<String>(
                             value: teacher['id'],
                             child: Text(teacher['teacher'].name ?? 'Unknown',
@@ -186,14 +159,16 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                         dropdownColor: Colors.grey[800],
                       ),
               const SizedBox(height: 16),
-              if (_selectedType == TimeConstraintType.classAvailability)
+              if (widget.constraint.type ==
+                  TimeConstraintType.classAvailability)
                 _classes.isEmpty
                     ? const CircularProgressIndicator()
                     : DropdownButton<String>(
                         value: _selectedClassId,
                         hint: const Text("Select Class",
                             style: TextStyle(color: Colors.white)),
-                        items: _classes.map<DropdownMenuItem<String>>((classItem) {
+                        items:
+                            _classes.map<DropdownMenuItem<String>>((classItem) {
                           return DropdownMenuItem<String>(
                             value: classItem.id,
                             child: Text(classItem.name,
@@ -209,7 +184,7 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                         dropdownColor: Colors.grey[800],
                       ),
               const SizedBox(height: 16),
-              if (_selectedType == TimeConstraintType.roomAvailability)
+              if (widget.constraint.type == TimeConstraintType.roomAvailability)
                 _rooms.isEmpty
                     ? const CircularProgressIndicator()
                     : DropdownButton<String>(
@@ -219,7 +194,7 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                         items: _rooms.map<DropdownMenuItem<String>>((room) {
                           return DropdownMenuItem<String>(
                             value: room.id,
-                            child: Text(room.name ?? 'Unknown',
+                            child: Text(room.name,
                                 style: const TextStyle(color: Colors.white)),
                           );
                         }).toList(),
@@ -279,7 +254,7 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(
                       const Color.fromARGB(255, 129, 77, 139)),
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                  foregroundColor: MaterialStateProperty.all(Colors.white),
                 ),
               ),
             ],
@@ -290,76 +265,82 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   }
 
   void _editConstraint() async {
-    // Show confirmation dialog
-    bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Confirm Edit'),
-          content: const Text('Are you sure you want to save these changes?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false), // Cancel
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true), // Confirm
-              child: const Text('Confirm'),
-            ),
-          ],
-        );
-      },
-    );
-
-    // If user cancels, do nothing
-    if (confirm != true) {
-      return;
-    }
-
-    // Show loading indicator
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    );
-
     final updatedConstraint = TimeConstraint(
       id: widget.constraint.id,
-      type: _selectedType ?? TimeConstraintType.classAvailability,
+      type: widget.constraint.type,
       startTime: _startTimeController.text,
       endTime: _endTimeController.text,
-      availableDays: _selectedDays.isNotEmpty ? _selectedDays : [WorkDay.Monday],
-      teacherId: _selectedTeacherId ?? 'default_teacher_id',
-      classId: _selectedClassId ?? 'default_class_id',
-      roomId: _selectedRoomId ?? 'default_room_id',
+      availableDays: _selectedDays,
+      teacherId: _selectedTeacherId,
+      classId: _selectedClassId,
+      roomId: _selectedRoomId,
       isActive: _isActive, // Include active state in the updated constraint
     );
-
-    final result = await _constraintService.updateConstraint(widget.constraint.id!, updatedConstraint);
-
-    // Close loading indicator
-    Navigator.pop(context);
-
-    // Show success or error message
-    if (result['success']) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Constraint edited successfully!'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pop(context); // Close the page after success
-      });
+    if (widget.constraint.equals(updatedConstraint)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('No changes were made to the constraint'),
+      ));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'])),
+      // Show confirmation dialog
+      bool? confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Confirm Edit'),
+            content: const Text('Are you sure you want to save these changes?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false), // Cancel
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true), // Confirm
+                child: const Text('Confirm'),
+              ),
+            ],
+          );
+        },
       );
+
+      // If user cancels, do nothing
+      if (confirm != true) {
+        return;
+      }
+
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
+      final result = await _constraintService.updateConstraint(
+          widget.constraint.id!, updatedConstraint);
+
+      // Close loading indicator
+      Navigator.pop(context);
+
+      // Show success or error message
+      if (result['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Constraint edited successfully!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        Future.delayed(const Duration(seconds: 2), () {
+          Navigator.pop(context); // Close the page after success
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'])),
+        );
+      }
     }
   }
 }

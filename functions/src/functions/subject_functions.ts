@@ -165,6 +165,7 @@ export const deleteSubject = functions.https.onCall(async (request) => {
     const subjectRef = db.collection("subjects").doc(subjectId);
     const activitiesRef = db.collection("activities");
     const teachersRef = db.collection("teachers");
+    const constraintsRef = db.collection("constraints");
 
     await db.runTransaction(async (transaction) => {
       // Find all activities with the subject reference
@@ -177,6 +178,16 @@ export const deleteSubject = functions.https.onCall(async (request) => {
         transaction.delete(activityDoc.ref);
       });
 
+      // Find all constraints with the subject reference
+      const constraintsSnapshot = await constraintsRef
+        .where("subjectId", "==", subjectId)
+        .get();
+
+      // delete the constraints
+      constraintsSnapshot.forEach((constraintDoc) => {
+        transaction.delete(constraintDoc.ref);
+      });
+      
       // Find all teachers with the subject reference
       const teachersSnapshot = await teachersRef
         .where("subjects", "array-contains", subjectId)

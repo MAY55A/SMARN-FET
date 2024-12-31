@@ -1,5 +1,7 @@
+import 'package:flutter/rendering.dart';
 import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/models/work_day.dart';
+import 'package:smarn/services/time_service.dart';
 
 class Activity {
   String? id;
@@ -80,6 +82,45 @@ class Activity {
         room == a.room &&
         startTime == a.startTime &&
         endTime == a.endTime;
+  }
+
+  Activity getScheduledActivity(WorkDay day, String startTime) {
+    var startMinutes = TimeService.timeToMinutes(startTime);
+    var endMinutes = startMinutes + duration;
+    var endTime = TimeService.minutesToTime(endMinutes);
+    return Activity(
+        id: id,
+        subject: subject,
+        teacher: teacher,
+        studentsClass: studentsClass,
+        tag: tag,
+        isActive: isActive,
+        duration: duration,
+        day: day,
+        startTime: startTime,
+        endTime: endTime,
+        room: room);
+  }
+
+// Function to check if two activities overlap
+  bool overlaps(Activity other) {
+    final start1 = TimeService.timeToMinutes(startTime!);
+    final end1 = TimeService.timeToMinutes(endTime!);
+    final start2 = TimeService.timeToMinutes(other.startTime!);
+    final end2 = TimeService.timeToMinutes(other.endTime!);
+
+    return start1 < end2 && start2 < end1;
+  }
+
+// Function to check if an activity is within a given boundary
+  bool isWithinBoundary(String start, String end) {
+    final activityStartMinutes = TimeService.timeToMinutes(startTime!);
+    final activityEndMinutes = TimeService.timeToMinutes(endTime!);
+    final boundaryStartMinutes = TimeService.timeToMinutes(start);
+    final boundaryEndMinutes = TimeService.timeToMinutes(end);
+
+    return activityStartMinutes >= boundaryStartMinutes &&
+        activityEndMinutes <= boundaryEndMinutes;
   }
 
   @override

@@ -5,7 +5,9 @@ import 'package:smarn/models/class.dart';
 import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
 import 'package:smarn/pages/widgets/dropDownMenu.dart';
+import 'package:smarn/pages/widgets/duration_form_field.dart';
 import 'package:smarn/services/class_service.dart';
+import 'package:smarn/services/constraint_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/services/activity_service.dart';
@@ -18,14 +20,13 @@ class AddActivity extends StatefulWidget {
 }
 
 class _AddActivityState extends State<AddActivity> {
-  final TextEditingController _durationController = TextEditingController();
-
   final List<String> _tags = ActivityTag.values.map((t) => t.name).toList();
 
   Class? _selectedClass;
   String? _selectedTag;
   Teacher? _selectedTeacher;
   Subject? _selectedSubject;
+  int? _duration;
 
   List<Class> _classes = [];
   List<Teacher> _allTeachers = [];
@@ -36,6 +37,10 @@ class _AddActivityState extends State<AddActivity> {
   final TeacherService _teacherService = TeacherService();
   final SubjectService _subjectService = SubjectService();
   final ClassService _classService = ClassService();
+  final ConstraintService _constraintService = ConstraintService();
+
+  int _minDuration = 60;
+  int _maxDuration = 240;
 
   @override
   void initState() {
@@ -45,10 +50,24 @@ class _AddActivityState extends State<AddActivity> {
 
   Future<void> _fetchData() async {
     await Future.wait([
+      _fetchDurations(),
       _fetchTeachers(),
       _fetchSubjects(),
       _fetchClasses(),
     ]);
+  }
+
+  Future<void> _fetchDurations() async {
+    final min = (await _constraintService.getMinMaxDuration('min'));
+    final max = (await _constraintService.getMinMaxDuration('max'));
+    setState(() {
+      if (min != null) {
+        _minDuration = min;
+      }
+      if (max != null) {
+        _maxDuration = max;
+      }
+    });
   }
 
   Future<void> _fetchTeachers() async {
@@ -82,6 +101,9 @@ class _AddActivityState extends State<AddActivity> {
         .toList();
     setState(() {
       _teachers = teachersList;
+      if (!_teachers.contains(_selectedTeacher)) {
+        _selectedTeacher = null;
+      }
     });
   }
 
@@ -100,7 +122,7 @@ class _AddActivityState extends State<AddActivity> {
         subject: _selectedSubject!.id!,
         teacher: _selectedTeacher!.id!,
         studentsClass: _selectedClass!.id!,
-        duration: int.parse(_durationController.text),
+        duration: _duration!,
         tag: ActivityTag.values.firstWhere((e) => e.name == _selectedTag),
       );
 
@@ -116,9 +138,7 @@ class _AddActivityState extends State<AddActivity> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Please fill out all fields and ensure the duration is at least 60 minutes.')),
+        const SnackBar(content: Text('Please fill out all fields.')),
       );
     }
   }
@@ -128,9 +148,7 @@ class _AddActivityState extends State<AddActivity> {
         _selectedTeacher != null &&
         _selectedClass != null &&
         _selectedTag != null &&
-        _durationController.text.isNotEmpty &&
-        int.tryParse(_durationController.text) != null &&
-        int.parse(_durationController.text) >= 60;
+        _duration != null;
   }
 
   @override
@@ -169,7 +187,7 @@ class _AddActivityState extends State<AddActivity> {
                       (dynamic newValue) {
                     setState(() {
                       _selectedTeacher = newValue as Teacher;
-                      _refreshSubjects();
+                      //_refreshSubjects();
                     });
                   }),
                   const SizedBox(height: 16),
@@ -193,16 +211,15 @@ class _AddActivityState extends State<AddActivity> {
                   const SizedBox(height: 16),
 
                   // Duration TextField
-                  TextField(
-                    controller: _durationController,
-                    style: const TextStyle(color: Colors.black),
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Duration (Minutes)',
-                      labelStyle: TextStyle(color: Color.fromARGB(255, 217, 217, 217)),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
+                  durationFormField(
+                      "Duration", // Field label
+                      _minDuration, // Minimum duration in minutes
+                      _maxDuration, // Maximum duration in minutes
+                      (value) {
+                    setState(() {
+                      _duration = value;
+                    });
+                  }),
                   const SizedBox(height: 16),
 
                   // Save Button

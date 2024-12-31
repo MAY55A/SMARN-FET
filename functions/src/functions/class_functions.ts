@@ -136,6 +136,7 @@ export const getAllClassesNames = functions.https.onCall(async (request) => {
     // Fetch all classes from Firestore
     const classesSnapshot = await db
       .collection("classes")
+      .select("name")
       .get();
     const classesList: any[] = [];
 
@@ -152,6 +153,38 @@ export const getAllClassesNames = functions.https.onCall(async (request) => {
     );
   }
 });
+
+export const getAllClassesNbStudents = functions.https.onCall(async (request) => {
+  // Check if the requesting user is allowed to view the classes
+  if (request.auth?.token.role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You do not have permission to view classes details."
+    );
+  }
+
+  try {
+    // Fetch all classes from Firestore
+    const classesSnapshot = await db
+      .collection("classes")
+      .select("id", "nbStudents")
+      .get();
+    const classesList: any[] = [];
+
+    classesSnapshot.forEach((doc) => {
+      classesList.push(doc.data());
+    });
+
+    return {classes: classesList};
+  } catch (error) {
+    throw new functions.https.HttpsError(
+      "internal",
+      "Error fetching classes names",
+      error
+    );
+  }
+});
+
 
 export const updateClass = functions.https.onCall(async (request) => {
   const {classId, updateData} = request.data;
@@ -256,6 +289,7 @@ export const deleteClass = functions.https.onCall(async (request) => {
   try {
     const classRef = db.collection("classes").doc(classId);
     const activitiesRef = db.collection("activities");
+    const constraintsRef = db.collection("constraints");
 
     await db.runTransaction(async (transaction) => {
       // Find all activities with the class reference
@@ -266,6 +300,16 @@ export const deleteClass = functions.https.onCall(async (request) => {
       // delete the activities
       activitiesSnapshot.forEach((activityDoc) => {
         transaction.delete(activityDoc.ref);
+      });
+
+      // Find all constraints with the class reference
+      const constraintsSnapshot = await constraintsRef
+        .where("classId", "==", classId)
+        .get();
+
+      // delete the constraints
+      constraintsSnapshot.forEach((constraintDoc) => {
+        transaction.delete(constraintDoc.ref);
       });
 
       // Delete the class's Firestore document

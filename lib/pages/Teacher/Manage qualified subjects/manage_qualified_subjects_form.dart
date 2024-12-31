@@ -76,7 +76,7 @@ class _ManageQualifiedSubjectsFormState
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor:Color.fromARGB(255, 56, 56, 56),        
+          backgroundColor: Color.fromARGB(255, 56, 56, 56),
           title: const Text(
             "Are you sure?",
             style: TextStyle(color: Colors.white), // White title text
@@ -97,12 +97,15 @@ class _ManageQualifiedSubjectsFormState
               ),
             ),
             TextButton(
+              style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.red),
+                  foregroundColor: WidgetStatePropertyAll(Colors.white)),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
                 _deleteSubject(subjectId); // Proceed to delete the subject
               },
               child: const Text(
-                "Confirm",
+                "Remove",
                 style:
                     TextStyle(color: Colors.white), // White text for the button
               ),
