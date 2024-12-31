@@ -14,7 +14,7 @@ class ViewSubjectDetails extends StatefulWidget {
 class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
   final TeacherService _teacherService = TeacherService();
   bool _isLoading = true;
-  List<Teacher> _teachers = [];
+  List<Map<String, String>> _teachers = [];
   String _errorMessage = '';
 
   @override
@@ -32,17 +32,7 @@ class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
       // Check if the teachersList is not empty
       if (teachersList.isNotEmpty) {
         setState(() {
-          _teachers = teachersList
-              .map((teacherData) {
-                // Ensure that teacherData contains valid 'teacher' data
-                if (teacherData['teacher'] != null) {
-                  return Teacher.fromMap(teacherData['teacher'] as Map<String, dynamic>);
-                }
-                return null; // If no valid teacher data, return null
-              })
-              .whereType<
-                  Teacher>() // This ensures only non-null Teacher objects are included
-              .toList();
+          _teachers = teachersList;
           _isLoading = false;
         });
       } else {
@@ -104,19 +94,20 @@ class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
                                 return ListTile(
                                   contentPadding:
                                       const EdgeInsets.symmetric(vertical: 5),
-                                  title: Text(teacher.name,
+                                  title: Text(teacher["name"]!,
                                       style:
                                           const TextStyle(color: Colors.white)),
-                                  subtitle: Text(
-                                      teacher.email ?? 'No email provided',
+                                  subtitle: Text(teacher["id"]!,
                                       style:
                                           const TextStyle(color: Colors.grey)),
+                                  /*
                                   leading: teacher.picture.isNotEmpty
                                       ? CircleAvatar(
                                           backgroundImage:
                                               NetworkImage(teacher.picture))
                                       : const CircleAvatar(
                                           child: Icon(Icons.person)),
+                                          */
                                 );
                               },
                             ),

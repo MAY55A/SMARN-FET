@@ -5,7 +5,7 @@ export interface Teacher {
     phone: string;
     picture?: string;
     nbHours: number;
-    subjects: string[]; // Array of subject IDs
+    subjects: string[];
 }
 
 export interface Subject {
@@ -95,4 +95,61 @@ export enum ChangeRequestStatus {
     pending = "pending",
     approved = "approved",
     rejected = "rejected",
+}
+
+export interface Constraint {
+    id: string;
+    category: ConstraintCategory;
+    isActive: boolean;
+}
+
+export interface TimeConstraint extends Constraint {
+    type: TimeConstraintType;
+    startTime: String;
+    endTime: String;
+    availableDays: WorkDay[];
+    teacherId?: String;
+    classId?: String;
+}
+
+export interface SpaceConstraint extends Constraint {
+    type: SpaceConstraintType;
+    roomId?: String;
+    subjectId?: String;
+    activityType?: ActivityTag;
+    requiredRoomType?: RoomType;
+    teacherId?: String;
+    classId?: String;
+}
+
+export interface SchedulingRule extends Constraint {
+    type: SchedulingRuleType;
+    startTime?: String;
+    endTime?: String;
+    applicableDays?: WorkDay[];
+    duration?: number;
+}
+
+export enum ConstraintCategory {
+    timeConstraint = "timeConstraint",
+    spaceConstraint = "spaceConstraint",
+    schedulingRule = "schedulingRule",
+}
+
+
+export enum TimeConstraintType {
+    teacherAvailability = "teacherAvailability",
+    classAvailability = "classAvailability",
+    roomAvailability = "roomAvailability",
+}
+
+export enum SpaceConstraintType {
+    roomType = "roomType",
+    preferredRoom = "preferredRoom",
+}
+
+export enum SchedulingRuleType {
+    workPeriod = "workPeriod",
+    breakPeriod = "breakPeriod",
+    minActivityDuration = "minActivityDuration",
 }

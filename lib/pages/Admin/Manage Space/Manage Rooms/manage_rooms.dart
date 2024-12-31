@@ -3,6 +3,7 @@ import 'package:smarn/models/room.dart';
 import 'package:smarn/services/room_service.dart'; // Import the RoomService
 import 'add_room.dart'; // Import the AddRoom screen
 import 'edit_room.dart'; // Import the EditRoom screen
+import 'view_room.dart'; // Import the ViewRoom screen
 
 class ManageRooms extends StatefulWidget {
   const ManageRooms({super.key});
@@ -73,6 +74,16 @@ class _ManageRoomsState extends State<ManageRooms> {
         _showErrorAlert('An error occurred while updating the room.');
       }
     }
+  }
+
+  // Handle viewing a room's details
+  void _viewRoom(Room roomItem) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ViewRoom(roomItem: roomItem), // Navigate to ViewRoom page
+      ),
+    );
   }
 
   // Handle deleting a room with confirmation
@@ -194,10 +205,15 @@ class _ManageRoomsState extends State<ManageRooms> {
                                 icon: const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () => _editRoom(roomItem),
                               ),
-                              // Delete icon
+                              // Delete icon (red)
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.white),
+                                icon: const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () => _deleteRoom(roomItem),
+                              ),
+                              // View icon (arrow) after delete icon
+                              IconButton(
+                                icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                                onPressed: () => _viewRoom(roomItem), // Navigate to view room details
                               ),
                             ],
                           ),

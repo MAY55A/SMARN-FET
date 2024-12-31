@@ -58,21 +58,55 @@ class _UpdatePhoneNumberPageState extends State<UpdatePhoneNumberPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Update Phone Number')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _phoneNumberController,
-              decoration: const InputDecoration(labelText: 'New Phone Number'),
+      appBar: AppBar(
+        title: const Text('Update Phone Number'),
+        backgroundColor: Colors.blue, // Blue AppBar
+      ),
+      body: Container(
+        color: Colors.black, // Black background for the page
+        child: Center(
+          child: Card(
+            color: Colors.grey[800], // Gray background for the card
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16), // Rounded corners
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _updatePhoneNumber,
-              child: const Text('Update Phone Number'),
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _phoneNumberController,
+                    decoration: const InputDecoration(
+                      labelText: 'New Phone Number',
+                      labelStyle: TextStyle(color: Colors.white),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _updatePhoneNumber,
+                    child: const Text('Update Phone Number'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // Blue button background
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 32),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );
