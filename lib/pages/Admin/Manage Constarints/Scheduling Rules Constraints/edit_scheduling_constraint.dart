@@ -224,81 +224,83 @@ class _EditSchedulingRuleFormState extends State<EditSchedulingRuleForm> {
                     ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState?.validate() ?? false) {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Confirm Update'),
-                              content: const Text(
-                                  'Are you sure you want to update this scheduling rule?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(false),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(true),
-                                  child: const Text('Confirm'),
-                                ),
-                              ],
-                            ),
+                          final updatedSchedulingRule = SchedulingRule(
+                            id: widget.schedulingRule.id,
+                            type: widget.schedulingRule.type,
+                            duration: int.tryParse(_durationController.text),
+                            startTime: _startTimeController.text.isEmpty
+                                ? null
+                                : _startTimeController.text,
+                            endTime: _endTimeController.text.isEmpty
+                                ? null
+                                : _endTimeController.text,
+                            applicableDays: _selectedDays,
+                            isActive: _isActive, // Include active state
                           );
-
-                          if (confirm == true) {
-                            setState(() {
-                              _isLoading = true;
-                            });
-
-                            final updatedSchedulingRule = SchedulingRule(
-                              id: widget.schedulingRule.id,
-                              type: _selectedType,
-                              duration: _selectedType ==
-                                      SchedulingRuleType.minActivityDuration
-                                  ? int.tryParse(_durationController.text)
-                                  : null,
-                              startTime: _selectedType !=
-                                      SchedulingRuleType.minActivityDuration
-                                  ? _startTimeController.text
-                                  : null,
-                              endTime: _selectedType !=
-                                      SchedulingRuleType.minActivityDuration
-                                  ? _endTimeController.text
-                                  : null,
-                              applicableDays: _selectedType !=
-                                      SchedulingRuleType.minActivityDuration
-                                  ? _selectedDays
-                                  : [],
-                              isActive: _isActive, // Include active state
+                          print(widget.schedulingRule);
+                          print(updatedSchedulingRule);
+                          if (widget.schedulingRule
+                              .equals(updatedSchedulingRule)) {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text(
+                                  'No changes were made to the constraint'),
+                            ));
+                          } else {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Confirm Update'),
+                                content: const Text(
+                                    'Are you sure you want to update this scheduling rule?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: const Text('Confirm'),
+                                  ),
+                                ],
+                              ),
                             );
 
-                            ConstraintService()
-                                .updateConstraint(widget.schedulingRule.id!,
-                                    updatedSchedulingRule)
-                                .then((response) {
+                            if (confirm == true) {
                               setState(() {
-                                _isLoading = false;
+                                _isLoading = true;
                               });
-                              if (response['success'] == true) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            'Scheduling Rule updated successfully')));
-                                Navigator.of(context).pop(); // Go back
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            'Failed to update Scheduling Rule')));
-                              }
-                            });
+                              ConstraintService()
+                                  .updateConstraint(widget.schedulingRule.id!,
+                                      updatedSchedulingRule)
+                                  .then((response) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                if (response['success'] == true) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Scheduling Rule updated successfully')));
+                                  Navigator.of(context).pop(); // Go back
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Failed to update Scheduling Rule')));
+                                }
+                              });
+                            }
                           }
                         }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             const Color.fromARGB(255, 129, 77, 139),
-                        foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                        foregroundColor:
+                            const Color.fromARGB(255, 255, 255, 255),
                       ),
                       child: const Text('Update'),
                     ),
