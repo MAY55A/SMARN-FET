@@ -58,11 +58,15 @@ class _AddActivityState extends State<AddActivity> {
   }
 
   Future<void> _fetchDurations() async {
-    final min = (await _constraintService.getMinMaxDuration('min'))!;
-    final max = (await _constraintService.getMinMaxDuration('max'))!;
+    final min = (await _constraintService.getMinMaxDuration('min'));
+    final max = (await _constraintService.getMinMaxDuration('max'));
     setState(() {
-      _minDuration = min;
-      _maxDuration = max;
+      if (min != null) {
+        _minDuration = min;
+      }
+      if (max != null) {
+        _maxDuration = max;
+      }
     });
   }
 
@@ -88,27 +92,6 @@ class _AddActivityState extends State<AddActivity> {
     final classesList = await _classService.getAllClasses();
     setState(() {
       _classes = classesList;
-    });
-  }
-
-  Future<void> _refreshTeachers() async {
-    final teachersList = _allTeachers
-        .where((teacher) => teacher.subjects.contains(_selectedSubject!.id))
-        .toList();
-    setState(() {
-      _teachers = teachersList;
-      if (!_teachers.contains(_selectedTeacher)) {
-        _selectedTeacher = null;
-      }
-    });
-  }
-
-  Future<void> _refreshSubjects() async {
-    final subjectsList = _allSubjects
-        .where((s) => _selectedTeacher!.subjects.contains(s.id))
-        .toList();
-    setState(() {
-      _subjects = subjectsList;
     });
   }
 
@@ -199,15 +182,15 @@ class _AddActivityState extends State<AddActivity> {
                   }),
                   const SizedBox(height: 16),
 
-              // Teacher Dropdown
-              activityDropdownMenu("teacher", _selectedTeacher, _teachers,
-                  (dynamic newValue) {
-                setState(() {
-                  _selectedTeacher = newValue as Teacher;
-                  //_refreshSubjects();
-                });
-              }),
-              const SizedBox(height: 16),
+                  // Teacher Dropdown
+                  activityDropdownMenu("teacher", _selectedTeacher, _teachers,
+                      (dynamic newValue) {
+                    setState(() {
+                      _selectedTeacher = newValue as Teacher;
+                      //_refreshSubjects();
+                    });
+                  }),
+                  const SizedBox(height: 16),
 
                   // Class Dropdown
                   activityDropdownMenu("class", _selectedClass, _classes,
@@ -227,16 +210,17 @@ class _AddActivityState extends State<AddActivity> {
                   }),
                   const SizedBox(height: 16),
 
-              // Duration TextField
-              durationFormField(
-                  _minDuration, // Minimum duration in minutes
-                  _maxDuration, // Maximum duration in minutes
-                  (value) {
-                setState(() {
-                  _duration = value;
-                });
-              }),
-              const SizedBox(height: 16),
+                  // Duration TextField
+                  durationFormField(
+                      "Duration", // Field label
+                      _minDuration, // Minimum duration in minutes
+                      _maxDuration, // Maximum duration in minutes
+                      (value) {
+                    setState(() {
+                      _duration = value;
+                    });
+                  }),
+                  const SizedBox(height: 16),
 
                   // Save Button
                   ElevatedButton(

@@ -115,9 +115,9 @@ class TimetableGenerationService {
             .getActiveConstraintsByCategory(ConstraintCategory.schedulingRule)
         as List<SchedulingRule>;
     _minActivityDuration =
-        (await ConstraintService().getMinMaxDuration('min'))!;
+        (await ConstraintService().getMinMaxDuration('min')) ?? 30;
     _maxActivityDuration =
-        (await ConstraintService().getMinMaxDuration('max'))!;
+        (await ConstraintService().getMinMaxDuration('max')) ?? 240;
 
     for (var rule in schedulingRules) {
       if (rule.type == SchedulingRuleType.breakPeriod) {

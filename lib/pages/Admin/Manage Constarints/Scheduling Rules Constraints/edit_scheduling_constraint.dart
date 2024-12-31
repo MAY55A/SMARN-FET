@@ -15,23 +15,42 @@ class EditSchedulingRuleForm extends StatefulWidget {
 
 class _EditSchedulingRuleFormState extends State<EditSchedulingRuleForm> {
   final _formKey = GlobalKey<FormState>();
+  final _constraintService = ConstraintService();
+
   final _durationController = TextEditingController();
   final _startTimeController = TextEditingController();
   final _endTimeController = TextEditingController();
-  late SchedulingRuleType _selectedType;
-  late List<WorkDay> _selectedDays;
+  late List<WorkDay>? _selectedDays;
   bool _isLoading = false;
   bool _isActive = true; // New variable for active state
+  late int? _minDuration;
+  late int? _maxDuration;
 
   @override
   void initState() {
     super.initState();
-    _durationController.text = widget.schedulingRule.duration?.toString() ?? '';
-    _startTimeController.text = widget.schedulingRule.startTime ?? '';
-    _endTimeController.text = widget.schedulingRule.endTime ?? '';
-    _selectedType = widget.schedulingRule.type;
-    _selectedDays = widget.schedulingRule.applicableDays ?? [];
+    _fetchDurations();
+
+    if (widget.schedulingRule.duration != null) {
+      _durationController.text = widget.schedulingRule.duration!.toString();
+    }
+    if (widget.schedulingRule.startTime != null) {
+      _startTimeController.text = widget.schedulingRule.startTime!;
+    }
+    if (widget.schedulingRule.endTime != null) {
+      _endTimeController.text = widget.schedulingRule.endTime!;
+    }
+    _selectedDays = widget.schedulingRule.applicableDays;
     _isActive = widget.schedulingRule.isActive; // Initialize active state
+  }
+
+  Future<void> _fetchDurations() async {
+    final min = (await _constraintService.getMinMaxDuration('min'));
+    final max = (await _constraintService.getMinMaxDuration('max'));
+    setState(() {
+      _minDuration = min;
+      _maxDuration = max;
+    });
   }
 
   @override
@@ -53,37 +72,13 @@ class _EditSchedulingRuleFormState extends State<EditSchedulingRuleForm> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    DropdownButtonFormField<SchedulingRuleType>(
-                      value: _selectedType,
-                      onChanged: (SchedulingRuleType? newValue) {
-                        setState(() {
-                          _selectedType = newValue!;
-                        });
-                      },
-                      items: SchedulingRuleType.values
-                          .map(
-                            (type) => DropdownMenuItem(
-                              value: type,
-                              child: Text(
-                                type.name,
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      dropdownColor: Colors.grey[800],
-                      decoration: InputDecoration(
-                        labelText: 'Scheduling Type',
-                        labelStyle: const TextStyle(color: Colors.white),
-                        filled: true,
-                        fillColor: Colors.grey[800],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                    ),
+                    Text(widget.schedulingRule.type.name,
+                        style: const TextStyle(color: Colors.white)),
                     const SizedBox(height: 16),
-                    if (_selectedType == SchedulingRuleType.minActivityDuration)
+                    if (widget.schedulingRule.type ==
+                            SchedulingRuleType.minActivityDuration ||
+                        widget.schedulingRule.type ==
+                            SchedulingRuleType.maxActivityDuration)
                       TextFormField(
                         controller: _durationController,
                         style: const TextStyle(color: Colors.white),
@@ -97,14 +92,33 @@ class _EditSchedulingRuleFormState extends State<EditSchedulingRuleForm> {
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter duration';
+                          if (value == null || int.tryParse(value) == null) {
+                            return 'Please enter a duration';
+                          }
+                          if (widget.schedulingRule.type ==
+                                  SchedulingRuleType.maxActivityDuration &&
+                              _minDuration != null) {
+                            if (int.parse(value) < _minDuration!) {
+                              return 'Max Duration must be greater than or equal to Min Duration : $_minDuration';
+                            }
+                          }
+                          if (widget.schedulingRule.type ==
+                                  SchedulingRuleType.minActivityDuration &&
+                              _maxDuration != null) {
+                            if (int.parse(value) > _maxDuration!) {
+                              return 'Min Duration must be less than or equal to Max Duration : $_maxDuration';
+                            }
+                          }
+                          if (int.parse(value) < 30) {
+                            return 'Duration must be at least 30 minutes';
                           }
                           return null;
                         },
                       ),
-                    if (_selectedType == SchedulingRuleType.workPeriod ||
-                        _selectedType == SchedulingRuleType.breakPeriod) ...[
+                    if (widget.schedulingRule.type ==
+                            SchedulingRuleType.workPeriod ||
+                        widget.schedulingRule.type ==
+                            SchedulingRuleType.breakPeriod) ...[
                       TextFormField(
                         controller: _startTimeController,
                         style: const TextStyle(color: Colors.white),
@@ -153,17 +167,16 @@ class _EditSchedulingRuleFormState extends State<EditSchedulingRuleForm> {
                               return MultiSelectDialog(
                                 items:
                                     WorkDay.values.map((e) => e.name).toList(),
-                                selectedItems: _selectedDays
-                                    .map((e) => e.name)
-                                    .toList(),
+                                selectedItems:
+                                    _selectedDays!.map((e) => e.name).toList(),
                               );
                             },
                           );
                           if (selected != null) {
                             setState(() {
                               _selectedDays = selected
-                                  .map((name) => WorkDay.values.firstWhere(
-                                      (e) => e.name == name))
+                                  .map((name) => WorkDay.values
+                                      .firstWhere((e) => e.name == name))
                                   .toList();
                             });
                           }
@@ -179,7 +192,7 @@ class _EditSchedulingRuleFormState extends State<EditSchedulingRuleForm> {
                             ),
                           ),
                           child: Text(
-                            _selectedDays.map((day) => day.name).join(', '),
+                            _selectedDays!.map((day) => day.name).join(', '),
                             style: const TextStyle(color: Colors.white),
                           ),
                         ),

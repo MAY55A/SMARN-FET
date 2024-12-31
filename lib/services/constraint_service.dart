@@ -1,7 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:smarn/models/constraint.dart';
 
-
 class ConstraintService {
   final useFunctionsEmulator =
       FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
@@ -68,11 +67,11 @@ class ConstraintService {
     }
   }
 
- Future<List<Constraint>> getAllConstraints() async {
-  try {
-    final HttpsCallable callable =
-        FirebaseFunctions.instance.httpsCallable('getAllConstraints');
-    final response = await callable.call();
+  Future<List<Constraint>> getAllConstraints() async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getAllConstraints');
+      final response = await callable.call();
 
       List<Constraint> constraintsList = (response.data["constraints"] as List)
           .map((item) => Map<String, dynamic>.from(item as Map))
@@ -190,10 +189,7 @@ class ConstraintService {
       return response.data['duration'];
     } catch (e) {
       print('Error fetching $type activity duration: $e');
-      var defaultValue =
-          type == 'min' ? 60 : (await getMinMaxDuration('min'))! * 4;
-      print('defaulting to $defaultValue');
-      return defaultValue;
+      return null;
     }
   }
 }

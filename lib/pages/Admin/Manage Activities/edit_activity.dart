@@ -77,8 +77,8 @@ class _EditActivityState extends State<EditActivity> {
           .firstWhere((t) => t.id == widget.activity['teacher']['id']);
       _selectedSubject = _allSubjects
           .firstWhere((s) => s.id == widget.activity['subject']['id']);
+      _isActive = widget.activity['isActive']; // Set initial active state
       _oldActivity = fillActivity();
-      _isActive = widget.activity['isActive'] ?? true; // Set initial active state
       _isLoading = false;
     });
   }
@@ -95,11 +95,15 @@ class _EditActivityState extends State<EditActivity> {
   }
 
   Future<void> _fetchDurations() async {
-    final min = (await _constraintService.getMinMaxDuration('min'))!;
-    final max = (await _constraintService.getMinMaxDuration('max'))!;
+    final min = (await _constraintService.getMinMaxDuration('min'));
+    final max = (await _constraintService.getMinMaxDuration('max'));
     setState(() {
-      _minDuration = min;
-      _maxDuration = max;
+      if (min != null) {
+        _minDuration = min;
+      }
+      if (max != null) {
+        _maxDuration = max;
+      }
     });
   }
 
@@ -206,7 +210,8 @@ class _EditActivityState extends State<EditActivity> {
                     child: Column(
                       children: [
                         // Subject Dropdown
-                        activityDropdownMenu("subject", _selectedSubject, _subjects,
+                        activityDropdownMenu(
+                            "subject", _selectedSubject, _subjects,
                             (dynamic newValue) {
                           setState(() {
                             _selectedSubject = newValue as Subject;
@@ -215,15 +220,16 @@ class _EditActivityState extends State<EditActivity> {
                         }),
                         const SizedBox(height: 16),
 
-              // Teacher Dropdown
-              activityDropdownMenu("teacher", _selectedTeacher, _teachers,
-                  (dynamic newValue) {
-                setState(() {
-                  _selectedTeacher = newValue as Teacher;
-                  //_refreshSubjects(); // Refresh subjects based on selected teacher
-                });
-              }),
-              const SizedBox(height: 16),
+                        // Teacher Dropdown
+                        activityDropdownMenu(
+                            "teacher", _selectedTeacher, _teachers,
+                            (dynamic newValue) {
+                          setState(() {
+                            _selectedTeacher = newValue as Teacher;
+                            //_refreshSubjects(); // Refresh subjects based on selected teacher
+                          });
+                        }),
+                        const SizedBox(height: 16),
 
                         // Class Dropdown
                         activityDropdownMenu("class", _selectedClass, _classes,
@@ -243,23 +249,45 @@ class _EditActivityState extends State<EditActivity> {
                         }),
                         const SizedBox(height: 16),
 
-              // Duration TextField
-              durationFormField(
-                  _minDuration, // Minimum duration in minutes
-                  _maxDuration, // Maximum duration in minutes
-                  (value) {
-                setState(() {
-                  _duration = value;
-                });
-              }, _duration),
-              const SizedBox(height: 16),
+                        // Duration TextField
+                        durationFormField(
+                            "Duration", // Field label
+                            _minDuration, // Minimum duration in minutes
+                            _maxDuration, // Maximum duration in minutes
+                            (value) {
+                          setState(() {
+                            _duration = value;
+                          });
+                        }, _duration),
+                        // Active Toggle
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Active',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            Switch(
+                              value: _isActive,
+                              onChanged: (value) {
+                                setState(() {
+                                  _isActive = value;
+                                });
+                              },
+                              activeColor:
+                                  const Color.fromARGB(255, 129, 77, 139),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
 
                         // Save Button
                         ElevatedButton(
                           onPressed: _saveActivity,
                           child: const Text('Save Activity'),
                           style: ButtonStyle(
-                            foregroundColor: MaterialStateProperty.all(Colors.black),
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.black),
                             backgroundColor: MaterialStateProperty.all(
                                 const Color.fromARGB(255, 129, 77, 139)),
                           ),
