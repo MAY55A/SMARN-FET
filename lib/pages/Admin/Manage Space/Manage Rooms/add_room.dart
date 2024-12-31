@@ -20,13 +20,11 @@ class _AddRoomState extends State<AddRoom> {
   int? capacity;
   RoomType type = RoomType.lecture;
   Building? selectedBuilding; // Selected building
- // Selected building
+  // Selected building
   final RoomService _roomService = RoomService();
   final BuildingService _buildingService = BuildingService();
   List<Building> buildings = []; // List of buildings from the database
   bool isSubmitting = false;
-
-
 
   @override
   void initState() {
@@ -69,7 +67,6 @@ class _AddRoomState extends State<AddRoom> {
       description: description,
       capacity: capacity!,
       building: selectedBuilding!.id!, // Building ID
-      
     );
 
     final result = await _roomService.addRoom(newRoom);
@@ -82,7 +79,8 @@ class _AddRoomState extends State<AddRoom> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Room added successfully')),
       );
-      Navigator.pop(context, newRoom); // This will return the new room to ManageRooms
+      Navigator.pop(
+          context, newRoom); // This will return the new room to ManageRooms
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['message'] ?? 'Failed to add room')),
@@ -160,6 +158,9 @@ class _AddRoomState extends State<AddRoom> {
                           if (value == null || int.tryParse(value) == null) {
                             return 'Enter a valid number for capacity';
                           }
+                          if (int.parse(value) < 5 || int.parse(value) > 100) {
+                            return 'The capacity must be between 5 and 100 people';
+                          }
                           return null;
                         },
                         onChanged: (value) => capacity = int.tryParse(value),
@@ -216,9 +217,12 @@ class _AddRoomState extends State<AddRoom> {
                       ElevatedButton(
                         onPressed: isSubmitting ? null : _addRoom,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 129, 77, 139),
-                          foregroundColor: const Color.fromARGB(255, 255, 255, 255),
-                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                          backgroundColor:
+                              const Color.fromARGB(255, 129, 77, 139),
+                          foregroundColor:
+                              const Color.fromARGB(255, 255, 255, 255),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 32),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           ),

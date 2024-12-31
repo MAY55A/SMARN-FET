@@ -48,6 +48,10 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     final newPassword = _newPasswordController.text.trim();
     final confirmPassword = _newPasswordConfirmController.text.trim();
 
+    if (newPassword == currentPassword) {
+      _showError('You need to enter a new different password.');
+      return;
+    }
     if (newPassword != confirmPassword) {
       _showError('Passwords do not match.');
       return;
@@ -76,7 +80,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
   // Show error messages
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -87,7 +92,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         title: const Text('Account Settings'),
         backgroundColor: AppColors.appBarColor,
       ),
-      body: Center( // Centering the content on the screen
+      body: Center(
+        // Centering the content on the screen
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Card(
@@ -112,7 +118,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                             labelStyle: TextStyle(color: Colors.white),
                             suffixIcon: _isEditingEmail
                                 ? IconButton(
-                                    icon: const Icon(Icons.check, color: Colors.white),
+                                    icon: const Icon(Icons.check,
+                                        color: Colors.white),
                                     onPressed: _updateCredentials,
                                   )
                                 : null,
@@ -156,7 +163,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                         ),
                         onPressed: () {
                           setState(() {
-                            _isPasswordVisible = !_isPasswordVisible; // Toggle visibility
+                            _isPasswordVisible =
+                                !_isPasswordVisible; // Toggle visibility
                           });
                         },
                       ),
@@ -179,7 +187,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                         ),
                         onPressed: () {
                           setState(() {
-                            _isPasswordVisible = !_isPasswordVisible; // Toggle visibility
+                            _isPasswordVisible =
+                                !_isPasswordVisible; // Toggle visibility
                           });
                         },
                       ),
@@ -202,7 +211,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                         ),
                         onPressed: () {
                           setState(() {
-                            _isPasswordVisible = !_isPasswordVisible; // Toggle visibility
+                            _isPasswordVisible =
+                                !_isPasswordVisible; // Toggle visibility
                           });
                         },
                       ),
@@ -216,7 +226,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.appBarColor,
                       foregroundColor: Colors.white,
-                      textStyle: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+                      textStyle: const TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255)),
                     ),
                   ),
                 ],
