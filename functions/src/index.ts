@@ -18,6 +18,7 @@ import {
   deleteClass,
   getAllClasses,
   getAllClassesNames,
+  getAllClassesNbStudents,
   getClass,
   regenerateClassKey,
   updateClass,
@@ -68,9 +69,13 @@ import {
   createTimeConstraint,
   deleteConstraint,
   getActiveConstraints,
+  getActiveConstraintsByCategory,
   getAllConstraints,
+  getConstraintsByCategory,
+  getMinMaxDuration,
   updateConstraint,
 } from "./functions/constraint_functions";
+import { createSchedules, getSchedule, getSchedulesForType, updateSchedule } from "./functions/schedule_functions";
 
 export {
   createTeacherAccount,
@@ -88,6 +93,7 @@ export {
   updateClass,
   regenerateClassKey,
   getAllClassesNames,
+  getAllClassesNbStudents,
   getClass,
   getAllClasses,
   deleteClass,
@@ -131,7 +137,16 @@ export {
   createSpaceConstraint,
   createSchedulingRule,
   getAllConstraints,
+  getConstraintsByCategory,
   getActiveConstraints,
+  getActiveConstraintsByCategory,
   updateConstraint,
   deleteConstraint,
+  getMinMaxDuration
+};
+export {
+  createSchedules,
+  getSchedule,
+  getSchedulesForType,
+  updateSchedule
 };
