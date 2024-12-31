@@ -6,6 +6,7 @@ import 'package:smarn/services/class_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'add_activity.dart';
 import 'edit_activity.dart';
+import 'view_activity.dart';
 
 class ManageActivitiesForm extends StatefulWidget {
   const ManageActivitiesForm({Key? key}) : super(key: key);
@@ -84,7 +85,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
         teachers = fetchedTeachers;
       });
     } catch (e) {
-      print('Error fetching classes: $e');
+      print('Error fetching teachers: $e');
     }
   }
 
@@ -123,15 +124,62 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
   }
 
   void _deleteActivity(Map<String, dynamic> activity) async {
-    final result = await _activityService.deleteActivity(activity["id"]);
-    if (result['success']) {
-      setState(() {
-        activities.remove(activity);
-        filteredActivities.remove(activity);
-      });
-    } else {
-      print('Error deleting activity: ${result['message']}');
+    // Show a confirmation dialog before deleting
+    bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this activity?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // Cancel the deletion
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // Confirm the deletion
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Proceed if user confirmed deletion
+    if (confirmDelete == true) {
+      final result = await _activityService.deleteActivity(activity["id"]);
+      if (result['success']) {
+        setState(() {
+          activities.remove(activity);
+          filteredActivities.remove(activity);
+        });
+
+        // Show a success SnackBar
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Activity deleted successfully'),
+          ),
+        );
+      } else {
+        // Show an error SnackBar if deletion failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error deleting activity: ${result['message']}'),
+          ),
+        );
+      }
     }
+  }
+
+  void _viewActivity(Map<String, dynamic> activity) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ViewActivity(activity: activity)),
+    );
   }
 
   @override
@@ -208,10 +256,11 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                             margin: const EdgeInsets.all(8.0),
                             child: ListTile(
                               title: Text(
-                                  "${activity['subject']['longName']} - ${activity["studentsClass"]["name"]}",
-                                  style: const TextStyle(color: Colors.white)),
+                                "${activity['subject']['longName']} - ${activity["studentsClass"]["name"]}",
+                                style: const TextStyle(color: Colors.white),
+                              ),
                               subtitle: Text(
-                                'By ${activity["teacher"]["name"]}\nOn ${activity['day'] ?? "??"} ${activity['startTime'] ?? "??"}h --> ${activity['endTime'] ?? "??"}h',
+                                'By ${activity["teacher"]["name"]}',
                                 style: const TextStyle(color: Colors.white),
                               ),
                               trailing: Row(
@@ -224,8 +273,13 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete,
-                                        color: Colors.white),
+                                        color: Colors.red),
                                     onPressed: () => _deleteActivity(activity),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_forward,
+                                        color: Colors.white),
+                                    onPressed: () => _viewActivity(activity),
                                   ),
                                 ],
                               ),

@@ -76,8 +76,7 @@ class _ManageQualifiedSubjectsFormState
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: const Color.fromARGB(
-              255, 30, 30, 30), // Black background for the dialog
+          backgroundColor:Color.fromARGB(255, 56, 56, 56),        
           title: const Text(
             "Are you sure?",
             style: TextStyle(color: Colors.white), // White title text

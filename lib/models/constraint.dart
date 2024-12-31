@@ -144,18 +144,17 @@ class SpaceConstraint extends Constraint {
   factory SpaceConstraint.fromMap(Map<String, dynamic> map) {
     return SpaceConstraint(
       id: map['id'],
-      type: SpaceConstraintType.values
-          .firstWhere((type) => type.name == map['type']),
-      activityType: map['activityType']?.let((activityTypeName) => ActivityTag
-          .values
-          .firstWhere((activityType) => activityType.name == activityTypeName)),
+      type: SpaceConstraintType.values.firstWhere((type) => type.name == map['type']),
+      activityType: map['activityType'] != null
+          ? ActivityTag.values.firstWhere((activityType) => activityType.name == map['activityType'])
+          : null, // Fix for the error
       teacherId: map['teacherId'],
       classId: map['classId'],
       subjectId: map['subjectId'],
       roomId: map['roomId'],
-      requiredRoomType: map['requiredRoomType']?.let((roomTypeName) => RoomType
-          .values
-          .firstWhere((roomType) => roomType.name == roomTypeName)),
+      requiredRoomType: map['requiredRoomType'] != null
+          ? RoomType.values.firstWhere((roomType) => roomType.name == map['requiredRoomType'])
+          : null,
       isActive: map['isActive'],
     );
   }
@@ -164,8 +163,8 @@ class SpaceConstraint extends Constraint {
   String toString() {
     return '${super.toString()}, Activity Type: ${activityType?.name}, Room ID: $roomId, Teacher ID: $teacherId, Class ID: $classId, Subject ID: $subjectId, Required Room Type : ${requiredRoomType?.name}';
   }
-
 }
+
 
 class SchedulingRule extends Constraint {
   final SchedulingRuleType type;

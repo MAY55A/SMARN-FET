@@ -118,7 +118,7 @@ class _EditPersonnelInformationFormState
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Personnel Information"),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.blue, // Blue AppBar
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -133,8 +133,7 @@ class _EditPersonnelInformationFormState
             padding: const EdgeInsets.all(16.0),
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(
-                    0xFFE0F7FA), // Light blue background for the form
+                color: Colors.black, // Black form background color
                 borderRadius: BorderRadius.circular(20), // Rounded corners
               ),
               padding: const EdgeInsets.all(20.0),
@@ -217,7 +216,7 @@ class _EditPersonnelInformationFormState
                     ),
                     const SizedBox(height: 30),
 
-                    // Save button
+                    // Save button centered and blue with white text
                     ElevatedButton(
                       onPressed: _updateTeacher,
                       style: ElevatedButton.styleFrom(
@@ -230,6 +229,27 @@ class _EditPersonnelInformationFormState
                       ),
                       child: const Text(
                         "Save Changes",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Confirmation dialog action buttons centered
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (await _showConfirmationDialog() == true) {
+                          _updateTeacher();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16, horizontal: 32),
+                      ),
+                      child: const Text(
+                        "Confirm Changes",
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),

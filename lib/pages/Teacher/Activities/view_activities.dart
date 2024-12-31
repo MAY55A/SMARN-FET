@@ -100,7 +100,7 @@ class _ViewActivitiesState extends State<ViewActivities> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Activities'),
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        backgroundColor: Colors.blue,
       ),
       body: Column(
         children: [

@@ -19,13 +19,11 @@ class _AddClassState extends State<AddClass> {
 
   bool _isLoading = false;
 
-  // Function to generate a 6-character access key consisting of letters and digits
   String _generateAccessKey() {
-    const length = 6; // Length of the generated key
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; // Alphanumeric characters
+    const length = 6;
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     Random random = Random();
 
-    // Generate a random key of the specified length
     String key = List.generate(length, (index) {
       return characters[random.nextInt(characters.length)];
     }).join();
@@ -44,11 +42,10 @@ class _AddClassState extends State<AddClass> {
         longName: _longNameController.text,
         nbStudents: int.parse(_nbStudentsController.text),
         accessKey: _accessKeyController.text.isEmpty
-            ? _generateAccessKey()  // Generate the key locally if not provided
+            ? _generateAccessKey()
             : _accessKeyController.text,
       );
 
-      // Assuming you are still calling your service to create the class
       final response = await ClassService().createClass(newClass);
 
       setState(() => _isLoading = false);
@@ -74,51 +71,59 @@ class _AddClassState extends State<AddClass> {
         title: const Text('Add Class'),
         backgroundColor: AppColors.appBarColor,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    buildTextField('Class Name', _nameController),
-                    const SizedBox(height: 16),
-                    buildTextField('Long Name', _longNameController),
-                    const SizedBox(height: 16),
-                    buildTextField(
-                      'Number of Students',
-                      _nbStudentsController,
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 16),
-                    buildTextField('Access Key ', _accessKeyController),
-                    const SizedBox(height: 8),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // Generate a new key when requested
-                        setState(() {
-                          _accessKeyController.text = _generateAccessKey();
-                        });
-                      },
-                      icon: const Icon(Icons.refresh, color: Colors.white),
-                      label: const Text('Generate Key', style: TextStyle(color: Colors.white)),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.purple),
+      body: Center(
+        child: _isLoading
+            ? const CircularProgressIndicator()
+            : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Card(
+                  color: Colors.grey[850],
+                  elevation: 8,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          buildTextField('Class Name', _nameController),
+                          const SizedBox(height: 16),
+                          buildTextField('Long Name', _longNameController),
+                          const SizedBox(height: 16),
+                          buildTextField(
+                            'Number of Students',
+                            _nbStudentsController,
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 16),
+                          buildTextField('Access Key', _accessKeyController),
+                          const SizedBox(height: 8),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _accessKeyController.text = _generateAccessKey();
+                              });
+                            },
+                            icon: const Icon(Icons.refresh, color: Colors.white),
+                            label: const Text('Generate Key', style: TextStyle(color: Colors.white)),
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(Colors.purple),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          ElevatedButton(
+                            onPressed: _addClass,
+                            child: const Text('Add Class'),
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
+                              foregroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 255, 255, 255)),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _addClass,
-                      child: const Text('Add Class'),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
-                        foregroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 255, 255, 255)),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 
@@ -138,7 +143,7 @@ class _AddClassState extends State<AddClass> {
           borderSide: BorderSide(color: Colors.white),
         ),
         focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Color.fromARGB(255, 110, 57, 119)),
+          borderSide: BorderSide(color: Colors.purple),
         ),
       ),
     );

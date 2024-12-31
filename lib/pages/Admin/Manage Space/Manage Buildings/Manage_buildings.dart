@@ -176,11 +176,25 @@ class _ManageBuildingsState extends State<ManageBuildings> {
                                       color: Colors.white),
                                   onPressed: () => _editBuilding(building),
                                 ),
-                                // Delete Icon
+                                // Delete Icon (red color)
                                 IconButton(
                                   icon: const Icon(Icons.delete,
-                                      color: Colors.white),
+                                      color: Colors.red),
                                   onPressed: () => _deleteBuilding(building),
+                                ),
+                                // Arrow Icon (Navigate to ViewBuilding)
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_forward,
+                                      color: Colors.white),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ViewBuilding(building: building),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),
