@@ -232,4 +232,5 @@ enum SchedulingRuleType {
   workPeriod,
   breakPeriod,
   minActivityDuration,
+  maxActivityDuration,
 }
