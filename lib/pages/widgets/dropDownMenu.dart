@@ -46,6 +46,8 @@ Widget activityDropdownMenu(String type, dynamic selected, List list,
     padding: const EdgeInsets.only(left: 20, right: 20),
     value: selected,
     hint: Text("Select $type", style: const TextStyle(color: Colors.white)),
+    disabledHint:
+        Text("No $type available", style: const TextStyle(color: Colors.grey)),
     onChanged: onChange,
     items: list.map<DropdownMenuItem<dynamic>>((dynamic value) {
       return DropdownMenuItem<dynamic>(

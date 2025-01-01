@@ -1,14 +1,14 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions/v2";
-import {generateId} from "../helpers/id_generator";
-import {Teacher} from "../models";
-import {documentExists} from "../helpers/check_existence";
+import { generateId } from "../helpers/id_generator";
+import { Teacher } from "../models";
+import { documentExists } from "../helpers/check_existence";
 
 const db = admin.firestore();
 
 // function to create a teacher account
 export const createTeacherAccount = functions.https.onCall(async (request) => {
-  const {email, password, teacher} = request.data;
+  const { email, password, teacher } = request.data;
 
   // Ensure the email, password and teacher are provided
   if (!email || !password || !teacher.name || !teacher.phone || !teacher.nbHours) {
@@ -42,7 +42,7 @@ export const createTeacherAccount = functions.https.onCall(async (request) => {
     });
 
     // Set custom claim for a teacher
-    await admin.auth().setCustomUserClaims(userRecord.uid, {role: "teacher"});
+    await admin.auth().setCustomUserClaims(userRecord.uid, { role: "teacher" });
 
     // Generate a unique teacher ID
     const teacherId = await generateId("TEA", "teachers");
@@ -91,7 +91,7 @@ export const createTeacherAccount = functions.https.onCall(async (request) => {
 });
 
 export const getTeacher = functions.https.onCall(async (request) => {
-  const {teacherDocId} = request.data;
+  const { teacherDocId } = request.data;
 
   // Ensure the teacher ID is provided
   if (!teacherDocId) {
@@ -132,7 +132,7 @@ export const getTeacher = functions.https.onCall(async (request) => {
 });
 
 export const getTeacherName = functions.https.onCall(async (request) => {
-  const {teacherId} = request.data;
+  const { teacherId } = request.data;
 
   // Ensure the teacher ID is provided
   if (!teacherId) {
@@ -181,10 +181,10 @@ export const getAllTeachers = functions.https.onCall(async (request) => {
     const teachersList: any[] = [];
 
     teachersSnapshot.forEach((doc) => {
-      teachersList.push({id: doc.id, teacher: doc.data()});
+      teachersList.push({ id: doc.id, teacher: doc.data() });
     });
 
-    return {teachers: teachersList};
+    return { teachers: teachersList };
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -195,7 +195,7 @@ export const getAllTeachers = functions.https.onCall(async (request) => {
 });
 
 export const updateTeacherAccount = functions.https.onCall(async (request) => {
-  const {teacherDocId, updateData} = request.data;
+  const { teacherDocId, updateData } = request.data;
 
   // Ensure the teacher document ID and updated data are provided
   if (!teacherDocId || !updateData) {
@@ -231,7 +231,7 @@ export const updateTeacherAccount = functions.https.onCall(async (request) => {
     // Use the updateData directly from the request
     await teacherRef.update(updateData);
 
-    return {message: "Teacher account updated successfully!", success: true};
+    return { message: "Teacher account updated successfully!", success: true };
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -242,7 +242,7 @@ export const updateTeacherAccount = functions.https.onCall(async (request) => {
 });
 
 export const deleteTeacherAccount = functions.https.onCall(async (request) => {
-  const {teacherDocId} = request.data;
+  const { teacherDocId } = request.data;
 
   // Ensure the teacher document ID is provided
   if (!teacherDocId) {
@@ -264,6 +264,7 @@ export const deleteTeacherAccount = functions.https.onCall(async (request) => {
     const teacherRef = db.collection("teachers").doc(teacherDocId);
     const teacherId = (await teacherRef.get()).data()?.id;
     const activitiesRef = db.collection("activities");
+    const constraintsRef = db.collection("constraints");
 
     await db.runTransaction(async (transaction) => {
       // Find all activities with the teacher reference
@@ -276,13 +277,23 @@ export const deleteTeacherAccount = functions.https.onCall(async (request) => {
         transaction.delete(activityDoc.ref);
       });
 
+      // Find all constraints with the teacher reference
+      const constraintsSnapshot = await constraintsRef
+        .where("teacherId", "==", teacherId)
+        .get();
+
+      // delete the constraints
+      constraintsSnapshot.forEach((constraintDoc) => {
+        transaction.delete(constraintDoc.ref);
+      });
+
       // Delete the teacher's Firestore document
       transaction.delete(teacherRef);
       // Delete the teacher's Firebase Auth account
       await admin.auth().deleteUser(teacherDocId);
     });
 
-    return {message: "Teacher account deleted successfully!", success: true};
+    return { message: "Teacher account deleted successfully!", success: true };
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -293,7 +304,7 @@ export const deleteTeacherAccount = functions.https.onCall(async (request) => {
 });
 
 export const getTeachersBySubject = functions.https.onCall(async (request) => {
-  const {subjectId} = request.data;
+  const { subjectId } = request.data;
 
   // Ensure only admin can view them
   if (request.auth?.token.role !== "admin") {
@@ -313,10 +324,10 @@ export const getTeachersBySubject = functions.https.onCall(async (request) => {
     const teachersList: any[] = [];
 
     teachersSnapshot.forEach((doc) => {
-      teachersList.push({id: doc.data().id, name: doc.data().name});
+      teachersList.push({ id: doc.data().id, name: doc.data().name });
     });
 
-    return {teachers: teachersList};
+    return { teachers: teachersList };
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -327,7 +338,7 @@ export const getTeachersBySubject = functions.https.onCall(async (request) => {
 });
 
 export const updateTeacherSubjects = functions.https.onCall(async (request) => {
-  const {teacherDocId, updatedSubjects} = request.data;
+  const { teacherDocId, updatedSubjects } = request.data;
 
   // Ensure the teacher document ID and updated data are provided
   if (!teacherDocId || !updatedSubjects) {
@@ -365,9 +376,9 @@ export const updateTeacherSubjects = functions.https.onCall(async (request) => {
 
   try {
     // Use the updatedSubjects directly from the request
-    await teacherRef.update({subjects: updatedSubjects});
+    await teacherRef.update({ subjects: updatedSubjects });
 
-    return {message: "Teacher subjects updated successfully!", success: true};
+    return { message: "Teacher subjects updated successfully!", success: true };
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
@@ -397,7 +408,7 @@ export const getAllTeachersNames = functions.https.onCall(async (request) => {
       teachersList.push(doc.data()?.name);
     });
 
-    return {teachers: teachersList};
+    return { teachers: teachersList };
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",

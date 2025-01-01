@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:smarn/pages/Admin/Manage%20Constarints/scheduling_rules_view.dart';
-import 'package:smarn/pages/Admin/Manage%20Constarints/space_constraints_view.dart';
-import 'package:smarn/pages/Admin/Manage%20Constarints/time_constraints_view.dart';
+import 'package:smarn/pages/Admin/Manage%20Constarints/Scheduling%20Rules%20Constraints/scheduling_rules_view.dart';
+import 'package:smarn/pages/Admin/Manage%20Constarints/Space%20Constraints/space_constraints_view.dart';
+import 'package:smarn/pages/Admin/Manage%20Constarints/Time%20Constraints/time_constraints_view.dart';
 
 class ConstraintsSelection extends StatefulWidget {
   const ConstraintsSelection({super.key});

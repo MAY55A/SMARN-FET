@@ -17,7 +17,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   final _newPasswordController = TextEditingController();
   final _newPasswordConfirmController = TextEditingController();
   bool _isEditingEmail = false;
-  bool _isPasswordVisible = false;
+  bool _isPasswordVisible = false; // Toggle visibility for all passwords
 
   // Load current user's email
   @override
@@ -48,6 +48,10 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     final newPassword = _newPasswordController.text.trim();
     final confirmPassword = _newPasswordConfirmController.text.trim();
 
+    if (newPassword == currentPassword) {
+      _showError('You need to enter a new different password.');
+      return;
+    }
     if (newPassword != confirmPassword) {
       _showError('Passwords do not match.');
       return;
@@ -76,113 +80,160 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
   // Show error messages
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.formColor,
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       appBar: AppBar(
         title: const Text('Account Settings'),
         backgroundColor: AppColors.appBarColor,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Email Section
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _emailController,
+      body: Center(
+        // Centering the content on the screen
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            color: AppColors.formColor, // Card background color
+            elevation: 8,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Email Section
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _emailController,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            labelStyle: TextStyle(color: Colors.white),
+                            suffixIcon: _isEditingEmail
+                                ? IconButton(
+                                    icon: const Icon(Icons.check,
+                                        color: Colors.white),
+                                    onPressed: _updateCredentials,
+                                  )
+                                : null,
+                          ),
+                          style: const TextStyle(color: Colors.white),
+                          enabled: _isEditingEmail,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          _isEditingEmail ? Icons.edit_off : Icons.edit,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isEditingEmail = !_isEditingEmail;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Password Update Section
+                  const Text(
+                    'Update Password',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _currentPasswordController,
+                    obscureText: !_isPasswordVisible, // Control visibility
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      labelText: 'Current Password',
                       labelStyle: TextStyle(color: Colors.white),
-                      suffixIcon: _isEditingEmail
-                          ? IconButton(
-                              icon: const Icon(Icons.check, color: Colors.white),
-                              onPressed: _updateCredentials,
-                            )
-                          : null,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible =
+                                !_isPasswordVisible; // Toggle visibility
+                          });
+                        },
+                      ),
                     ),
                     style: const TextStyle(color: Colors.white),
-                    enabled: _isEditingEmail,
                   ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    _isEditingEmail ? Icons.edit_off : Icons.edit,
-                    color: Colors.white,
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _newPasswordController,
+                    obscureText: !_isPasswordVisible, // Control visibility
+                    decoration: InputDecoration(
+                      labelText: 'New Password',
+                      labelStyle: TextStyle(color: Colors.white),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible =
+                                !_isPasswordVisible; // Toggle visibility
+                          });
+                        },
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.white),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _isEditingEmail = !_isEditingEmail;
-                    });
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Password Update Section
-            const Text(
-              'Update Password',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _currentPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Current Password',
-                labelStyle: TextStyle(color: Colors.white),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: Colors.white,
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _newPasswordConfirmController,
+                    obscureText: !_isPasswordVisible, // Control visibility
+                    decoration: InputDecoration(
+                      labelText: 'Confirm New Password',
+                      labelStyle: TextStyle(color: Colors.white),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible =
+                                !_isPasswordVisible; // Toggle visibility
+                          });
+                        },
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.white),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  },
-                ),
-              ),
-              style: const TextStyle(color: Colors.white),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _newPasswordController,
-              obscureText: !_isPasswordVisible,
-              decoration: InputDecoration(
-                labelText: 'New Password',
-                labelStyle: TextStyle(color: Colors.white),
-              ),
-              style: const TextStyle(color: Colors.white),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _newPasswordConfirmController,
-              obscureText: !_isPasswordVisible,
-              decoration: InputDecoration(
-                labelText: 'Confirm New Password',
-                labelStyle: TextStyle(color: Colors.white),
-              ),
-              style: const TextStyle(color: Colors.white),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _updateCredentials,
-              child: const Text('Update Credentials'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.appBarColor,
-                textStyle: const TextStyle(color: Colors.white),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _updateCredentials,
+                    child: const Text('Update Credentials'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.appBarColor,
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255)),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

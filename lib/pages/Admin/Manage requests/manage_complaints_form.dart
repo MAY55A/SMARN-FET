@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
 import 'package:smarn/models/change_request_status.dart';
 import 'package:smarn/pages/Admin/Manage%20requests/view_change_request_details.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
@@ -29,13 +29,12 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
     final teacherService = TeacherService();
 
     for (var request in changeRequests) {
-      if (request.teacher != null) {
-        try {
-          final teacher = await teacherService.getTeacher(request.teacher!);
-          request.teacher = teacher?.name ?? request.teacher; // Replace ID with name if available.
-        } catch (e) {
-          print("Error fetching teacher name for ID ${request.teacher}: $e");
-        }
+      try {
+        final teacher = await teacherService.getTeacher(request.teacher);
+        request.teacher = teacher?.name ??
+            request.teacher; // Replace ID with name if available.
+      } catch (e) {
+        print("Error fetching teacher name for ID ${request.teacher}: $e");
       }
     }
 
@@ -104,11 +103,12 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                   itemBuilder: (context, index) {
                     final request = changeRequests[index];
                     return Card(
-                      color: AppColors.formColor, // Set the card's background color to blue.
+                      color: AppColors
+                          .formColor, // Set the card's background color to blue.
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
                         title: Text(
-                          request.teacher ?? 'Unknown Teacher',
+                          request.teacher,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -119,7 +119,7 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                           children: [
                             const SizedBox(height: 4),
                             Text(
-                              'Reason: ${request.reason ?? 'N/A'}',
+                              'Reason: ${request.reason}',
                               style: const TextStyle(color: Colors.white),
                             ),
                             const SizedBox(height: 4),
@@ -141,7 +141,8 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                                 Icon(
                                   request.status == ChangeRequestStatus.approved
                                       ? Icons.check_circle
-                                      : request.status == ChangeRequestStatus.rejected
+                                      : request.status ==
+                                              ChangeRequestStatus.rejected
                                           ? Icons.cancel
                                           : Icons.pending,
                                   color: getStatusColor(request.status),
@@ -165,7 +166,8 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                           ),
                           child: const Text(
                             'View Details',
-                            style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                            style:
+                                TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                           ),
                         ),
                       ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 
 Widget buildAnimatedDashboardCard(
-    BuildContext context, String title, IconData icon, Widget page) {
+    BuildContext context, String title, IconData icon, Widget page, Color color) {
   return GestureDetector(
     onTap: () {
       Navigator.push(
@@ -35,7 +35,7 @@ Widget buildAnimatedDashboardCard(
             children: [
               Icon(icon,
                   size: 36,
-                  color: AppColors.appBarColor), // Further reduced icon size
+                  color:color), // Further reduced icon size
               const SizedBox(height: 8), // Reduced spacing
               Text(
                 title,

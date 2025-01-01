@@ -183,6 +183,39 @@ export const getAllActivities = functions.https.onCall(async (request) => {
   }
 });
 
+
+export const getActiveActivities = functions.https.onCall(async (request) => {
+  // Ensure only an admin can call this function
+  if (request.auth?.token.role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Only admins can view all active activities."
+    );
+  }
+
+  try {
+
+    // Fetch all active activities from Firestore
+    const activitiesSnapshot = await admin
+      .firestore()
+      .collection("activities")
+      .where("isActive", "==", true)
+      .get();
+    const activitiesList: any[] = [];
+
+    activitiesSnapshot.forEach((doc) => {
+      activitiesList.push(doc.data());
+      });
+
+    return {activities: activitiesList};
+  } catch (error) {
+    throw new functions.https.HttpsError(
+      "internal",
+      "Error fetching active activities"
+    );
+  }
+});
+
 export const updateActivity = functions.https.onCall(async (request) => {
   const {activityId, updateData} = request.data;
 

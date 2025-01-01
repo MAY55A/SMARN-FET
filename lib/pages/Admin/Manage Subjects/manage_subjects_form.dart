@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/subject.dart';
 import 'package:smarn/pages/widgets/canstants.dart'; // Fixed typo in 'constants'
+
 import 'package:smarn/services/subject_service.dart';
 import 'add_subject.dart';
 import 'edit_subject.dart';
+import 'view_subject_details.dart';
 import 'view_subject_details.dart';
 
 class ManageSubjectsForm extends StatefulWidget {
@@ -100,13 +102,17 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirm Delete'),
-        content: Text('Are you sure you want to delete the subject "${subject.name}"?'),
+        content: Text(
+            'Are you sure you want to delete the subject "${subject.name}" and its associated activities ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Cancel'),
           ),
           TextButton(
+            style: const ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(Colors.red),
+                foregroundColor: WidgetStatePropertyAll(Colors.white)),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Delete'),
           ),
@@ -140,7 +146,8 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Manage Subjects", style: TextStyle(color: Colors.white)),
+        title: const Text("Manage Subjects",
+            style: TextStyle(color: Colors.white)),
         backgroundColor: AppColors.appBarColor,
       ),
       body: isLoading
@@ -157,7 +164,8 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
                       decoration: InputDecoration(
                         hintText: 'Search subjects...',
                         hintStyle: const TextStyle(color: Colors.white),
-                        prefixIcon: const Icon(Icons.search, color: Colors.white),
+                        prefixIcon:
+                            const Icon(Icons.search, color: Colors.white),
                         filled: true,
                         fillColor: Colors.grey[800],
                         border: OutlineInputBorder(
@@ -197,17 +205,24 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
-                                        icon: const Icon(Icons.edit, color: Colors.white),
+                                        icon: const Icon(Icons.edit,
+                                            color: Colors.white),
                                         onPressed: () => _editSubject(subject),
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.white),
-                                        onPressed: () => _confirmDeleteSubject(subject),
+                                        icon: const Icon(Icons.delete,
+                                            color: Colors
+                                                .red), // Changer la couleur en rouge
+                                        onPressed: () =>
+                                            _confirmDeleteSubject(subject),
                                       ),
-                                      // View Details Icon
+                                      // Remplacer l'icône de vue par une flèche
                                       IconButton(
-                                        icon: const Icon(Icons.visibility, color: Colors.white),
-                                        onPressed: () => _viewSubjectDetails(subject),
+                                        icon: const Icon(Icons.arrow_forward,
+                                            color: Colors
+                                                .white), // Icône de flèche
+                                        onPressed: () =>
+                                            _viewSubjectDetails(subject),
                                       ),
                                     ],
                                   ),

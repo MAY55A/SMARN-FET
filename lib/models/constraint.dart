@@ -40,6 +40,21 @@ abstract class Constraint {
   String toString() {
     return 'Constraint: $id, Category: $category, Active: $isActive';
   }
+
+  bool equals(Constraint other) {
+    if (category == ConstraintCategory.timeConstraint &&
+        other.category == ConstraintCategory.timeConstraint) {
+      return (this as TimeConstraint).equals(other);
+    } else if (category == ConstraintCategory.spaceConstraint &&
+        other.category == ConstraintCategory.spaceConstraint) {
+      return (this as SpaceConstraint).equals(other);
+    } else if (category == ConstraintCategory.schedulingRule &&
+        other.category == ConstraintCategory.schedulingRule) {
+      return (this as SchedulingRule).equals(other);
+    } else {
+      return false;
+    }
+  }
 }
 
 class TimeConstraint extends Constraint {
@@ -102,6 +117,19 @@ class TimeConstraint extends Constraint {
     return '${super.toString()}, Type: ${type.name}, Start Time: $startTime, End Time: $endTime, Available Days: ${availableDays.join(', ')}, Teacher ID: $teacherId, Class ID: $classId, Room ID: $roomId';
   }
 
+  @override
+  bool equals(Constraint other) {
+    other = other as TimeConstraint;
+    return type == other.type &&
+        startTime == other.startTime &&
+        endTime == other.endTime &&
+        availableDays.toSet().containsAll(other.availableDays) &&
+        other.availableDays.toSet().containsAll(availableDays) &&
+        teacherId == other.teacherId &&
+        classId == other.classId &&
+        roomId == other.roomId &&
+        isActive == other.isActive;
+  }
 }
 
 class SpaceConstraint extends Constraint {
@@ -146,16 +174,18 @@ class SpaceConstraint extends Constraint {
       id: map['id'],
       type: SpaceConstraintType.values
           .firstWhere((type) => type.name == map['type']),
-      activityType: map['activityType']?.let((activityTypeName) => ActivityTag
-          .values
-          .firstWhere((activityType) => activityType.name == activityTypeName)),
+      activityType: map['activityType'] != null
+          ? ActivityTag.values.firstWhere(
+              (activityType) => activityType.name == map['activityType'])
+          : null, // Fix for the error
       teacherId: map['teacherId'],
       classId: map['classId'],
       subjectId: map['subjectId'],
       roomId: map['roomId'],
-      requiredRoomType: map['requiredRoomType']?.let((roomTypeName) => RoomType
-          .values
-          .firstWhere((roomType) => roomType.name == roomTypeName)),
+      requiredRoomType: map['requiredRoomType'] != null
+          ? RoomType.values.firstWhere(
+              (roomType) => roomType.name == map['requiredRoomType'])
+          : null,
       isActive: map['isActive'],
     );
   }
@@ -165,6 +195,18 @@ class SpaceConstraint extends Constraint {
     return '${super.toString()}, Activity Type: ${activityType?.name}, Room ID: $roomId, Teacher ID: $teacherId, Class ID: $classId, Subject ID: $subjectId, Required Room Type : ${requiredRoomType?.name}';
   }
 
+  @override
+  bool equals(Constraint other) {
+    other = other as SpaceConstraint;
+    return type == other.type &&
+        teacherId == other.teacherId &&
+        classId == other.classId &&
+        subjectId == other.subjectId &&
+        roomId == other.roomId &&
+        activityType == other.activityType &&
+        requiredRoomType == other.requiredRoomType &&
+        isActive == other.isActive;
+  }
 }
 
 class SchedulingRule extends Constraint {
@@ -218,6 +260,20 @@ class SchedulingRule extends Constraint {
   String toString() {
     return '${super.toString()}, Duration: $duration, Start Time: $startTime, End Time: $endTime, Applicable Days: ${applicableDays?.join(', ')}';
   }
+
+  @override
+  bool equals(Constraint other) {
+    other = other as SchedulingRule;
+    return type == other.type &&
+        duration == other.duration &&
+        (applicableDays != null && other.applicableDays != null
+            ? (applicableDays!.toSet().containsAll(other.applicableDays!) &&
+                other.applicableDays!.toSet().containsAll(applicableDays!))
+            : applicableDays == other.applicableDays) &&
+        startTime == other.startTime &&
+        endTime == other.endTime &&
+        isActive == other.isActive;
+  }
 }
 
 enum ConstraintCategory { timeConstraint, spaceConstraint, schedulingRule }
@@ -234,4 +290,5 @@ enum SchedulingRuleType {
   workPeriod,
   breakPeriod,
   minActivityDuration,
+  maxActivityDuration,
 }

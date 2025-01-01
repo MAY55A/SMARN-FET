@@ -72,13 +72,17 @@ class _ManageBuildingsState extends State<ManageBuildings> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Building'),
-          content: Text('Are you sure you want to delete "${building.name}"?'),
+          content: Text(
+              'Are you sure you want to delete "${building.name}" and its associated rooms?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Cancel'),
             ),
             TextButton(
+              style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.red),
+                  foregroundColor: WidgetStatePropertyAll(Colors.white)),
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text('Delete'),
             ),
@@ -176,11 +180,25 @@ class _ManageBuildingsState extends State<ManageBuildings> {
                                       color: Colors.white),
                                   onPressed: () => _editBuilding(building),
                                 ),
-                                // Delete Icon
+                                // Delete Icon (red color)
                                 IconButton(
                                   icon: const Icon(Icons.delete,
-                                      color: Colors.white),
+                                      color: Colors.red),
                                   onPressed: () => _deleteBuilding(building),
+                                ),
+                                // Arrow Icon (Navigate to ViewBuilding)
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_forward,
+                                      color: Colors.white),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ViewBuilding(building: building),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),
