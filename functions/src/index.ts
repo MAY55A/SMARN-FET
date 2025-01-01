@@ -1,6 +1,8 @@
-import { initializeApp } from "firebase-admin";
+import * as admin from "firebase-admin";
 
-initializeApp();
+
+admin.initializeApp();
+
 
 import {
   createTeacherAccount,
@@ -60,7 +62,7 @@ import {
   getActivitiesByTeacher,
   getActivitiesByClass,
   deleteActivity,
-  getActiveActivities,
+  // getActiveActivities,
 } from "./functions/activity_functions";
 import {
   createSchedulingRule,
@@ -121,7 +123,7 @@ export {
   updateActivity,
   getActivity,
   getAllActivities,
-  getActiveActivities,
+ // getActiveActivities,
   getActivitiesByTeacher,
   getActivitiesByClass,
   deleteActivity,
