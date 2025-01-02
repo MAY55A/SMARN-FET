@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/CRUD_test.dart';
 import 'package:smarn/services/admin_service.dart';
 
 class AdminForm extends StatefulWidget {
@@ -29,7 +28,8 @@ class _AdminFormState extends State<AdminForm> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(res["message"] ?? "Login failed. Unauthorized access."),
+            content:
+                Text(res["message"] ?? "Login failed. Unauthorized access."),
           ),
         );
       }
@@ -39,7 +39,7 @@ class _AdminFormState extends State<AdminForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 9, 17),
+      backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
       appBar: AppBar(
         title: const Text('Admin Form'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
@@ -49,16 +49,8 @@ class _AdminFormState extends State<AdminForm> {
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color.fromARGB(255, 58, 58, 58), // Form background
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.3),
-                  spreadRadius: 3,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
             padding: const EdgeInsets.all(20),
             child: Form(
@@ -71,14 +63,22 @@ class _AdminFormState extends State<AdminForm> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      color: Colors.white, // Title text color
                     ),
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: _usernameController,
+                    style: const TextStyle(
+                        color: Colors.white), // Text color inside field
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Email',
+                      labelStyle:
+                          TextStyle(color: Colors.white), // Label text color
+                      fillColor:
+                          Color.fromARGB(255, 72, 72, 72), // Field background
+                      filled: true,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -91,14 +91,22 @@ class _AdminFormState extends State<AdminForm> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: !_isPasswordVisible, // Toggle visibility
+                    style: const TextStyle(
+                        color: Colors.white), // Text color inside field
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       labelText: 'Password',
+                      labelStyle: const TextStyle(
+                          color: Colors.white), // Label text color
+                      fillColor: const Color.fromARGB(
+                          255, 72, 72, 72), // Field background
+                      filled: true,
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordVisible
                               ? Icons.visibility
                               : Icons.visibility_off,
+                          color: Colors.white, // Icon color
                         ),
                         onPressed: () {
                           setState(() {
@@ -117,16 +125,16 @@ class _AdminFormState extends State<AdminForm> {
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: _loginAdmin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(
-                          255, 129, 77, 139), // Button color
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        const Color.fromARGB(255, 129, 77, 139),
+                      ), // Button color
+                      foregroundColor: MaterialStateProperty.all(
+                          Colors.white), // Button text color
                     ),
                     child: const Text(
                       'Login',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(fontSize: 16),
                     ),
                   ),
                 ],
