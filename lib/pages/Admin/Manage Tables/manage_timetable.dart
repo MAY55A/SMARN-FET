@@ -357,14 +357,14 @@ class _ManageTimetableState extends State<ManageTimetable> {
               ),
               DataColumn(
                 label: Text(
-                  'Class',
+                  'Room',
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
               DataColumn(
                 label: Text(
-                  'Room',
+                  'Class',
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
                 ),
@@ -379,9 +379,9 @@ class _ManageTimetableState extends State<ManageTimetable> {
                       style: const TextStyle(color: Colors.white))),
                   DataCell(Text(activity['activity'],
                       style: const TextStyle(color: Colors.white))),
-                  DataCell(Text(activity['class'],
-                      style: const TextStyle(color: Colors.white))),
                   DataCell(Text(activity['room'],
+                      style: const TextStyle(color: Colors.white))),
+                  DataCell(Text(activity['class'],
                       style: const TextStyle(color: Colors.white))),
                 ],
               );
