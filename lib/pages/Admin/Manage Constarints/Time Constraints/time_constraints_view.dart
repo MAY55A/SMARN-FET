@@ -25,7 +25,6 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
   Future<void> _fetchTimeConstraints() async {
     try {
       List<Constraint> constraints = await _constraintService.getAllConstraints();
-      // Filter only timeConstraints
       List<TimeConstraint> timeConstraints = constraints
           .where((constraint) =>
               constraint.category == ConstraintCategory.timeConstraint)
@@ -46,7 +45,7 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AddTimeConstraintView()),
-    ).then((_) => _fetchTimeConstraints()); // Refresh data after adding
+    ).then((_) => _fetchTimeConstraints());
   }
 
   void _navigateToEdit(TimeConstraint constraint) {
@@ -55,10 +54,9 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
       MaterialPageRoute(
         builder: (context) => EditTimeConstraintView(constraint: constraint),
       ),
-    ).then((_) => _fetchTimeConstraints()); // Refresh data after editing
+    ).then((_) => _fetchTimeConstraints());
   }
 
-  // Navigate to TimeConstraintDetails
   void _navigateToDetails(TimeConstraint constraint) {
     Navigator.push(
       context,
@@ -66,6 +64,46 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
         builder: (context) => TimeConstraintDetails(constraint: constraint),
       ),
     );
+  }
+
+  Future<void> _confirmDelete(TimeConstraint constraint) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this constraint?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      await _deleteConstraint(constraint.id!);
+    }
+  }
+
+  Future<void> _deleteConstraint(String constraintId) async {
+    final response = await _constraintService.deleteConstraint(constraintId);
+    if (response['success']) {
+      _fetchTimeConstraints(); // Refresh the list
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Constraint deleted successfully')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${response['message']}')),
+      );
+    }
   }
 
   @override
@@ -121,9 +159,8 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title of the constraint
                     const Text(
-                      'Time Constraint', // Handle null id
+                      'Time Constraint',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -131,7 +168,6 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    // Display the ID and Type of the constraint
                     Text(
                       'ID: ${constraint.id ?? "Unknown"}',
                       style: const TextStyle(
@@ -140,7 +176,7 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
                       ),
                     ),
                     Text(
-                      'Type: ${constraint.type.toString().split('.').last}',  // Convert enum to string
+                      'Type: ${constraint.type.toString().split('.').last}',
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
                   ],
@@ -158,13 +194,13 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
                   IconButton(
                     icon: const Icon(Icons.delete, color: Color.fromARGB(255, 255, 79, 79)),
                     onPressed: () {
-                      // Implement delete functionality
+                      _confirmDelete(constraint); // Show confirmation dialog
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.arrow_forward_ios, color: Colors.white), // Replace eye icon with arrow
+                    icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
                     onPressed: () {
-                      _navigateToDetails(constraint); // Navigate to details screen
+                      _navigateToDetails(constraint);
                     },
                   ),
                 ],

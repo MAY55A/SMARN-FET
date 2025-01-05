@@ -48,59 +48,63 @@ class _AddSubjectState extends State<AddSubject> {
         backgroundColor: AppColors.appBarColor,
       ),
       body: Center(
-        child: SafeArea(
-          child: _isLoading
-              ? const CircularProgressIndicator()
-              : Card(
-                  color: Colors.grey[850],
-                  elevation: 8,
-                  margin: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Subject Name
-                          _buildTextField(_nameController, "Subject Name"),
-                          const SizedBox(height: 16),
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 600), // Limiter la largeur du formulaire
+          padding: const EdgeInsets.all(16.0),
+          child: SafeArea(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Card(
+                    color: Colors.grey[850],
+                    elevation: 8,
+                    margin: const EdgeInsets.all(16.0),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Subject Name
+                            _buildTextField(_nameController, "Subject Name"),
+                            const SizedBox(height: 16),
 
-                          // Full Name
-                          _buildTextField(_longNameController, "Full Name"),
-                          const SizedBox(height: 16),
+                            // Full Name
+                            _buildTextField(_longNameController, "Full Name"),
+                            const SizedBox(height: 16),
 
-                          // Description
-                          _buildTextField(
-                            _descriptionController,
-                            "Description",
-                            maxLines: 3,
-                          ),
-                          const SizedBox(height: 16),
+                            // Description
+                            _buildTextField(
+                              _descriptionController,
+                              "Description",
+                              maxLines: 3,
+                            ),
+                            const SizedBox(height: 16),
 
-                          // Add Subject Button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _addSubject,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.appBarColor,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
+                            // Add Subject Button
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _addSubject,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.appBarColor,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Add Subject",
+                                  style: TextStyle(color: Colors.black, fontSize: 16),
                                 ),
                               ),
-                              child: const Text(
-                                "Add Subject",
-                                style: TextStyle(color: Colors.black, fontSize: 16),
-                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
+          ),
         ),
       ),
     );

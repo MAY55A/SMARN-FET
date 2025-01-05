@@ -26,13 +26,21 @@ class _MultiSelectDialogState extends State<MultiSelectDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Select Available Days"),
+      backgroundColor: Colors.grey[800], // Set the background color to gray
+      title: const Text(
+        "Select Available Days",
+        style: TextStyle(color: Colors.white), // Set title text color to white
+      ),
       content: SingleChildScrollView(
         child: ListBody(
           children: widget.items.map((item) {
             return CheckboxListTile(
-              title: Text(item),
+              title: Text(
+                item,
+                style: const TextStyle(color: Colors.white), // Set item text color to white
+              ),
               value: _selectedItems.contains(item),
+              activeColor: const Color.fromARGB(255, 129, 77, 139), // Checkbox color when selected
               onChanged: (bool? selected) {
                 setState(() {
                   if (selected != null) {
@@ -54,7 +62,10 @@ class _MultiSelectDialogState extends State<MultiSelectDialog> {
             // Return the selected items back to the parent widget
             Navigator.of(context).pop(_selectedItems);
           },
-          child: const Text("Done"),
+          child: const Text(
+            "Done",
+            style: TextStyle(color: Colors.white), // Set button text color to white
+          ),
         ),
       ],
     );

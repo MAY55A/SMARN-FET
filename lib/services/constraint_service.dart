@@ -7,7 +7,8 @@ class ConstraintService {
       FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
 
   // Add a new Time Constraint
-  Future<Map<String, dynamic>> createTimeConstraint(TimeConstraint constraint) async {
+  Future<Map<String, dynamic>> createTimeConstraint(
+      TimeConstraint constraint) async {
     try {
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('createTimeConstraint');
@@ -21,8 +22,9 @@ class ConstraintService {
     }
   }
 
-    // Add a new Space Constraint
-  Future<Map<String, dynamic>> createSpaceConstraint(SpaceConstraint constraint) async {
+  // Add a new Space Constraint
+  Future<Map<String, dynamic>> createSpaceConstraint(
+      SpaceConstraint constraint) async {
     try {
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('createSpaceConstraint');
@@ -36,8 +38,9 @@ class ConstraintService {
     }
   }
 
-      // Add a new Scheduling Rule
-  Future<Map<String, dynamic>> createSchedulingRule(SchedulingRule constraint) async {
+  // Add a new Scheduling Rule
+  Future<Map<String, dynamic>> createSchedulingRule(
+      SchedulingRule constraint) async {
     try {
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('createSchedulingRule');
@@ -53,11 +56,10 @@ class ConstraintService {
 
   Future<Constraint?> getConstraint(String constraintId) async {
     try {
-      // Call function to get Constraint details
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('getConstraint');
-      final response = await callable.call(
-          <String, dynamic>{'constraintId': constraintId});
+      final response =
+          await callable.call(<String, dynamic>{'constraintId': constraintId});
 
       return Constraint.fromMap(response.data);
     } catch (e) {
@@ -72,21 +74,37 @@ class ConstraintService {
         FirebaseFunctions.instance.httpsCallable('getAllConstraints');
     final response = await callable.call();
 
-    print('Response data: ${response.data}'); // Debugging line
+      List<Constraint> constraintsList = (response.data["constraints"] as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .map((c) => Constraint.fromMap(c))
+          .toList();
 
-    // Ensure the response contains the list of constraints
-    List<Constraint> constraintsList = (response.data["constraints"] as List)
-        .map((item) => Map<String, dynamic>.from(item as Map))
-        .map((c) => Constraint.fromMap(c))
-        .toList();
-
-    return constraintsList;
-  } catch (e) {
-    print('Error fetching all constraints: $e');
-    return [];
+      return constraintsList;
+    } catch (e) {
+      print('Error fetching all constraints: $e');
+      return [];
+    }
   }
-}
 
+  Future<List<Constraint>> getAllConstraintsByCategory(
+      ConstraintCategory category) async {
+    try {
+      final HttpsCallable callable = FirebaseFunctions.instance
+          .httpsCallable('getAllConstraintsByCategory');
+      final response =
+          await callable.call(<String, String>{'category': category.name});
+
+      List<Constraint> constraintsList = (response.data["constraints"] as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .map((c) => Constraint.fromMap(c))
+          .toList();
+
+      return constraintsList;
+    } catch (e) {
+      print('Error fetching all constraints by category $category : $e');
+      return [];
+    }
+  }
 
   Future<List<Constraint>> getActiveConstraints() async {
     try {
@@ -103,6 +121,26 @@ class ConstraintService {
       return constraintsList;
     } catch (e) {
       print('Error fetching all constraints: $e');
+      return [];
+    }
+  }
+
+  Future<List<Constraint>> getActiveConstraintsByCategory(
+      ConstraintCategory category) async {
+    try {
+      final HttpsCallable callable = FirebaseFunctions.instance
+          .httpsCallable('getActiveConstraintsByCategory');
+      final response =
+          await callable.call(<String, String>{'category': category.name});
+
+      List<Constraint> constraintsList = (response.data["constraints"] as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .map((c) => Constraint.fromMap(c))
+          .toList();
+
+      return constraintsList;
+    } catch (e) {
+      print('Error fetching active constraints by category $category : $e');
       return [];
     }
   }
@@ -135,6 +173,24 @@ class ConstraintService {
       return response.data;
     } catch (e) {
       return {'success': false, 'message': e};
+    }
+  }
+
+// get minimum and maximum activity durations (type: "min" or "max")
+  Future<int?> getMinMaxDuration(String type) async {
+    if (type != 'min' && type != 'max') {
+      print(
+          'Invalid type for getMinMaxDuration. Type should be either "min" or "max".');
+      return null;
+    }
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getMinMaxDuration');
+      final response = await callable.call(<String, String>{'type': type});
+      return response.data['duration'];
+    } catch (e) {
+      print('Error fetching $type activity duration: $e');
+      return null;
     }
   }
 }

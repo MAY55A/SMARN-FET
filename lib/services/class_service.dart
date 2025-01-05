@@ -67,6 +67,25 @@ class ClassService {
     }
   }
 
+  Future<Map<String, int>> getAllClassesNbStudents() async {
+    try {
+      final HttpsCallable callable =
+          FirebaseFunctions.instance.httpsCallable('getAllClassesNbStudents');
+      final response = await callable.call();
+      var classesList = response.data["classes"] as List<Map>;
+      Map<String, int> nbStudentsPerClass = {};
+      for (var classMap in classesList) {
+        classMap = Map<String, dynamic>.from(classMap);
+        nbStudentsPerClass[classMap["id"]] =
+            classesList[classMap["nbStudents"]] as int;
+      }
+      return nbStudentsPerClass;
+    } catch (e) {
+      print('Error fetching number of students for all classes: $e');
+      return {};
+    }
+  }
+
   Future<Map<String, dynamic>> updateClass(
       String classId, Class studentsClass) async {
     try {

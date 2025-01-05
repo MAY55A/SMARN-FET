@@ -110,6 +110,7 @@ export interface TimeConstraint extends Constraint {
     availableDays: WorkDay[];
     teacherId?: String;
     classId?: String;
+    roomId?: String;
 }
 
 export interface SpaceConstraint extends Constraint {
@@ -152,4 +153,13 @@ export enum SchedulingRuleType {
     workPeriod = "workPeriod",
     breakPeriod = "breakPeriod",
     minActivityDuration = "minActivityDuration",
+    maxActivityDuration = "maxActivityDuration",
+}
+
+export interface Schedule {
+    id: String;
+    creationDate: String;
+    belongsTo: String;
+    activities: Activity[];
+    logs?: String;
 }

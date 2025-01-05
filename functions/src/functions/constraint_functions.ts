@@ -86,7 +86,7 @@ export const createTimeConstraint = functions.https.onCall(async (request) => {
     );
   } else {
     // Ensure the id is valid
-    if (!(await documentExists(idType + "s", "id", constraintData[idType + "Id"]))) {
+    if (!(await documentExists(idType == "class" ? "classes" : idType + "s", "id", constraintData[idType + "Id"]))) {
       throw new functions.https.HttpsError(
         "invalid-argument",
         "Invalid " + idType
@@ -120,6 +120,9 @@ export const createTimeConstraint = functions.https.onCall(async (request) => {
       startTime: constraintData.startTime,
       endTime: constraintData.endTime,
       availableDays: constraintData.availableDays,
+      teacherId: constraintData.teacherId,
+      classId: constraintData.classId,
+      roomId: constraintData.roomId,
       isActive: true,
     };
 
@@ -258,6 +261,7 @@ export const createSpaceConstraint = functions.https.onCall(async (request) => {
       activityType: constraintData.activityType,
       requiredRoomType: constraintData.requiredRoomType,
       teacherId: constraintData.teacherId,
+      classId: constraintData.classId,
       isActive: true,
     };
 
@@ -336,12 +340,24 @@ export const createSchedulingRule = functions.https.onCall(async (request) => {
       }
     }
   } else {
-    // schedule rule type is minActivityDuration
+    // schedule rule type is minActivityDuration or maxActivityDuration
     if (!constraintData.duration) {
       throw new functions.https.HttpsError(
         "invalid-argument",
         "Missing required parameter: duration"
       );
+    } else {
+      // Ensure the rule does not already exist
+      const constraintSnapshot = await db
+        .collection("constraints")
+        .where("type", "==", constraintData.type)
+        .get();
+      if (!constraintSnapshot.empty) {
+        throw new functions.https.HttpsError(
+          "already-exists",
+          "A scheduling rule of this type already exists."
+        );
+      }
     }
   }
 
@@ -430,7 +446,75 @@ export const getAllConstraints = functions.https.onCall(async (request) => {
   } catch (error) {
     throw new functions.https.HttpsError(
       "internal",
-      "Error fetching constraints data",
+      "Error fetching constraints",
+      error
+    );
+  }
+});
+
+export const getMinMaxDuration = functions.https.onCall(async (request) => {
+  const { type } = request.data;
+
+  // Ensure only an admin can call this function
+  if (request.auth?.token.role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Only admins can view min/max activity durations."
+    );
+  }
+
+  // Ensure type is provided and valid
+  if (type != 'min' && type != 'max') {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Invalid type. Type should be either 'min' or 'max'"
+    );
+  }
+
+    const constraintSnapshot = await db
+      .collection("constraints")
+      .where("type", "==", type == 'min' ? SchedulingRuleType.minActivityDuration : SchedulingRuleType.maxActivityDuration)
+      .limit(1)
+      .get();
+
+    if(constraintSnapshot.empty) {
+      throw new functions.https.HttpsError(
+        "not-found",
+        "No constraint for " + type + " activity duration found"
+      );
+    }
+    return { duration: constraintSnapshot.docs[0].data().duration };
+});
+
+export const getConstraintsByCategory = functions.https.onCall(async (request) => {
+  const { category } = request.data;
+
+  // Ensure only an admin can call this function
+  if (request.auth?.token.role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Only admins can view constraints."
+    );
+  }
+
+  try {
+    // Fetch Constraints by category from Firestore
+    const constraintsSnapshot = await admin
+      .firestore()
+      .collection("constraints")
+      .where("category", "==", category)
+      .get();
+    const constraintsList: any[] = [];
+
+    constraintsSnapshot.forEach((doc) => {
+      constraintsList.push(doc.data());
+    });
+
+    return { constraints: constraintsList };
+  } catch (error) {
+    throw new functions.https.HttpsError(
+      "internal",
+      "Error fetching constraints by category",
       error
     );
   }
@@ -462,6 +546,41 @@ export const getActiveConstraints = functions.https.onCall(async (request) => {
     throw new functions.https.HttpsError(
       "internal",
       "Error fetching active constraints",
+      error
+    );
+  }
+}
+);
+
+export const getActiveConstraintsByCategory = functions.https.onCall(async (request) => {
+  const { category } = request.data;
+
+  // Ensure only an admin can call this function
+  if (request.auth?.token.role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Only admins can view constraints."
+    );
+  }
+
+  try {
+    const constraintsSnapshot = await db
+      .collection("constraints")
+      .where("category", "==", category)
+      .where("isActive", "==", true)
+      .get();
+
+    const constraintsList: any[] = [];
+
+    constraintsSnapshot.forEach((doc) => {
+      constraintsList.push(doc.data());
+    });
+
+    return { constraints: constraintsList };
+  } catch (error) {
+    throw new functions.https.HttpsError(
+      "internal",
+      "Error fetching active constraints by category",
       error
     );
   }

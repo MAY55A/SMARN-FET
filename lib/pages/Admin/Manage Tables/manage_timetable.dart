@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'manage_timetable_teacher.dart';
+import 'manage_timetable_class.dart';
 
 class ManageTimetable extends StatefulWidget {
   const ManageTimetable({super.key});
@@ -116,10 +118,14 @@ class _ManageTimetableState extends State<ManageTimetable> {
     }
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(
+          255, 0, 0, 0), // Dark background (same as AdminDashboard)
       appBar: AppBar(
         title: const Text('Manage Timetable'),
-        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        backgroundColor: const Color.fromARGB(
+            255, 129, 77, 139), // Maintain original app bar color
       ),
+<<<<<<< HEAD
       body: Container(
         color: const Color.fromARGB(255, 0, 0, 0),
         child: Column(
@@ -174,10 +180,62 @@ class _ManageTimetableState extends State<ManageTimetable> {
                         );
                       }).toList(),
                       dropdownColor: Colors.black45,
-                    ),
+=======
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(
+                      255, 129, 77, 139), // Maintain original button color
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                ],
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ManageTimetableTeacher(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Manage Timetable (Teacher)',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
               ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(
+                      255, 129, 77, 139), // Maintain original button color
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ManageTimetableClass(),
+>>>>>>> c081f0d6be90986eb4cb45829b6376fd774b87bc
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Manage Timetable (Class)',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+<<<<<<< HEAD
             ),
             // Display timetable grouped by teacher or class
             Expanded(
@@ -241,6 +299,10 @@ class _ManageTimetableState extends State<ManageTimetable> {
                     ),
             ),
           ],
+=======
+            ],
+          ),
+>>>>>>> c081f0d6be90986eb4cb45829b6376fd774b87bc
         ),
       ),
     );

@@ -107,8 +107,8 @@ class _ManageTimetableTeacherState extends State<ManageTimetableTeacher> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Timetable '),
-        backgroundColor: Colors.blue,
+        title: const Text('Manage Timetable (Teacher)'),
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

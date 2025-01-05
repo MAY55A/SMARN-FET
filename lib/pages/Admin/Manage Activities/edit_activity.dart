@@ -5,7 +5,9 @@ import 'package:smarn/models/class.dart';
 import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
 import 'package:smarn/pages/widgets/dropDownMenu.dart';
+import 'package:smarn/pages/widgets/duration_form_field.dart';
 import 'package:smarn/services/class_service.dart';
+import 'package:smarn/services/constraint_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/services/activity_service.dart';
@@ -20,14 +22,13 @@ class EditActivity extends StatefulWidget {
 }
 
 class _EditActivityState extends State<EditActivity> {
-  final TextEditingController _durationController = TextEditingController();
-
   final List<String> _tags = ActivityTag.values.map((a) => a.name).toList();
 
   Class? _selectedClass;
   String? _selectedTag;
   Teacher? _selectedTeacher;
   Subject? _selectedSubject;
+  int? _duration;
 
   List<Class> _classes = [];
   List<Teacher> _allTeachers = [];
@@ -38,6 +39,10 @@ class _EditActivityState extends State<EditActivity> {
   final TeacherService _teacherService = TeacherService();
   final SubjectService _subjectService = SubjectService();
   final ClassService _classService = ClassService();
+  final ConstraintService _constraintService = ConstraintService();
+
+  int _minDuration = 60;
+  int _maxDuration = 240;
 
   late Activity _oldActivity;
 
@@ -56,6 +61,7 @@ class _EditActivityState extends State<EditActivity> {
     });
 
     await Future.wait([
+      _fetchDurations(),
       _fetchTeachers(),
       _fetchSubjects(),
       _fetchClasses(),
@@ -63,7 +69,7 @@ class _EditActivityState extends State<EditActivity> {
 
     // Pre-fill fields with existing data
     setState(() {
-      _durationController.text = widget.activity['duration']?.toString() ?? '';
+      _duration = widget.activity['duration'];
       _selectedClass = _classes
           .firstWhere((c) => c.id == widget.activity['studentsClass']['id']);
       _selectedTag = widget.activity['tag'];
@@ -71,8 +77,8 @@ class _EditActivityState extends State<EditActivity> {
           .firstWhere((t) => t.id == widget.activity['teacher']['id']);
       _selectedSubject = _allSubjects
           .firstWhere((s) => s.id == widget.activity['subject']['id']);
+      _isActive = widget.activity['isActive']; // Set initial active state
       _oldActivity = fillActivity();
-      _isActive = widget.activity['isActive'] ?? true; // Set initial active state
       _isLoading = false;
     });
   }
@@ -83,9 +89,22 @@ class _EditActivityState extends State<EditActivity> {
         subject: _selectedSubject!.id!,
         teacher: _selectedTeacher!.id!,
         studentsClass: _selectedClass!.id!,
-        duration: int.parse(_durationController.text),
+        duration: _duration!,
         tag: ActivityTag.values.firstWhere((t) => t.name == _selectedTag),
         isActive: _isActive); // Include active state
+  }
+
+  Future<void> _fetchDurations() async {
+    final min = (await _constraintService.getMinMaxDuration('min'));
+    final max = (await _constraintService.getMinMaxDuration('max'));
+    setState(() {
+      if (min != null) {
+        _minDuration = min;
+      }
+      if (max != null) {
+        _maxDuration = max;
+      }
+    });
   }
 
   Future<void> _fetchTeachers() async {
@@ -114,23 +133,22 @@ class _EditActivityState extends State<EditActivity> {
   }
 
   void _refreshTeachers() {
-    if (_selectedSubject != null) {
-      setState(() {
-        _teachers = _allTeachers
-            .where((teacher) => teacher.subjects.contains(_selectedSubject!.id))
-            .toList();
-      });
-    }
+    setState(() {
+      _teachers = _allTeachers
+          .where((teacher) => teacher.subjects.contains(_selectedSubject!.id))
+          .toList();
+      if (!_teachers.contains(_selectedTeacher)) {
+        _selectedTeacher = null;
+      }
+    });
   }
 
   void _refreshSubjects() {
-    if (_selectedTeacher != null) {
-      setState(() {
-        _subjects = _allSubjects
-            .where((subject) => _selectedTeacher!.subjects.contains(subject.id))
-            .toList();
-      });
-    }
+    setState(() {
+      _subjects = _allSubjects
+          .where((subject) => _selectedTeacher!.subjects.contains(subject.id))
+          .toList();
+    });
   }
 
   void _saveActivity() async {
@@ -154,9 +172,8 @@ class _EditActivityState extends State<EditActivity> {
         }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Please fill out all fields and ensure the duration is at least 60 minutes.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please fill out all fields.')));
     }
   }
 
@@ -165,9 +182,7 @@ class _EditActivityState extends State<EditActivity> {
         _selectedTeacher != null &&
         _selectedClass != null &&
         _selectedTag != null &&
-        _durationController.text.isNotEmpty &&
-        int.tryParse(_durationController.text) != null &&
-        int.parse(_durationController.text) >= 60;
+        _duration != null;
   }
 
   @override
@@ -182,101 +197,107 @@ class _EditActivityState extends State<EditActivity> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Center(
-              child: Card(
-                color: const Color.fromARGB(255, 34, 34, 34),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 400, // Set a maximum width for the form
                 ),
-                elevation: 8.0,
-                margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        // Subject Dropdown
-                        activityDropdownMenu("subject", _selectedSubject, _subjects,
-                            (dynamic newValue) {
-                          setState(() {
-                            _selectedSubject = newValue as Subject;
-                            _refreshTeachers(); // Refresh teachers based on selected subject
-                          });
-                        }),
-                        const SizedBox(height: 16),
+                child: Card(
+                  color: const Color.fromARGB(255, 34, 34, 34),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  elevation: 8.0,
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          // Subject Dropdown
+                          activityDropdownMenu(
+                              "subject", _selectedSubject, _subjects,
+                              (dynamic newValue) {
+                            setState(() {
+                              _selectedSubject = newValue as Subject;
+                              _refreshTeachers(); // Refresh teachers based on selected subject
+                            });
+                          }),
+                          const SizedBox(height: 16),
 
-                        // Teacher Dropdown
-                        activityDropdownMenu("teacher", _selectedTeacher, _teachers,
-                            (dynamic newValue) {
-                          setState(() {
-                            _selectedTeacher = newValue as Teacher;
-                            _refreshSubjects(); // Refresh subjects based on selected teacher
-                          });
-                        }),
-                        const SizedBox(height: 16),
+                          // Teacher Dropdown
+                          activityDropdownMenu(
+                              "teacher", _selectedTeacher, _teachers,
+                              (dynamic newValue) {
+                            setState(() {
+                              _selectedTeacher = newValue as Teacher;
+                              //_refreshSubjects(); // Refresh subjects based on selected teacher
+                            });
+                          }),
+                          const SizedBox(height: 16),
 
-                        // Class Dropdown
-                        activityDropdownMenu("class", _selectedClass, _classes,
-                            (dynamic newValue) {
-                          setState(() {
-                            _selectedClass = newValue as Class;
-                          });
-                        }),
-                        const SizedBox(height: 16),
+                          // Class Dropdown
+                          activityDropdownMenu("class", _selectedClass, _classes,
+                              (dynamic newValue) {
+                            setState(() {
+                              _selectedClass = newValue as Class;
+                            });
+                          }),
+                          const SizedBox(height: 16),
 
-                        // Tag Dropdown
-                        activityDropdownMenu("tag", _selectedTag, _tags,
-                            (dynamic newValue) {
-                          setState(() {
-                            _selectedTag = newValue as String;
-                          });
-                        }),
-                        const SizedBox(height: 16),
+                          // Tag Dropdown
+                          activityDropdownMenu("tag", _selectedTag, _tags,
+                              (dynamic newValue) {
+                            setState(() {
+                              _selectedTag = newValue as String;
+                            });
+                          }),
+                          const SizedBox(height: 16),
 
-                        // Duration TextField
-                        TextField(
-                          controller: _durationController,
-                          style: const TextStyle(color: Colors.white),
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Duration (Minutes)',
-                            labelStyle: TextStyle(color: Colors.white),
-                            border: OutlineInputBorder(),
+                          // Duration TextField
+                          durationFormField(
+                              "Duration", // Field label
+                              _minDuration, // Minimum duration in minutes
+                              _maxDuration, // Maximum duration in minutes
+                              (value) {
+                            setState(() {
+                              _duration = value;
+                            });
+                          }, _duration),
+                          // Active Toggle
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Active',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Switch(
+                                value: _isActive,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isActive = value;
+                                  });
+                                },
+                                activeColor:
+                                    const Color.fromARGB(255, 129, 77, 139),
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                        // Active Toggle
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Active',
-                              style: TextStyle(color: Colors.white),
+                          // Save Button
+                          ElevatedButton(
+                            onPressed: _saveActivity,
+                            child: const Text('Save Activity'),
+                            style: ButtonStyle(
+                              foregroundColor:
+                                  MaterialStateProperty.all(Colors.black),
+                              backgroundColor: MaterialStateProperty.all(
+                                  const Color.fromARGB(255, 129, 77, 139)),
                             ),
-                            Switch(
-                              value: _isActive,
-                              onChanged: (value) {
-                                setState(() {
-                                  _isActive = value;
-                                });
-                              },
-                              activeColor: const Color.fromARGB(255, 129, 77, 139),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Save Button
-                        ElevatedButton(
-                          onPressed: _saveActivity,
-                          child: const Text('Save Activity'),
-                          style: ButtonStyle(
-                            foregroundColor: MaterialStateProperty.all(Colors.black),
-                            backgroundColor: MaterialStateProperty.all(
-                                const Color.fromARGB(255, 129, 77, 139)),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

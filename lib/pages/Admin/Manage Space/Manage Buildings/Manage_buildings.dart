@@ -72,13 +72,17 @@ class _ManageBuildingsState extends State<ManageBuildings> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Building'),
-          content: Text('Are you sure you want to delete "${building.name}"?'),
+          content: Text(
+              'Are you sure you want to delete "${building.name}" and its associated rooms?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Cancel'),
             ),
             TextButton(
+              style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.red),
+                  foregroundColor: WidgetStatePropertyAll(Colors.white)),
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text('Delete'),
             ),

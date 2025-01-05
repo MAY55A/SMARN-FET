@@ -63,6 +63,8 @@ class _ManagePersonnelInformationFormState
 
   @override
   Widget build(BuildContext context) {
+    final isWeb = MediaQuery.of(context).size.width > 600;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -80,6 +82,7 @@ class _ManagePersonnelInformationFormState
               padding: const EdgeInsets.all(16.0),
               child: Center(
                 child: Container(
+                  width: isWeb ? 400 : double.infinity, // Adjust width for web
                   decoration: BoxDecoration(
                     color: const Color(0xFFE0F7FA),
                     borderRadius: BorderRadius.circular(20),
@@ -136,7 +139,8 @@ class _ManagePersonnelInformationFormState
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AccountSettingsPage()
+                                builder: (context) =>
+                                    const AccountSettingsPage(),
                               ),
                             );
                           },

@@ -31,7 +31,8 @@ class _ViewRequestsState extends State<ViewRequests> {
         _isLoading = true;
       });
       // Fetch requests by teacher ID
-      List<ChangeRequest> requests = await getChangeRequestsByTeacher(teacherId!);
+      List<ChangeRequest> requests =
+          await getChangeRequestsByTeacher(teacherId!);
       setState(() {
         _requests = requests;
       });
@@ -66,7 +67,7 @@ class _ViewRequestsState extends State<ViewRequests> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm Delete'),
-          content: const Text('Are you sure you want to delete this request?'),
+          content: const Text('Are you sure you want to delete this request ?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -75,6 +76,9 @@ class _ViewRequestsState extends State<ViewRequests> {
               child: const Text('Cancel'),
             ),
             TextButton(
+              style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.red),
+                  foregroundColor: WidgetStatePropertyAll(Colors.white)),
               onPressed: () {
                 Navigator.of(context).pop(true); // User confirmed
               },
@@ -98,7 +102,8 @@ class _ViewRequestsState extends State<ViewRequests> {
   void _navigateToEditRequest(ChangeRequest request) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EditRequestForm(request: request)),
+      MaterialPageRoute(
+          builder: (context) => EditRequestForm(request: request)),
     ).then((_) {
       _fetchRequests(); // Refresh the list after editing a request
     });
@@ -121,6 +126,7 @@ class _ViewRequestsState extends State<ViewRequests> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text("View Requests"),
         backgroundColor: Colors.blue,
@@ -140,7 +146,8 @@ class _ViewRequestsState extends State<ViewRequests> {
                     final request = _requests[index];
 
                     // Assuming request.status is an enum that you can check
-                    ChangeRequestStatus requestStatus = request.status ?? ChangeRequestStatus.pending;
+                    ChangeRequestStatus requestStatus =
+                        request.status ?? ChangeRequestStatus.pending;
 
                     return Card(
                       color: Colors.grey[900],
@@ -158,7 +165,8 @@ class _ViewRequestsState extends State<ViewRequests> {
                           request.content,
                           style: const TextStyle(color: Colors.white70),
                         ),
-                        leading: _getStatusIcon(requestStatus),  // Display status icon
+                        leading: _getStatusIcon(
+                            requestStatus), // Display status icon
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -186,7 +194,7 @@ class _ViewRequestsState extends State<ViewRequests> {
         backgroundColor: Colors.blue,
         child: const Icon(Icons.add),
       ),
-      backgroundColor: const Color(0xFF2C2C2C),
+      
     );
   }
 }

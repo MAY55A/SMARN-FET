@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
 import 'package:smarn/models/change_request_status.dart';
 import 'package:smarn/pages/Admin/Manage%20requests/view_request_details.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
@@ -68,7 +68,8 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
     final result = await ChangeRequestService().deleteChangeRequest(requestId);
     if (result['success'] == true) {
       setState(() {
-        _changeRequests = fetchChangeRequestsWithTeacherNames();  // Refresh the list
+        _changeRequests =
+            fetchChangeRequestsWithTeacherNames(); // Refresh the list
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Request deleted successfully')),
@@ -155,7 +156,8 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                                 Icon(
                                   request.status == ChangeRequestStatus.approved
                                       ? Icons.check_circle
-                                      : request.status == ChangeRequestStatus.rejected
+                                      : request.status ==
+                                              ChangeRequestStatus.rejected
                                           ? Icons.cancel
                                           : Icons.pending,
                                   color: getStatusColor(request.status),
@@ -173,7 +175,8 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        ViewChangeRequestDetails(request: request),
+                                        ViewChangeRequestDetails(
+                                            request: request),
                                   ),
                                 );
                               },
@@ -182,8 +185,8 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                               ),
                               child: const Text(
                                 'View Details',
-                                style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
-                                
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 255, 255, 255)),
                               ),
                             ),
                             IconButton(
@@ -211,6 +214,13 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                                           Navigator.of(context).pop();
                                           deleteChangeRequest(request.id!);
                                         },
+                                        style: const ButtonStyle(
+                                            backgroundColor:
+                                                WidgetStatePropertyAll(
+                                                    Colors.red),
+                                            foregroundColor:
+                                                WidgetStatePropertyAll(
+                                                    Colors.white)),
                                         child: const Text('Delete'),
                                       ),
                                     ],
