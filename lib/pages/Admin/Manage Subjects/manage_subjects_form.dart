@@ -103,13 +103,16 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
       builder: (context) => AlertDialog(
         title: const Text('Confirm Delete'),
         content: Text(
-            'Are you sure you want to delete the subject "${subject.name}"?'),
+            'Are you sure you want to delete the subject "${subject.name}" and its associated activities ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Cancel'),
           ),
           TextButton(
+            style: const ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(Colors.red),
+                foregroundColor: WidgetStatePropertyAll(Colors.white)),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Delete'),
           ),

@@ -22,7 +22,7 @@ class _EditRoomState extends State<EditRoom> {
   late int capacity;
   late RoomType type;
   late Building selectedBuilding;
- 
+
   bool isLoading = false;
   bool isBuildingsLoading = true;
   List<Building> buildings = [];
@@ -50,8 +50,10 @@ class _EditRoomState extends State<EditRoom> {
 
       // Find the Building object based on the building ID (String)
       selectedBuilding = buildings.firstWhere(
-        (building) => building.id == widget.roomItem.building, // Match with building ID
-        orElse: () => buildings.first, // Fallback to the first building if not found
+        (building) =>
+            building.id == widget.roomItem.building, // Match with building ID
+        orElse: () =>
+            buildings.first, // Fallback to the first building if not found
       );
     });
   }
@@ -73,8 +75,9 @@ class _EditRoomState extends State<EditRoom> {
       );
 
       if (!updatedRoom.equals(widget.roomItem)) {
-        final result = await _roomService.updateRoom(widget.roomItem.id!, updatedRoom);
-      
+        final result =
+            await _roomService.updateRoom(widget.roomItem.id!, updatedRoom);
+
         if (result['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Room updated successfully!')),
@@ -119,7 +122,8 @@ class _EditRoomState extends State<EditRoom> {
                     child: Card(
                       color: const Color(0xFF2A2A2A), // Dark card background
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0), // Rounded corners
+                        borderRadius:
+                            BorderRadius.circular(20.0), // Rounded corners
                       ),
                       elevation: 8.0, // Shadow effect
                       child: Padding(
@@ -173,12 +177,18 @@ class _EditRoomState extends State<EditRoom> {
                                 ),
                                 style: const TextStyle(color: Colors.white),
                                 validator: (value) {
-                                  if (value == null || int.tryParse(value) == null) {
+                                  if (value == null ||
+                                      int.tryParse(value) == null) {
                                     return 'Enter a valid number for capacity';
+                                  }
+                                  if (int.parse(value) < 5 ||
+                                      int.parse(value) > 100) {
+                                    return 'The capacity must be between 5 and 100 people';
                                   }
                                   return null;
                                 },
-                                onChanged: (value) => capacity = int.tryParse(value)!,
+                                onChanged: (value) =>
+                                    capacity = int.tryParse(value)!,
                               ),
                               const SizedBox(height: 16),
                               DropdownButtonFormField<RoomType>(
@@ -232,9 +242,12 @@ class _EditRoomState extends State<EditRoom> {
                               ElevatedButton(
                                 onPressed: isLoading ? null : _updateRoom,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color.fromARGB(255, 129, 77, 139),
-                                  foregroundColor: const Color.fromARGB(255, 255, 255, 255),
-                                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 129, 77, 139),
+                                  foregroundColor:
+                                      const Color.fromARGB(255, 255, 255, 255),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16, horizontal: 32),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20.0),
                                   ),

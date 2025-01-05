@@ -20,7 +20,7 @@ class _AddRoomState extends State<AddRoom> {
   int? capacity;
   RoomType type = RoomType.lecture;
   Building? selectedBuilding; // Selected building
- // Selected building
+  // Selected building
   final RoomService _roomService = RoomService();
   final BuildingService _buildingService = BuildingService();
   List<Building> buildings = []; // List of buildings from the database
@@ -160,6 +160,9 @@ class _AddRoomState extends State<AddRoom> {
                           if (value == null || int.tryParse(value) == null) {
                             return 'Enter a valid number for capacity';
                           }
+                          if (int.parse(value) < 5 || int.parse(value) > 100) {
+                            return 'The capacity must be between 5 and 100 people';
+                          }
                           return null;
                         },
                         onChanged: (value) => capacity = int.tryParse(value),
@@ -216,9 +219,12 @@ class _AddRoomState extends State<AddRoom> {
                       ElevatedButton(
                         onPressed: isSubmitting ? null : _addRoom,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 129, 77, 139),
-                          foregroundColor: const Color.fromARGB(255, 255, 255, 255),
-                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                          backgroundColor:
+                              const Color.fromARGB(255, 129, 77, 139),
+                          foregroundColor:
+                              const Color.fromARGB(255, 255, 255, 255),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 32),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/CRUD_test.dart';
 import 'package:smarn/models/constraint.dart';
 import 'package:smarn/models/work_day.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Scheduling%20Rules%20Constraints/scheduling_rules_view.dart';
 import 'package:smarn/services/constraint_service.dart';
 import 'package:smarn/pages/widgets/multi_select_dialog.dart'; // Import MultiSelectDialog
-
 
 class AddSchedulingRuleForm extends StatefulWidget {
   @override
@@ -13,12 +13,38 @@ class AddSchedulingRuleForm extends StatefulWidget {
 
 class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
   final _formKey = GlobalKey<FormState>();
+  final _constraintService = ConstraintService();
+
   final _durationController = TextEditingController();
   final _startTimeController = TextEditingController();
   final _endTimeController = TextEditingController();
+  List<SchedulingRuleType> _types = SchedulingRuleType.values;
   SchedulingRuleType _selectedType = SchedulingRuleType.workPeriod;
   List<WorkDay> _selectedDays = [];
   bool _isLoading = false; // Loading indicator
+  late int? _minDuration;
+  late int? _maxDuration;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDurations();
+  }
+
+  Future<void> _fetchDurations() async {
+    final min = (await _constraintService.getMinMaxDuration('min'));
+    final max = (await _constraintService.getMinMaxDuration('max'));
+    setState(() {
+      _minDuration = min;
+      _maxDuration = max;
+      if (min != null) {
+        _types.remove(SchedulingRuleType.minActivityDuration);
+      }
+      if (max != null) {
+        _types.remove(SchedulingRuleType.maxActivityDuration);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +70,7 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                         _selectedType = newValue!;
                       });
                     },
-                    items: SchedulingRuleType.values
+                    items: _types
                         .map(
                           (type) => DropdownMenuItem(
                             value: type,
@@ -67,7 +93,8 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (_selectedType == SchedulingRuleType.minActivityDuration)
+                  if (_selectedType == SchedulingRuleType.minActivityDuration ||
+                      _selectedType == SchedulingRuleType.maxActivityDuration)
                     TextFormField(
                       controller: _durationController,
                       style: const TextStyle(color: Colors.white),
@@ -81,8 +108,25 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter duration';
+                        if (value == null || int.tryParse(value) == null) {
+                          return 'Please enter a duration';
+                        }
+                        if (_selectedType ==
+                                SchedulingRuleType.maxActivityDuration &&
+                            _minDuration != null) {
+                          if (int.parse(value) < _minDuration!) {
+                            return 'Max Duration must be greater than or equal to Min Duration : $_minDuration';
+                          }
+                        }
+                        if (_selectedType ==
+                                SchedulingRuleType.minActivityDuration &&
+                            _maxDuration != null) {
+                          if (int.parse(value) > _maxDuration!) {
+                            return 'Min Duration must be less than or equal to Max Duration : $_maxDuration';
+                          }
+                        }
+                        if (int.parse(value) < 30) {
+                          return 'Duration must be at least 30 minutes';
                         }
                         return null;
                       },
@@ -145,7 +189,8 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                               "Select Applicable Days: ${_selectedDays.map((e) => e.name).join(', ')}",
                               style: const TextStyle(color: Colors.white),
                             ),
-                            const Icon(Icons.arrow_drop_down, color: Colors.white),
+                            const Icon(Icons.arrow_drop_down,
+                                color: Colors.white),
                           ],
                         ),
                       ),
@@ -161,10 +206,8 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color.fromARGB(255, 129, 77, 139),
-                      foregroundColor:
-                          const Color.fromARGB(255, 255, 255, 255),
+                      backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+                      foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                     ),
                     child: const Text('Submit'),
                   ),
@@ -189,47 +232,31 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
     });
 
     final newSchedulingRule = SchedulingRule(
-      id: '', // Generate or set the ID
       type: _selectedType,
-      duration: _selectedType == SchedulingRuleType.minActivityDuration
-          ? int.tryParse(_durationController.text)
-          : null,
-      startTime: _selectedType != SchedulingRuleType.minActivityDuration
-          ? _startTimeController.text
-          : null,
-      endTime: _selectedType != SchedulingRuleType.minActivityDuration
-          ? _endTimeController.text
-          : null,
-      applicableDays: _selectedType != SchedulingRuleType.minActivityDuration
-          ? _selectedDays
-          : [],
+      duration: int.tryParse(_durationController.text),
+      startTime:
+          _startTimeController.text.isEmpty ? null : _startTimeController.text,
+      endTime: _endTimeController.text.isEmpty ? null : _endTimeController.text,
+      applicableDays: _selectedDays == [] ? null : _selectedDays,
     );
-
-    try {
-      final response =
-          await ConstraintService().createSchedulingRule(newSchedulingRule);
-      if (response['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Scheduling Rule added successfully')),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => SchedulingRulesView()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to add Scheduling Rule')),
-        );
-      }
-    } catch (e) {
+    final response =
+        await _constraintService.createSchedulingRule(newSchedulingRule);
+    if (response['success'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred. Please try again.')),
+        const SnackBar(content: Text('Scheduling Rule added successfully')),
       );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SchedulingRulesView()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'])),
+      );
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _selectDays(BuildContext context) async {

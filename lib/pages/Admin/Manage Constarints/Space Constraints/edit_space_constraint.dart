@@ -35,7 +35,6 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
   String? _selectedClassId;
   String? _selectedSubjectId;
   RoomType? _selectedRoomType;
-  SpaceConstraintType? _selectedType;
   bool _isActive = true; // Toggle for activation
 
   List<Map<String, dynamic>> _teachers = [];
@@ -52,7 +51,6 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
     _selectedClassId = widget.constraint.classId;
     _selectedSubjectId = widget.constraint.subjectId;
     _selectedRoomType = widget.constraint.requiredRoomType;
-    _selectedType = widget.constraint.type;
     _isActive = widget.constraint.isActive; // Set initial active state
 
     _fetchTeachers();
@@ -105,44 +103,12 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DropdownButton<SpaceConstraintType>(
-                value: _selectedType,
-                hint: const Text(
-                  "Select Constraint Type",
-                  style: TextStyle(color: Colors.white),
-                ),
-                items: SpaceConstraintType.values.map((type) {
-                  return DropdownMenuItem<SpaceConstraintType>(
-                    value: type,
-                    child: Text(
-                      type.name,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedType = value;
-                    // Reset fields based on the selected type
-                    if (_selectedType != SpaceConstraintType.roomType) {
-                      _selectedActivityType = null;
-                      _selectedRoomType = null;
-                    }
-                    if (_selectedType != SpaceConstraintType.preferredRoom) {
-                      _selectedRoomId = null;
-                      _selectedTeacherId = null;
-                      _selectedClassId = null;
-                      _selectedSubjectId = null;
-                    }
-                  });
-                },
-                style: const TextStyle(color: Colors.white),
-                dropdownColor: Colors.grey[800],
-              ),
+              Text(widget.constraint.type.name,
+                  style: const TextStyle(color: Colors.white)),
               const SizedBox(height: 16),
 
               // Activity Type dropdown for roomType
-              if (_selectedType == SpaceConstraintType.roomType)
+              if (widget.constraint.type == SpaceConstraintType.roomType)
                 DropdownButton<ActivityTag>(
                   value: _selectedActivityType,
                   hint: const Text(
@@ -169,7 +135,7 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
               const SizedBox(height: 16),
 
               // Room Type dropdown for roomType
-              if (_selectedType == SpaceConstraintType.roomType)
+              if (widget.constraint.type == SpaceConstraintType.roomType)
                 DropdownButton<RoomType?>(
                   value: _selectedRoomType,
                   hint: const Text(
@@ -196,7 +162,8 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
               const SizedBox(height: 16),
 
               // Preferred Room fields: Room, Teacher, Class, Subject
-              if (_selectedType == SpaceConstraintType.preferredRoom) ...[
+              if (widget.constraint.type ==
+                  SpaceConstraintType.preferredRoom) ...[
                 DropdownButton<String?>(
                   value: _selectedRoomId,
                   hint: const Text(
@@ -206,13 +173,13 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                   items: _rooms.isEmpty
                       ? [
                           const DropdownMenuItem<String?>(
-                              child: Text('Loading...'), value: null)
+                              value: null, child: Text('Loading...'))
                         ]
                       : _rooms.map((room) {
                           return DropdownMenuItem<String?>(
                             value: room.id,
                             child: Text(
-                              room.name ?? 'Unknown',
+                              room.name,
                               style: const TextStyle(color: Colors.white),
                             ),
                           );
@@ -235,7 +202,7 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                   items: _teachers.isEmpty
                       ? [
                           const DropdownMenuItem<String?>(
-                              child: Text('Loading...'), value: null)
+                              value: null, child: Text('Loading...'))
                         ]
                       : _teachers.map((teacher) {
                           return DropdownMenuItem<String?>(
@@ -264,7 +231,7 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                   items: _classes.isEmpty
                       ? [
                           const DropdownMenuItem<String?>(
-                              child: Text('Loading...'), value: null)
+                              value: null, child: Text('Loading...'))
                         ]
                       : _classes.map((classItem) {
                           return DropdownMenuItem<String?>(
@@ -293,7 +260,7 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
                   items: _subjects.isEmpty
                       ? [
                           const DropdownMenuItem<String?>(
-                              child: Text('Loading...'), value: null)
+                              value: null, child: Text('Loading...'))
                         ]
                       : _subjects.map((subject) {
                           return DropdownMenuItem<String?>(
@@ -338,12 +305,12 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
 
               ElevatedButton(
                 onPressed: _saveConstraint,
-                child: const Text('Save Constraint'),
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(
                       const Color.fromARGB(255, 129, 77, 139)),
                   foregroundColor: MaterialStateProperty.all(Colors.white),
                 ),
+                child: const Text('Save Constraint'),
               ),
             ],
           ),
@@ -355,7 +322,7 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
   void _saveConstraint() {
     SpaceConstraint updatedConstraint = SpaceConstraint(
       id: widget.constraint.id,
-      type: _selectedType!,
+      type: widget.constraint.type,
       activityType: _selectedActivityType,
       roomId: _selectedRoomId,
       teacherId: _selectedTeacherId,
@@ -364,26 +331,31 @@ class _EditSpaceConstraintViewState extends State<EditSpaceConstraintView> {
       requiredRoomType: _selectedRoomType,
       isActive: _isActive, // Include active state in the updated constraint
     );
-
-    _constraintService
-        .updateConstraint(widget.constraint.id!, updatedConstraint)
-        .then((response) {
-      if (response['success'] == true) {
+    if (widget.constraint.equals(updatedConstraint)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('No changes were made to the constraint'),
+      ));
+    } else {
+      _constraintService
+          .updateConstraint(widget.constraint.id!, updatedConstraint)
+          .then((response) {
+        if (response['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Constraint updated successfully!')),
+          );
+          Navigator.pop(context);
+        } else {
+          String errorMessage =
+              response['message'] ?? 'Failed to update constraint.';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
+        }
+      }).catchError((error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Constraint updated successfully!')),
+          const SnackBar(content: Text('An error occurred.')),
         );
-        Navigator.pop(context);
-      } else {
-        String errorMessage =
-            response['message'] ?? 'Failed to update constraint.';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
-    }).catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred.')),
-      );
-    });
+      });
+    }
   }
 }

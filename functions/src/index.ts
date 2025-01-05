@@ -1,6 +1,6 @@
-import { initializeApp } from "firebase-admin";
+import * as admin from "firebase-admin";
 
-initializeApp();
+admin.initializeApp();
 
 import {
   createTeacherAccount,
@@ -18,6 +18,7 @@ import {
   deleteClass,
   getAllClasses,
   getAllClassesNames,
+  getAllClassesNbStudents,
   getClass,
   regenerateClassKey,
   updateClass,
@@ -60,7 +61,7 @@ import {
   getActivitiesByTeacher,
   getActivitiesByClass,
   deleteActivity,
-  getActiveActivities,
+  // getActiveActivities,
 } from "./functions/activity_functions";
 import {
   createSchedulingRule,
@@ -68,9 +69,13 @@ import {
   createTimeConstraint,
   deleteConstraint,
   getActiveConstraints,
+  getActiveConstraintsByCategory,
   getAllConstraints,
+  getConstraintsByCategory,
+  getMinMaxDuration,
   updateConstraint,
 } from "./functions/constraint_functions";
+import { createSchedules, getSchedule, getSchedulesForType, updateSchedule } from "./functions/schedule_functions";
 
 export {
   createTeacherAccount,
@@ -88,6 +93,7 @@ export {
   updateClass,
   regenerateClassKey,
   getAllClassesNames,
+  getAllClassesNbStudents,
   getClass,
   getAllClasses,
   deleteClass,
@@ -121,7 +127,7 @@ export {
   updateActivity,
   getActivity,
   getAllActivities,
-  getActiveActivities,
+ // getActiveActivities,
   getActivitiesByTeacher,
   getActivitiesByClass,
   deleteActivity,
@@ -131,7 +137,16 @@ export {
   createSpaceConstraint,
   createSchedulingRule,
   getAllConstraints,
+  getConstraintsByCategory,
   getActiveConstraints,
+  getActiveConstraintsByCategory,
   updateConstraint,
   deleteConstraint,
+  getMinMaxDuration
+};
+export {
+  createSchedules,
+  getSchedule,
+  getSchedulesForType,
+  updateSchedule
 };
