@@ -74,7 +74,6 @@ class _ManageTimetableState extends State<ManageTimetable> {
     },
   ];
 
-  String searchText = '';
   String? selectedTeacher;
   String? selectedClass;
 
@@ -95,30 +94,25 @@ class _ManageTimetableState extends State<ManageTimetable> {
 
   @override
   Widget build(BuildContext context) {
+    // Filter by teacher or class
     List<Map<String, dynamic>> filteredTimetable = timetable.where((entry) {
       bool matchesTeacher =
           selectedTeacher == null || entry['teacher'] == selectedTeacher;
       bool matchesClass =
           selectedClass == null || entry['class'] == selectedClass;
-      bool matchesSearch = entry['activity']
-              .toLowerCase()
-              .contains(searchText.toLowerCase()) ||
-          entry['teacher'].toLowerCase().contains(searchText.toLowerCase()) ||
-          entry['room'].toLowerCase().contains(searchText.toLowerCase()) ||
-          entry['day'].toLowerCase().contains(searchText.toLowerCase());
-      return matchesTeacher && matchesClass && matchesSearch;
+      return matchesTeacher && matchesClass;
     }).toList();
 
-    // Group timetable by teacher
-    Map<String, List<Map<String, dynamic>>> groupedByTeacher = {};
-    for (var entry in filteredTimetable) {
-      groupedByTeacher.putIfAbsent(entry['teacher'], () => []).add(entry);
-    }
-
-    // Group timetable by class
-    Map<String, List<Map<String, dynamic>>> groupedByClass = {};
-    for (var entry in filteredTimetable) {
-      groupedByClass.putIfAbsent(entry['class'], () => []).add(entry);
+    // Group timetable by teacher or class
+    Map<String, List<Map<String, dynamic>>> groupedByKey = {};
+    if (selectedTeacher != null) {
+      for (var entry in filteredTimetable) {
+        groupedByKey.putIfAbsent(entry['day'], () => []).add(entry);
+      }
+    } else if (selectedClass != null) {
+      for (var entry in filteredTimetable) {
+        groupedByKey.putIfAbsent(entry['day'], () => []).add(entry);
+      }
     }
 
     return Scaffold(
@@ -130,28 +124,6 @@ class _ManageTimetableState extends State<ManageTimetable> {
         color: const Color.fromARGB(255, 0, 0, 0),
         child: Column(
           children: [
-            // Search bar
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    searchText = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Search Teacher/Class/Activity',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  filled: true,
-                  fillColor: Colors.grey.shade800,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
             // Dropdowns to select teacher or class
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -167,7 +139,7 @@ class _ManageTimetableState extends State<ManageTimetable> {
                       onChanged: (value) {
                         setState(() {
                           selectedTeacher = value;
-                          selectedClass = null; // Reset the class selection
+                          selectedClass = null; // Reset class selection
                         });
                       },
                       items: teachers.map((teacher) {
@@ -191,7 +163,7 @@ class _ManageTimetableState extends State<ManageTimetable> {
                       onChanged: (value) {
                         setState(() {
                           selectedClass = value;
-                          selectedTeacher = null; // Reset the teacher selection
+                          selectedTeacher = null; // Reset teacher selection
                         });
                       },
                       items: classes.map((className) {
@@ -207,129 +179,59 @@ class _ManageTimetableState extends State<ManageTimetable> {
                 ],
               ),
             ),
-            // Display timetable for selected teacher or class
+            // Display timetable grouped by teacher or class
             Expanded(
-              child: filteredTimetable.isNotEmpty
-                  ? SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        headingRowHeight: 50,
-                        dataRowHeight: 60,
-                        columns: selectedTeacher != null
-                            ? const [
-                                DataColumn(
-                                    label: Text('Day',
+              child: groupedByKey.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: groupedByKey.keys.length,
+                      itemBuilder: (context, index) {
+                        String key = groupedByKey.keys.elementAt(index);
+                        List<Map<String, dynamic>> entries = groupedByKey[key]!;
+                        return Card(
+                          color: Colors.grey.shade900,
+                          margin: const EdgeInsets.all(8.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "$key:",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Column(
+                                  children: entries.map((entry) {
+                                    return ListTile(
+                                      title: Text(
+                                        entry['activity'],
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      subtitle: Text(
+                                        "Time: ${entry['time']}\nRoom: ${entry['room']}",
+                                        style:
+                                            const TextStyle(color: Colors.grey),
+                                      ),
+                                      trailing: Text(
+                                        entry['type'],
                                         style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold))),
-                                DataColumn(
-                                    label: Text('Time',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold))),
-                                DataColumn(
-                                    label: Text('Activity',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold))),
-                                DataColumn(
-                                    label: Text('Room',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold))),
-                                DataColumn(
-                                    label: Text('Class',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold))),
-                              ]
-                            : const [
-                                DataColumn(
-                                    label: Text('Day',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold))),
-                                DataColumn(
-                                    label: Text('Time',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold))),
-                                DataColumn(
-                                    label: Text('Activity',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold))),
-                                DataColumn(
-                                    label: Text('Room',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold))),
-                                DataColumn(
-                                    label: Text('Teacher',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold))),
+                                          color: activityColors[entry['type']],
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
                               ],
-                        rows: filteredTimetable.map((entry) {
-                          return DataRow(
-                            cells: selectedTeacher != null
-                                ? [
-                                    DataCell(Text(entry['day'],
-                                        style: const TextStyle(
-                                            color: Colors.white))),
-                                    DataCell(Text(entry['time'],
-                                        style: const TextStyle(
-                                            color: Colors.white))),
-                                    DataCell(
-                                      Container(
-                                        padding: const EdgeInsets.all(8.0),
-                                        decoration: BoxDecoration(
-                                          color: activityColors[entry['type']],
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        child: Text(entry['activity'],
-                                            style: const TextStyle(
-                                                color: Colors.white)),
-                                      ),
-                                    ),
-                                    DataCell(Text(entry['room'],
-                                        style: const TextStyle(
-                                            color: Colors.white))),
-                                    DataCell(Text(entry['class'],
-                                        style: const TextStyle(
-                                            color: Colors.white))),
-                                  ]
-                                : [
-                                    DataCell(Text(entry['day'],
-                                        style: const TextStyle(
-                                            color: Colors.white))),
-                                    DataCell(Text(entry['time'],
-                                        style: const TextStyle(
-                                            color: Colors.white))),
-                                    DataCell(
-                                      Container(
-                                        padding: const EdgeInsets.all(8.0),
-                                        decoration: BoxDecoration(
-                                          color: activityColors[entry['type']],
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        child: Text(entry['activity'],
-                                            style: const TextStyle(
-                                                color: Colors.white)),
-                                      ),
-                                    ),
-                                    DataCell(Text(entry['room'],
-                                        style: const TextStyle(
-                                            color: Colors.white))),
-                                    DataCell(Text(entry['teacher'],
-                                        style: const TextStyle(
-                                            color: Colors.white))),
-                                  ],
-                          );
-                        }).toList(),
-                      ),
+                            ),
+                          ),
+                        );
+                      },
                     )
                   : const Center(
                       child: Text(
