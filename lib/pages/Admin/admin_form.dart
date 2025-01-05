@@ -28,7 +28,8 @@ class _AdminFormState extends State<AdminForm> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(res["message"] ?? "Login failed. Unauthorized access."),
+            content:
+                Text(res["message"] ?? "Login failed. Unauthorized access."),
           ),
         );
       }
@@ -38,7 +39,7 @@ class _AdminFormState extends State<AdminForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 9, 17),
+      backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
       appBar: AppBar(
         title: const Text('Admin Form'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
@@ -49,7 +50,8 @@ class _AdminFormState extends State<AdminForm> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               // Adjust the width based on screen size
-              double formWidth = constraints.maxWidth > 600 ? 400 : double.infinity;
+              double formWidth =
+                  constraints.maxWidth > 600 ? 400 : double.infinity;
 
               return Container(
                 width: formWidth,
