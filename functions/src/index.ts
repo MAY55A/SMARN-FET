@@ -1,11 +1,7 @@
 import * as admin from "firebase-admin";
 
-<<<<<<< HEAD
 // Initialisation Firebase
-initializeApp();
-=======
 admin.initializeApp();
->>>>>>> c081f0d6be90986eb4cb45829b6376fd774b87bc
 
 // Importation des fonctions depuis différents modules
 import {
@@ -69,14 +65,10 @@ import {
   addActivity,
   updateActivity,
   getActivity,
-  getAllActivities, // Correct import
+  getAllActivities,
   getActivitiesByTeacher,
   getActivitiesByClass,
   deleteActivity,
-<<<<<<< HEAD
-=======
-  // getActiveActivities,
->>>>>>> c081f0d6be90986eb4cb45829b6376fd774b87bc
 } from "./functions/activity_functions";
 
 import {
@@ -91,7 +83,13 @@ import {
   getMinMaxDuration,
   updateConstraint,
 } from "./functions/constraint_functions";
-import { createSchedules, getSchedule, getSchedulesForType, updateSchedule } from "./functions/schedule_functions";
+
+import {
+  createSchedules,
+  getSchedule,
+  getSchedulesForType,
+  updateSchedule,
+} from "./functions/schedule_functions";
 
 // Exportation des fonctions pour utilisation dans Firebase
 export {
@@ -149,12 +147,7 @@ export {
   addActivity,
   updateActivity,
   getActivity,
-<<<<<<< HEAD
-  getAllActivities, // Suppression de la duplication
-=======
   getAllActivities,
- // getActiveActivities,
->>>>>>> c081f0d6be90986eb4cb45829b6376fd774b87bc
   getActivitiesByTeacher,
   getActivitiesByClass,
   deleteActivity,
@@ -170,11 +163,12 @@ export {
   getActiveConstraintsByCategory,
   updateConstraint,
   deleteConstraint,
-  getMinMaxDuration
+  getMinMaxDuration,
 };
+
 export {
   createSchedules,
   getSchedule,
   getSchedulesForType,
-  updateSchedule
+  updateSchedule,
 };
