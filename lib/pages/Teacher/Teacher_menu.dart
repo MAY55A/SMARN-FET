@@ -76,7 +76,7 @@ class TeacherDrawer extends StatelessWidget {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const TeacherDashboard()),
+                          builder: (context) =>  TeacherDashboard()),
                     );
                   },
                 ),

@@ -294,6 +294,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
           ),
         ],
       ),
+      
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context,

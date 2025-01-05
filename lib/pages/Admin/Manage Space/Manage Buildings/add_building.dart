@@ -22,80 +22,85 @@ class AddBuilding extends StatelessWidget {
         color: Colors.black,
         padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: Card(
-            color: Colors.grey[850],
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 400, // Limite la largeur du formulaire
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                // Limiter la hauteur de la carte
-                height: 400, // Ajustez cette valeur selon vos besoins
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20.0),
-                    _buildTextField(
-                      controller: nameController,
-                      labelText: 'Name',
-                    ),
-                    const SizedBox(height: 16.0),
-                    _buildTextField(
-                      controller: longNameController,
-                      labelText: 'Long Name',
-                    ),
-                    const SizedBox(height: 16.0),
-                    _buildTextField(
-                      controller: descriptionController,
-                      labelText: 'Description',
-                      maxLines: 5, // Rendre la zone de description plus grande
-                    ),
-                    const SizedBox(height: 24.0),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (nameController.text.isEmpty ||
-                              longNameController.text.isEmpty ||
-                              descriptionController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Please fill in all fields')),
-                            );
-                            return;
-                          }
+            child: Card(
+              color: Colors.grey[850],
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SizedBox(
+                  // Limiter la hauteur de la carte
+                  height: 400, // Ajustez cette valeur selon vos besoins
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20.0),
+                      _buildTextField(
+                        controller: nameController,
+                        labelText: 'Name',
+                      ),
+                      const SizedBox(height: 16.0),
+                      _buildTextField(
+                        controller: longNameController,
+                        labelText: 'Long Name',
+                      ),
+                      const SizedBox(height: 16.0),
+                      _buildTextField(
+                        controller: descriptionController,
+                        labelText: 'Description',
+                        maxLines: 5, // Rendre la zone de description plus grande
+                      ),
+                      const SizedBox(height: 24.0),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (nameController.text.isEmpty ||
+                                longNameController.text.isEmpty ||
+                                descriptionController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please fill in all fields')),
+                              );
+                              return;
+                            }
 
-                          Building newBuilding = Building(
-                            id: DateTime.now().millisecondsSinceEpoch.toString(),
-                            name: nameController.text,
-                            longName: longNameController.text,
-                            description: descriptionController.text,
-                          );
-
-                          final result = await buildingService.addBuilding(newBuilding);
-
-                          if (result['success'] == true) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Building added successfully!')),
+                            Building newBuilding = Building(
+                              id: DateTime.now().millisecondsSinceEpoch.toString(),
+                              name: nameController.text,
+                              longName: longNameController.text,
+                              description: descriptionController.text,
                             );
-                            Navigator.pop(context, newBuilding);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: ${result['message']}')),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 129, 77, 139),
-                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                        ),
-                        child: const Text(
-                          'Save',
-                          style: TextStyle(fontSize: 16.0, color: Colors.black),
+
+                            final result = await buildingService.addBuilding(newBuilding);
+
+                            if (result['success'] == true) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Building added successfully!')),
+                              );
+                              Navigator.pop(context, newBuilding);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: ${result['message']}')),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                          ),
+                          child: const Text(
+                            'Save',
+                            style: TextStyle(fontSize: 16.0, color: Colors.black),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

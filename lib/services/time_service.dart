@@ -4,6 +4,12 @@ class TimeService {
     final parts = time.split(':').map(int.parse).toList();
     return parts[0] * 60 + parts[1];
   }
+  // Helper function to add minutes to a given time
+  static String addMinutesToTime(String time, int minutesToAdd) {
+    final totalMinutes = timeToMinutes(time) + minutesToAdd;
+    return minutesToTime(totalMinutes);
+  }
+
 
 // Helper function to convert minutes back to "HH:MM"
   static String minutesToTime(int totalMinutes) {

@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:smarn/models/class.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
@@ -76,48 +78,51 @@ class _AddClassState extends State<AddClass> {
             ? const CircularProgressIndicator()
             : Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Card(
-                  color: Colors.grey[850],
-                  elevation: 8,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          buildTextField('Class Name', _nameController),
-                          const SizedBox(height: 16),
-                          buildTextField('Long Name', _longNameController),
-                          const SizedBox(height: 16),
-                          buildTextField(
-                            'Number of Students',
-                            _nbStudentsController,
-                            keyboardType: TextInputType.number,
-                          ),
-                          const SizedBox(height: 16),
-                          buildTextField('Access Key', _accessKeyController),
-                          const SizedBox(height: 8),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                _accessKeyController.text = _generateAccessKey();
-                              });
-                            },
-                            icon: const Icon(Icons.refresh, color: Colors.white),
-                            label: const Text('Generate Key', style: TextStyle(color: Colors.white)),
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.purple),
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: 600), // Limiter la largeur de la carte
+                  child: Card(
+                    color: Colors.grey[850],
+                    elevation: 8,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            buildTextField('Class Name', _nameController),
+                            const SizedBox(height: 16),
+                            buildTextField('Long Name', _longNameController),
+                            const SizedBox(height: 16),
+                            buildTextField(
+                              'Number of Students',
+                              _nbStudentsController,
+                              keyboardType: TextInputType.number,
                             ),
-                          ),
-                          const SizedBox(height: 32),
-                          ElevatedButton(
-                            onPressed: _addClass,
-                            child: const Text('Add Class'),
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
-                              foregroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 255, 255, 255)),
+                            const SizedBox(height: 16),
+                            buildTextField('Access Key', _accessKeyController),
+                            const SizedBox(height: 8),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _accessKeyController.text = _generateAccessKey();
+                                });
+                              },
+                              icon: const Icon(Icons.refresh, color: Colors.white),
+                              label: const Text('Generate Key', style: TextStyle(color: Colors.white)),
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.purple),
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 32),
+                            ElevatedButton(
+                              onPressed: _addClass,
+                              child: const Text('Add Class'),
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
+                                foregroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 255, 255, 255)),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

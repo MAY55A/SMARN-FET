@@ -93,137 +93,142 @@ class _AddTeacherFormState extends State<AddTeacherForm> {
         title: const Text("Add Teacher"),
       ),
       body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            color: Colors.grey[850], // Couleur de la carte
-            elevation: 8,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: "Name",
-                        labelStyle: TextStyle(color: Colors.white),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Name is required';
-                        }
-                        return null;
-                      },
-                    ),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: "Email",
-                        labelStyle: TextStyle(color: Colors.white),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      style: const TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Email is required';
-                        }
-                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                          return 'Enter a valid email address';
-                        }
-                        return null;
-                      },
-                    ),
-                    TextFormField(
-                      controller: _phoneController,
-                      decoration: const InputDecoration(
-                        labelText: "Phone",
-                        labelStyle: TextStyle(color: Colors.white),
-                      ),
-                      keyboardType: TextInputType.phone,
-                      style: const TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Phone is required';
-                        }
-                        if (value.length != 8 || !RegExp(r'^\d+$').hasMatch(value)) {
-                          return 'Phone number must be 8 digits';
-                        }
-                        return null;
-                      },
-                    ),
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        labelStyle: const TextStyle(color: Colors.white),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 400, // Set a maximum width for the form
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              color: Colors.grey[850], // Couleur de la carte
+              elevation: 8,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          labelText: "Name",
+                          labelStyle: TextStyle(color: Colors.white),
                         ),
+                        style: const TextStyle(color: Colors.white),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Name is required';
+                          }
+                          return null;
+                        },
                       ),
-                      obscureText: !_isPasswordVisible,
-                      style: const TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Password is required';
-                        }
-                        if (value.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)')
-                            .hasMatch(value)) {
-                          return 'Password must contain upper, lower case letters, and a number';
-                        }
-                        return null;
-                      },
-                    ),
-                    TextFormField(
-                      controller: _nbHoursController,
-                      decoration: const InputDecoration(
-                        labelText: "Target Hours",
-                        labelStyle: TextStyle(color: Colors.white),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: "Email",
+                          labelStyle: TextStyle(color: Colors.white),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        style: const TextStyle(color: Colors.white),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Email is required';
+                          }
+                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                            return 'Enter a valid email address';
+                          }
+                          return null;
+                        },
                       ),
-                      keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Number of target hours is required';
-                        }
-                        if (int.tryParse(value)! <= 0 || int.tryParse(value)! > 40) {
-                          return 'Number of target hours must be between 0 and 40.';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(AppColors.appBarColor),
+                      TextFormField(
+                        controller: _phoneController,
+                        decoration: const InputDecoration(
+                          labelText: "Phone",
+                          labelStyle: TextStyle(color: Colors.white),
+                        ),
+                        keyboardType: TextInputType.phone,
+                        style: const TextStyle(color: Colors.white),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Phone is required';
+                          }
+                          if (value.length != 8 || !RegExp(r'^\d+$').hasMatch(value)) {
+                            return 'Phone number must be 8 digits';
+                          }
+                          return null;
+                        },
                       ),
-                      onPressed: _isLoading ? null : _addTeacher, // Disable button when loading
-                      child: _isLoading
-                          ? const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                            )
-                          : const Text(
-                              "Add Teacher",
-                              style: TextStyle(color: Colors.black),
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: "Password",
+                          labelStyle: const TextStyle(color: Colors.white),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.white,
                             ),
-                    ),
-                  ],
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
+                        ),
+                        obscureText: !_isPasswordVisible,
+                        style: const TextStyle(color: Colors.white),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Password is required';
+                          }
+                          if (value.length < 6) {
+                            return 'Password must be at least 6 characters';
+                          }
+                          if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)')
+                              .hasMatch(value)) {
+                            return 'Password must contain upper, lower case letters, and a number';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _nbHoursController,
+                        decoration: const InputDecoration(
+                          labelText: "Target Hours",
+                          labelStyle: TextStyle(color: Colors.white),
+                        ),
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(color: Colors.white),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Number of target hours is required';
+                          }
+                          if (int.tryParse(value)! <= 0 || int.tryParse(value)! > 40) {
+                            return 'Number of target hours must be between 0 and 40.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(AppColors.appBarColor),
+                        ),
+                        onPressed: _isLoading ? null : _addTeacher, // Disable button when loading
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                              )
+                            : const Text(
+                                "Add Teacher",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

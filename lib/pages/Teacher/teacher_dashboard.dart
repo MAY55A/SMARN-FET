@@ -4,7 +4,6 @@ import 'package:smarn/pages/Teacher/Manage%20qualified%20subjects/manage_qualifi
 import 'package:smarn/pages/Teacher/Request/view_requests.dart';
 import 'package:smarn/pages/Teacher/timetable/view_timetable.dart';
 import 'package:smarn/pages/Teacher/Teacher_menu.dart';
-import 'package:smarn/pages/widgets/dashboard_card.dart';
 import 'package:smarn/services/auth_service.dart';
 
 class TeacherDashboard extends StatelessWidget {
@@ -19,81 +18,81 @@ class TeacherDashboard extends StatelessWidget {
         backgroundColor: Colors.blue,
       ),
       drawer: TeacherDrawer(),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16, // Adjusted spacing for better fit
-            mainAxisSpacing: 16,
-            children: [
-              buildAnimatedDashboardCard(context, 'Timetable', Icons.schedule,
-                  const ViewComplaintsOrPrintTimetable(),Colors.blue),
-              buildAnimatedDashboardCard(context, 'Subjects',
-                  Icons.book_outlined, ManageQualifiedSubjectsForm(),Colors.blue),
-              buildAnimatedDashboardCard(context, 'Activities',
-                  Icons.assignment, const ViewActivities(),Colors.blue),
-              buildAnimatedDashboardCard(context, 'Change Requests',
-                  Icons.location_on_outlined, const ViewRequests(),Colors.blue),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Reusable widget for the cards (Timetable, Qualified Subjects, Requests)
-  Widget _buildCard(
-      BuildContext context, IconData icon, String title, Color color) {
-    return Container(
-      height: 120,
-      width: 120,
-      decoration: BoxDecoration(
-        color: Colors.grey[700],
-        borderRadius: BorderRadius.circular(12), // Border radius
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // Center the contents
-        children: <Widget>[
-          Icon(
-            icon,
-            size: 50,
-            color: color,
-          ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: TextStyle(
-              color: color,
-              fontSize: 16,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: GridView.builder(
+                itemCount: 4,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // Adjusted for better responsiveness
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                  childAspectRatio: 1.5,
+                ),
+                shrinkWrap: true, // Ensures GridView takes minimal space
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return _buildDashboardCard(context, index);
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  // Logout button widget
-  Widget _buildLogoutButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ListTile(
-        leading: const Icon(Icons.logout,
-            color: Colors.redAccent, size: 20), // Logout icon
-        title: const Text(
-          'Logout',
-          style: TextStyle(
-              color: Colors.redAccent, fontSize: 12), // Logout text style
+  Widget _buildDashboardCard(BuildContext context, int index) {
+    final items = [
+      {'title': 'Timetable', 'icon': Icons.schedule, 'page': ManageTimetableTeacher()},
+      {'title': 'Subjects', 'icon': Icons.book_outlined, 'page': ManageQualifiedSubjectsForm()},
+      {'title': 'Activities', 'icon': Icons.assignment, 'page': ViewActivities()},
+      {'title': 'Requests', 'icon': Icons.location_on_outlined, 'page': const ViewRequests()},
+    ];
+
+    final item = items[index];
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => item['page'] as Widget),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[700],
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 8.0,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        tileColor: Colors.transparent,
-        onTap: () async {
-          // Call the sign-out method from AuthService
-          await AuthService().signOut();
-          // Navigate to the home page
-          Navigator.pushNamedAndRemoveUntil(
-              context, '/', (route) => false); // Redirect to HomePage
-        },
-        hoverColor: Colors.red.withOpacity(0.2), // Hover color effect
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              item['icon'] as IconData,
+              size: 70,
+              color: Colors.blue,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              item['title'] as String,
+              style: const TextStyle(
+                color: Colors.blue,
+                fontSize: 18,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

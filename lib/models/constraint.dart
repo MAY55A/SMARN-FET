@@ -209,7 +209,6 @@ class SpaceConstraint extends Constraint {
   }
 }
 
-
 class SchedulingRule extends Constraint {
   final SchedulingRuleType type;
   final int? duration;

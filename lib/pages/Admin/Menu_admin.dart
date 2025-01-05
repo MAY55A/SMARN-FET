@@ -64,7 +64,7 @@ class _AdminMenuState extends State<AdminMenu> {
               ),
             ),
             // Home Menu Item
-            _buildMenuItem(context, Icons.home, 'Home', const AdminDashboard()),
+            _buildMenuItem(context, Icons.home, 'Home', const HomePage()),
 
             // Other Menu Items
             _buildMenuItem(context, Icons.person_outline, 'Manage Teachers',

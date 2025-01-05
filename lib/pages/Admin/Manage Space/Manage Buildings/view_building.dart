@@ -29,11 +29,16 @@ class _ViewBuildingState extends State<ViewBuilding> {
       isLoading = true;
     });
 
-    rooms = await _roomService.getRoomsByBuilding(widget.building.id!);
-
-    setState(() {
-      isLoading = false;
-    });
+    try {
+      rooms = await _roomService.getRoomsByBuilding(widget.building.id!);
+    } catch (e) {
+      print('Error fetching rooms: $e');
+      rooms = [];
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -50,104 +55,110 @@ class _ViewBuildingState extends State<ViewBuilding> {
           : SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Building Info Section - All details inside a single card
-                    Card(
-                      color: const Color.fromARGB(255, 34, 34, 34),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Description: ${widget.building.description}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16.0,
-                              ),
+                child: Center(
+                  child: Card(
+                    color: const Color.fromARGB(255, 34, 34, 34),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Building Info Section
+                          Text(
+                            'Building Information',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Long Name: ${widget.building.longName}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16.0,
-                              ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Description: ${widget.building.description}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Rooms List Section - Styled and Left Aligned
-                    Text(
-                      'Rooms in this building:',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // List of Rooms
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: rooms.length,
-                      itemBuilder: (context, index) {
-                        final room = rooms[index];
-                        return GestureDetector(
-                          onTap: () {
-                            // Navigate to the ViewRoom page
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ViewRoom(roomItem: room),
-                              ),
-                            );
-                          },
-                          child: Card(
-                            margin: const EdgeInsets.symmetric(vertical: 8.0),
-                            color: const Color.fromARGB(255, 34, 34, 34),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Room Name: ${room.name}',
-                                    style: const TextStyle(
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Long Name: ${widget.building.longName}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Rooms List Section
+                          Text(
+                            'Rooms in this building:',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          // List of Rooms or No Rooms Found Message
+                          rooms.isEmpty
+                              ? const Center(
+                                  child: Text(
+                                    'No rooms found in this building.',
+                                    style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16.0,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Capacity: ${room.capacity}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14.0,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Description: ${room.description}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14.0,
-                                    ),
-                                  ),
-                                  // You can add more room details here if needed
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+                                )
+                              : Column(
+                                  children: rooms.map((room) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        // Navigate to the ViewRoom page
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ViewRoom(roomItem: room),
+                                          ),
+                                        );
+                                      },
+                                      child: Card(
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        color: const Color.fromARGB(255, 50, 50, 50),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Room Name: ${room.name}',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16.0,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                'Capacity: ${room.capacity}',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14.0,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
