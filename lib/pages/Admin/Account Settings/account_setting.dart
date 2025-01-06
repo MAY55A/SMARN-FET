@@ -12,29 +12,10 @@ class AccountSettingsPage extends StatefulWidget {
 
 class _AccountSettingsPageState extends State<AccountSettingsPage> {
   final AuthService _authService = AuthService();
-  final _emailController = TextEditingController();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _newPasswordConfirmController = TextEditingController();
-  bool _isEditingEmail = false;
   bool _isPasswordVisible = false; // Toggle visibility for all passwords
-
-  // Load current user's email
-  @override
-  void initState() {
-    super.initState();
-    _loadUserEmail();
-  }
-
-  // Load current user's email
-  void _loadUserEmail() async {
-    final user = _authService.getCurrentUser();
-    if (user != null) {
-      setState(() {
-        _emailController.text = user.email ?? '';
-      });
-    }
-  }
 
   // Function to update email and password after verifying current password
   Future<void> _updateCredentials() async {
@@ -44,7 +25,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       return;
     }
 
-    final newEmail = _emailController.text.trim();
     final newPassword = _newPasswordController.text.trim();
     final confirmPassword = _newPasswordConfirmController.text.trim();
 
@@ -66,7 +46,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       // Update credentials using the AuthService
       final message = await _authService.updateUserCredentials(
         currentPassword: currentPassword,
-        newEmail: newEmail.isNotEmpty ? newEmail : null,
+        newEmail: null, // Email update is removed
         newPassword: newPassword.isNotEmpty ? newPassword : null,
       );
 
@@ -107,41 +87,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Email Section
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            labelStyle: TextStyle(color: Colors.white),
-                            suffixIcon: _isEditingEmail
-                                ? IconButton(
-                                    icon: const Icon(Icons.check,
-                                        color: Colors.white),
-                                    onPressed: _updateCredentials,
-                                  )
-                                : null,
-                          ),
-                          style: const TextStyle(color: Colors.white),
-                          enabled: _isEditingEmail,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          _isEditingEmail ? Icons.edit_off : Icons.edit,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isEditingEmail = !_isEditingEmail;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
                   // Password Update Section
                   const Text(
                     'Update Password',

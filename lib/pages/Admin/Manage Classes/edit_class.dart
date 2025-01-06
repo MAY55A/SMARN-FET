@@ -105,40 +105,43 @@ class _EditClassState extends State<EditClass> {
             ? const CircularProgressIndicator()
             : Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Card(
-                  color: Colors.grey[850],
-                  elevation: 8,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          buildTextField('Class Name', _nameController),
-                          const SizedBox(height: 16),
-                          buildTextField('Long Name', _longNameController),
-                          const SizedBox(height: 16),
-                          buildTextField(
-                            'Number of Students',
-                            _nbStudentsController,
-                            keyboardType: TextInputType.number,
-                          ),
-                          const SizedBox(height: 16),
-                          buildTextFieldWithButton(
-                            'Access Key',
-                            _accessKeyController,
-                            'Regenerate Key',
-                            _resetKey,
-                          ),
-                          const SizedBox(height: 32),
-                          ElevatedButton(
-                            onPressed: _saveChanges,
-                            child: const Text('Save Changes'),
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
-                              foregroundColor: MaterialStateProperty.all(Colors.white),
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: 600), // Limiter la largeur de la carte
+                  child: Card(
+                    color: Colors.grey[850],
+                    elevation: 8,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            buildTextField('Class Name', _nameController),
+                            const SizedBox(height: 16),
+                            buildTextField('Long Name', _longNameController),
+                            const SizedBox(height: 16),
+                            buildTextField(
+                              'Number of Students',
+                              _nbStudentsController,
+                              keyboardType: TextInputType.number,
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 16),
+                            buildTextFieldWithButton(
+                              'Access Key',
+                              _accessKeyController,
+                              'Regenerate Key',
+                              _resetKey,
+                            ),
+                            const SizedBox(height: 32),
+                            ElevatedButton(
+                              onPressed: _saveChanges,
+                              child: const Text('Save Changes'),
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(AppColors.appBarColor),
+                                foregroundColor: MaterialStateProperty.all(Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

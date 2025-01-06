@@ -100,164 +100,177 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       appBar: AppBar(
         title: const Text("Edit Time Constraint"),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
-      body: Container(
-        color: Colors.black,
-        child: Padding(
+      body: Center(
+        
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 600), // Limiter la largeur du formulaire
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(widget.constraint.type.name,
-                  style: const TextStyle(color: Colors.white)),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _startTimeController,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: 'Start Time',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
+          child: Card(
+            color: Colors.grey[850],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.constraint.type.name,
+                        style: const TextStyle(color: Colors.white)),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _startTimeController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Start Time',
+                        labelStyle: TextStyle(color: Colors.white),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _endTimeController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'End Time',
+                        labelStyle: TextStyle(color: Colors.white),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (widget.constraint.type ==
+                        TimeConstraintType.teacherAvailability)
+                      _teachers.isEmpty
+                          ? const CircularProgressIndicator()
+                          : DropdownButton<String>(
+                              value: _selectedTeacherId,
+                              hint: const Text("Select Teacher",
+                                  style: TextStyle(color: Colors.white)),
+                              items: _teachers
+                                  .map<DropdownMenuItem<String>>((teacher) {
+                                return DropdownMenuItem<String>(
+                                  value: teacher['id'],
+                                  child: Text(teacher['teacher'].name ?? 'Unknown',
+                                      style: const TextStyle(color: Colors.white)),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedTeacherId = value;
+                                });
+                              },
+                              style: const TextStyle(color: Colors.white),
+                              dropdownColor: Colors.grey[800],
+                            ),
+                    const SizedBox(height: 16),
+                    if (widget.constraint.type ==
+                        TimeConstraintType.classAvailability)
+                      _classes.isEmpty
+                          ? const CircularProgressIndicator()
+                          : DropdownButton<String>(
+                              value: _selectedClassId,
+                              hint: const Text("Select Class",
+                                  style: TextStyle(color: Colors.white)),
+                              items: _classes
+                                  .map<DropdownMenuItem<String>>((classItem) {
+                                return DropdownMenuItem<String>(
+                                  value: classItem.id,
+                                  child: Text(classItem.name,
+                                      style: const TextStyle(color: Colors.white)),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedClassId = value;
+                                });
+                              },
+                              style: const TextStyle(color: Colors.white),
+                              dropdownColor: Colors.grey[800],
+                            ),
+                    const SizedBox(height: 16),
+                    if (widget.constraint.type == TimeConstraintType.roomAvailability)
+                      _rooms.isEmpty
+                          ? const CircularProgressIndicator()
+                          : DropdownButton<String>(
+                              value: _selectedRoomId,
+                              hint: const Text("Select Room",
+                                  style: TextStyle(color: Colors.white)),
+                              items: _rooms.map<DropdownMenuItem<String>>((room) {
+                                return DropdownMenuItem<String>(
+                                  value: room.id,
+                                  child: Text(room.name,
+                                      style: const TextStyle(color: Colors.white)),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedRoomId = value;
+                                });
+                              },
+                              style: const TextStyle(color: Colors.white),
+                              dropdownColor: Colors.grey[800],
+                            ),
+                    const SizedBox(height: 16),
+                    GestureDetector(
+                      onTap: () => _selectDays(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Select Available Days: ${_selectedDays.map((e) => e.name).join(', ')}",
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            const Icon(Icons.arrow_drop_down, color: Colors.white),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Active:",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Switch(
+                          value: _isActive,
+                          onChanged: (value) {
+                            setState(() {
+                              _isActive = value;
+                            });
+                          },
+                          activeColor: const Color.fromARGB(255, 129, 77, 139),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _editConstraint,
+                      child: const Text('Save Changes'),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            const Color.fromARGB(255, 129, 77, 139)),
+                        foregroundColor: MaterialStateProperty.all(Colors.white),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _endTimeController,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelText: 'End Time',
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (widget.constraint.type ==
-                  TimeConstraintType.teacherAvailability)
-                _teachers.isEmpty
-                    ? const CircularProgressIndicator()
-                    : DropdownButton<String>(
-                        value: _selectedTeacherId,
-                        hint: const Text("Select Teacher",
-                            style: TextStyle(color: Colors.white)),
-                        items:
-                            _teachers.map<DropdownMenuItem<String>>((teacher) {
-                          return DropdownMenuItem<String>(
-                            value: teacher['id'],
-                            child: Text(teacher['teacher'].name ?? 'Unknown',
-                                style: const TextStyle(color: Colors.white)),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedTeacherId = value;
-                          });
-                        },
-                        style: const TextStyle(color: Colors.white),
-                        dropdownColor: Colors.grey[800],
-                      ),
-              const SizedBox(height: 16),
-              if (widget.constraint.type ==
-                  TimeConstraintType.classAvailability)
-                _classes.isEmpty
-                    ? const CircularProgressIndicator()
-                    : DropdownButton<String>(
-                        value: _selectedClassId,
-                        hint: const Text("Select Class",
-                            style: TextStyle(color: Colors.white)),
-                        items:
-                            _classes.map<DropdownMenuItem<String>>((classItem) {
-                          return DropdownMenuItem<String>(
-                            value: classItem.id,
-                            child: Text(classItem.name,
-                                style: const TextStyle(color: Colors.white)),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedClassId = value;
-                          });
-                        },
-                        style: const TextStyle(color: Colors.white),
-                        dropdownColor: Colors.grey[800],
-                      ),
-              const SizedBox(height: 16),
-              if (widget.constraint.type == TimeConstraintType.roomAvailability)
-                _rooms.isEmpty
-                    ? const CircularProgressIndicator()
-                    : DropdownButton<String>(
-                        value: _selectedRoomId,
-                        hint: const Text("Select Room",
-                            style: TextStyle(color: Colors.white)),
-                        items: _rooms.map<DropdownMenuItem<String>>((room) {
-                          return DropdownMenuItem<String>(
-                            value: room.id,
-                            child: Text(room.name,
-                                style: const TextStyle(color: Colors.white)),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedRoomId = value;
-                          });
-                        },
-                        style: const TextStyle(color: Colors.white),
-                        dropdownColor: Colors.grey[800],
-                      ),
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () => _selectDays(context),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Select Available Days: ${_selectedDays.map((e) => e.name).join(', ')}",
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const Icon(Icons.arrow_drop_down, color: Colors.white),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Active:",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  Switch(
-                    value: _isActive,
-                    onChanged: (value) {
-                      setState(() {
-                        _isActive = value;
-                      });
-                    },
-                    activeColor: const Color.fromARGB(255, 129, 77, 139),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _editConstraint,
-                child: const Text('Save Changes'),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                      const Color.fromARGB(255, 129, 77, 139)),
-                  foregroundColor: MaterialStateProperty.all(Colors.white),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -285,20 +298,28 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
       bool? confirm = await showDialog<bool>(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: const Text('Confirm Edit'),
-            content: const Text('Are you sure you want to save these changes?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false), // Cancel
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true), // Confirm
-                child: const Text('Confirm'),
-              ),
-            ],
-          );
+  return AlertDialog(
+  backgroundColor: Colors.grey[800], // Set background color to gray
+  title: const Text(
+    "Confirm Constraint Addition",
+    style: TextStyle(color: Colors.white), // White title text
+  ),
+  content: const Text(
+    "Are you sure you want to confirm this changes?",
+    style: TextStyle(color: Colors.white), // White content text
+  ),
+  actions: [
+    TextButton(
+      onPressed: () => Navigator.pop(context, false),
+      child: const Text("Cancel", style: TextStyle(color: Colors.white)),
+    ),
+    TextButton(
+      onPressed: () => Navigator.pop(context, true),
+      child: const Text("Confirm", style: TextStyle(color: Colors.white)),
+    ),
+  ],
+);
+
         },
       );
 

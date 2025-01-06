@@ -6,7 +6,6 @@ import 'package:smarn/services/subject_service.dart';
 import 'add_subject.dart';
 import 'edit_subject.dart';
 import 'view_subject_details.dart';
-import 'view_subject_details.dart';
 
 class ManageSubjectsForm extends StatefulWidget {
   const ManageSubjectsForm({Key? key}) : super(key: key);
@@ -103,16 +102,17 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
       builder: (context) => AlertDialog(
         title: const Text('Confirm Delete'),
         content: Text(
-            'Are you sure you want to delete the subject "${subject.name}" and its associated activities ?'),
+            'Are you sure you want to delete the subject "${subject.name}" and its associated activities?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Cancel'),
           ),
           TextButton(
-            style: const ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(Colors.red),
-                foregroundColor: WidgetStatePropertyAll(Colors.white)),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.red),
+              foregroundColor: MaterialStateProperty.all(Colors.white),
+            ),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Delete'),
           ),
@@ -133,12 +133,21 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
           subjects.remove(subject);
           _filterSubjects();
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Subject deleted successfully')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text('Failed to delete subject: ${response['message']}')),
+        );
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'])),
-      );
     } catch (e) {
       print("Error deleting subject: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting subject: ${e.toString()}')),
+      );
     }
   }
 
@@ -147,7 +156,8 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Manage Subjects",
-            style: TextStyle(color: Colors.white)),
+            style:
+                TextStyle(color: Colors.black)), // Text color changed to black
         backgroundColor: AppColors.appBarColor,
       ),
       body: isLoading
@@ -211,16 +221,13 @@ class _ManageSubjectsFormState extends State<ManageSubjectsForm> {
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.delete,
-                                            color: Colors
-                                                .red), // Changer la couleur en rouge
+                                            color: Colors.red),
                                         onPressed: () =>
                                             _confirmDeleteSubject(subject),
                                       ),
-                                      // Remplacer l'icône de vue par une flèche
                                       IconButton(
                                         icon: const Icon(Icons.arrow_forward,
-                                            color: Colors
-                                                .white), // Icône de flèche
+                                            color: Colors.white),
                                         onPressed: () =>
                                             _viewSubjectDetails(subject),
                                       ),

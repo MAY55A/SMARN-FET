@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smarn/models/change_request_status.dart';
-import 'package:smarn/pages/Admin/Manage%20requests/view_change_request_details.dart';
+import 'package:smarn/pages/Admin/Manage%20requests/view_request_details.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/models/change_request.dart';
 import 'package:smarn/services/change_request_service.dart';
@@ -20,7 +20,20 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
   @override
   void initState() {
     super.initState();
-    _changeRequests = fetchChangeRequestsWithTeacherNames();
+    _fetchChangeRequests();
+  }
+
+  /// Refresh data whenever the screen is accessed.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _fetchChangeRequests();
+  }
+
+  void _fetchChangeRequests() {
+    setState(() {
+      _changeRequests = fetchChangeRequestsWithTeacherNames();
+    });
   }
 
   /// Fetch change requests and attach teacher names based on their IDs.
@@ -31,8 +44,7 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
     for (var request in changeRequests) {
       try {
         final teacher = await teacherService.getTeacher(request.teacher);
-        request.teacher = teacher?.name ??
-            request.teacher; // Replace ID with name if available.
+        request.teacher = teacher?.name ?? request.teacher;
       } catch (e) {
         print("Error fetching teacher name for ID ${request.teacher}: $e");
       }
@@ -103,8 +115,7 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                   itemBuilder: (context, index) {
                     final request = changeRequests[index];
                     return Card(
-                      color: AppColors
-                          .formColor, // Set the card's background color to blue.
+                      color: AppColors.formColor,
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
                         title: Text(
@@ -141,8 +152,7 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                                 Icon(
                                   request.status == ChangeRequestStatus.approved
                                       ? Icons.check_circle
-                                      : request.status ==
-                                              ChangeRequestStatus.rejected
+                                      : request.status == ChangeRequestStatus.rejected
                                           ? Icons.cancel
                                           : Icons.pending,
                                   color: getStatusColor(request.status),
@@ -152,22 +162,23 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                           ],
                         ),
                         trailing: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    ViewChangeRequestDetails(request: request),
+                                builder: (context) => ViewChangeRequestDetails(
+                                  request: request,
+                                ),
                               ),
                             );
+                            _fetchChangeRequests(); // Refresh data on return
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                           ),
                           child: const Text(
                             'View Details',
-                            style:
-                                TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                            style: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),

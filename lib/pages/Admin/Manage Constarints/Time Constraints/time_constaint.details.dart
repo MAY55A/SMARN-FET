@@ -9,22 +9,27 @@ class TimeConstraintDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Time Constraint Details'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
-      body: Container(
-        color: Colors.black,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Card(
-              color: Colors.grey[850],
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: _buildDetails(),
+      body: Center(
+        child: Container(
+          height: 400,
+          width: 800,
+          color: Colors.black,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Card(
+                color: Colors.grey[850],
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _buildDetails(),
+                  ),
                 ),
               ),
             ),
@@ -52,7 +57,11 @@ class TimeConstraintDetails extends StatelessWidget {
       details.add(_buildDetailRow('End Time:', constraint.endTime!));
     }
     if (constraint.availableDays.isNotEmpty) {
-      details.add(_buildDetailRow('Available Days:', constraint.availableDays.join(', ')));
+      // Map Workday enums to plain day names
+      final availableDaysNames = constraint.availableDays.map((day) {
+        return day.toString().split('.').last.capitalize();
+      }).join(', ');
+      details.add(_buildDetailRow('Available Days:', availableDaysNames));
     }
     if (constraint.teacherId != null) {
       details.add(_buildDetailRow('Teacher ID:', constraint.teacherId!));
@@ -94,5 +103,12 @@ class TimeConstraintDetails extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+// Add a string extension to capitalize the first letter
+extension StringExtension on String {
+  String capitalize() {
+    return this[0].toUpperCase() + substring(1).toLowerCase();
   }
 }

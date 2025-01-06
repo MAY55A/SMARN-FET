@@ -48,9 +48,10 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Constraint'),
+          backgroundColor: const Color.fromARGB(255, 82, 82, 82),
+          title: const Text('Delete Constraint',style: TextStyle(color: Colors.white),),
           content:
-              const Text('Are you sure you want to delete this constraint?'),
+              const Text('Are you sure you want to delete this constraint?',style: TextStyle(color: Colors.white)),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),

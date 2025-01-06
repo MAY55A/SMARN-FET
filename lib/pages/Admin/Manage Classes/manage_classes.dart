@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/class.dart';
-import 'package:smarn/services/class_service.dart'; // Import ClassService
-import 'add_class.dart'; // Import the AddClass screen
-import 'edit_class.dart'; // Import the EditClass screen
-import 'view_class.dart'; // Import the ViewClass screen (new page)
+import 'package:smarn/services/class_service.dart';
+import 'add_class.dart';
+import 'edit_class.dart';
+import 'view_class.dart';
 
 class ManageClasses extends StatefulWidget {
   const ManageClasses({super.key});
@@ -15,29 +15,27 @@ class ManageClasses extends StatefulWidget {
 class _ManageClassesState extends State<ManageClasses> {
   List<Class> classes = [];
   List<Class> filteredClasses = [];
-  String filterName = ''; // Filter for class name
+  String filterName = '';
   final ClassService _classService = ClassService();
 
   @override
   void initState() {
     super.initState();
-    _fetchClasses(); // Fetch classes when the screen is loaded
+    _fetchClasses();
   }
 
-  // Fetch classes dynamically from the backend
   Future<void> _fetchClasses() async {
     try {
       List<Class> fetchedClasses = await _classService.getAllClasses();
       setState(() {
         classes = fetchedClasses;
-        filteredClasses = classes; // Initially show all classes
+        filteredClasses = classes;
       });
     } catch (e) {
       print('Error fetching classes: $e');
     }
   }
 
-  // Function to filter classes based on the current filters
   void _filterClasses() {
     setState(() {
       filteredClasses = classes
@@ -47,7 +45,6 @@ class _ManageClassesState extends State<ManageClasses> {
     });
   }
 
-  // Function to handle edit class and navigate to EditClass
   void _editClass(Class classItem) async {
     final updatedClass = await Navigator.push(
       context,
@@ -62,12 +59,11 @@ class _ManageClassesState extends State<ManageClasses> {
         if (index != -1) {
           classes[index] = updatedClass;
         }
-        _filterClasses(); // Reapply the filter after editing
+        _filterClasses();
       });
     }
   }
 
-  // Function to handle delete class with a confirmation dialog
   void _confirmDelete(Class classItem) {
     showDialog(
       context: context,
@@ -78,14 +74,14 @@ class _ManageClassesState extends State<ManageClasses> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Close the dialog
+              Navigator.pop(context);
             },
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context); // Close the dialog
-              _deleteClass(classItem); // Proceed with deletion
+              Navigator.pop(context);
+              _deleteClass(classItem);
             },
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
@@ -94,7 +90,6 @@ class _ManageClassesState extends State<ManageClasses> {
     );
   }
 
-  // Function to handle delete class
   void _deleteClass(Class classItem) async {
     final result = await _classService.deleteClass(classItem.id!);
     if (result['success']) {
@@ -120,111 +115,109 @@ class _ManageClassesState extends State<ManageClasses> {
       appBar: AppBar(
         title: const Text('Manage Classes'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
-        foregroundColor: Colors.white,
+        foregroundColor:
+            Colors.black, // Le texte de l'AppBar est maintenant en noir
       ),
-      body: Column(
-        children: [
-          // Filter Section combined with Search
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                // Search Bar for Class Name
-                Expanded(
-                  child: TextField(
-                    onChanged: (value) {
-                      filterName = value;
-                      _filterClasses(); // Filter by name
-                    },
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Search...',
-                      labelStyle: const TextStyle(color: Colors.white),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      prefixIcon: const Icon(Icons.search, color: Colors.white),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                    width: 5), // Space between search bar and filter dropdowns
-              ],
-            ),
-          ),
-          // List of Filtered Classes
-          Expanded(
-            child: filteredClasses.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No classes found',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: filteredClasses.length,
-                    itemBuilder: (context, index) {
-                      final classItem = filteredClasses[index];
-                      return Card(
-                        margin: const EdgeInsets.all(8.0),
-                        color: const Color.fromARGB(255, 34, 34, 34),
-                        child: ListTile(
-                          title: Text(classItem.name,
-                              style: const TextStyle(color: Colors.white)),
-                          subtitle: Text(
-                              'Students: ${classItem.nbStudents}, Access Key: ${classItem.accessKey}',
-                              style: const TextStyle(color: Colors.white)),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Edit Icon
-                              IconButton(
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.white),
-                                onPressed: () => _editClass(classItem),
-                              ),
-                              // Delete Icon with Confirmation in Red
-                              IconButton(
-                                icon: const Icon(Icons.delete,
-                                    color: Colors.red), // Red color for delete icon
-                                onPressed: () => _confirmDelete(classItem),
-                              ),
-                              // View Icon (Arrow to view the class details)
-                              IconButton(
-                                icon: const Icon(Icons.arrow_forward,
-                                    color: Colors.white),
-                                onPressed: () async {
-                                  // Navigate to ViewClass screen
-                                  final classDetails = await _classService
-                                      .getClassDetails(
-                                          classItem.name, classItem.accessKey!);
-                                  if (classDetails != null) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ViewClass(classItem: classDetails),
-                                      ),
-                                    );
-                                  }
-                                },
-                              ),
-                            ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Column(
+            children: [
+              // Search Bar
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: (value) {
+                          filterName = value;
+                          _filterClasses();
+                        },
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          labelText: 'Search...',
+                          labelStyle: const TextStyle(color: Colors.white),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
                           ),
-                          onTap: () {
-                            print("Class tapped: ${classItem.name}");
-                          },
+                          prefixIcon:
+                              const Icon(Icons.search, color: Colors.white),
                         ),
-                      );
-                    },
-                  ),
-          ),
-        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // List of Filtered Classes
+              Expanded(
+                child: filteredClasses.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No classes found',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: filteredClasses.length,
+                        itemBuilder: (context, index) {
+                          final classItem = filteredClasses[index];
+                          return Card(
+                            margin: const EdgeInsets.all(8.0),
+                            color: const Color.fromARGB(255, 34, 34, 34),
+                            child: ListTile(
+                              title: Text(classItem.name,
+                                  style: const TextStyle(color: Colors.white)),
+                              subtitle: Text(
+                                  'Students: ${classItem.nbStudents}, Access Key: ${classItem.accessKey}',
+                                  style: const TextStyle(color: Colors.white)),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit,
+                                        color: Colors.white),
+                                    onPressed: () => _editClass(classItem),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.red),
+                                    onPressed: () => _confirmDelete(classItem),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_forward,
+                                        color: Colors.white),
+                                    onPressed: () async {
+                                      final classDetails =
+                                          await _classService.getClassDetails(
+                                              classItem.name,
+                                              classItem.accessKey!);
+                                      if (classDetails != null) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ViewClass(
+                                                classItem: classDetails),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                print("Class tapped: ${classItem.name}");
+                              },
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          );
+        },
       ),
-      // Floating Action Button to Add Classes
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigate to the AddClass form
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const AddClass()),
