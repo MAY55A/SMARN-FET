@@ -33,17 +33,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) =>
-            HomePage(), // Home screen (choose admin, teacher, or student)
-        '/admin_login': (context) => AdminForm(), // Admin login form
-        '/class_access': (context) =>
-            StudentForm(), // Student class access form
-        '/teacher_login': (context) =>
-            const EducatorForm(), // Teacher login form
-        '/admin_dashboard': (context) => AdminDashboard(), // Admin dashboard
-        '/class_dashboard': (context) =>
-            ClassDashboard(), // Class schedule screen
-        '/teacher_dashboard': (context) =>
-            TeacherDashboard(), // Teacher dashboard
+            const HomePage(), // Home screen (choose admin, teacher, or student)
       },
     );
   }

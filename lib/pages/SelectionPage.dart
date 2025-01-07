@@ -28,7 +28,7 @@ class _SelectionPageState extends State<SelectionPage> {
       ),
       body: Stack(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 70,
           ),
           // Background image
@@ -49,7 +49,7 @@ class _SelectionPageState extends State<SelectionPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height: 110),
+                  const SizedBox(height: 110),
                   const Text(
                     'Login as:',
                     textAlign: TextAlign.center,
@@ -69,8 +69,11 @@ class _SelectionPageState extends State<SelectionPage> {
                         icon: Icons.school,
                         label: ' Student ',
                         onTap: () {
-                          Navigator.pushReplacementNamed(
-                              context, '/class_access');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const StudentForm()),
+                          );
                         },
                       ),
                       const SizedBox(width: 30), // Space between buttons
@@ -80,8 +83,11 @@ class _SelectionPageState extends State<SelectionPage> {
                         icon: Icons.people,
                         label: 'Educator',
                         onTap: () {
-                          Navigator.pushReplacementNamed(
-                              context, '/teacher_login');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const EducatorForm()),
+                          );
                         },
                       ),
                     ],
@@ -116,8 +122,11 @@ class _SelectionPageState extends State<SelectionPage> {
                             WidgetStateProperty.all(AppColors.appBarColor),
                       ),
                       onPressed: () {
-                        // Navigate to Admin Login Form
-                        Navigator.pushReplacementNamed(context, '/admin_login');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AdminForm()),
+                        );
                       },
                       child: const Text(
                         "Admin Login",

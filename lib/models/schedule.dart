@@ -29,8 +29,9 @@ class Schedule {
     return Schedule(
       id: map['id'],
       belongsTo: map['belongsTo'],
-      activities: map['activities']
-          .map((activityMap) => Activity.fromMap(activityMap))
+      activities: (map["activities"] as List)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .map((c) => Activity.fromMap(c))
           .toList(),
       creationDate: map['creationDate'],
       logs: map['logs'],

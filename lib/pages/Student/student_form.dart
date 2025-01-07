@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/Student/view_timetable.dart';
 import 'package:smarn/services/class_service.dart';
 import 'package:smarn/pages/widgets/canstants.dart'; // Assuming AppColors is defined here
 
@@ -23,7 +24,10 @@ class _StudentFormState extends State<StudentForm> {
           _keyController.text.trim(),
         );
         if (studentsClass != null) {
-          Navigator.pushReplacementNamed(context, '/class_dashboard');
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ViewTimetable(studentsClass: studentsClass,)),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

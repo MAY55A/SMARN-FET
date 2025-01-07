@@ -25,7 +25,7 @@ export const addActivity = functions.https.onCall(async (request) => {
 
   // Ensure the activity data is provided
   if (!activityData.subject || !activityData.tag || !activityData.teacher ||
-    !activityData.class || !activityData.duration) {
+    !activityData.studentsClass || !activityData.duration) {
     throw new functions.https.HttpsError(
       "invalid-argument",
       "Missing required parameters: subject, teacher, class, duration, tag"
@@ -49,10 +49,10 @@ export const addActivity = functions.https.onCall(async (request) => {
   }
 
   // Ensure the activity class is valid
-  if (!(await documentExists("classes", "id", activityData.class))) {
+  if (!(await documentExists("classes", "id", activityData.studentsClass))) {
     throw new functions.https.HttpsError(
       "invalid-argument",
-      "Invalid class"
+      "Invalid studentsClass"
     );
   }
 
@@ -89,7 +89,7 @@ export const addActivity = functions.https.onCall(async (request) => {
       id: activityId,
       subject: activityData.subject,
       teacher: activityData.teacher,
-      studentsClass: activityData.class,
+      studentsClass: activityData.studentsClass,
       tag: activityData.tag,
       duration: activityData.duration,
       isActive: activityData.isActive || true,
@@ -159,8 +159,7 @@ export const getAllActivities = functions.https.onCall(async (request) => {
 
   try {
     // Fetch all activities from Firestore
-    const activitiesSnapshot = await admin
-      .firestore()
+    const activitiesSnapshot = await db
       .collection("activities")
       .get();
     const activitiesList: any[] = [];

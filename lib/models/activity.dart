@@ -38,7 +38,7 @@ class Activity {
       'id': id,
       'subject': subject,
       'teacher': teacher,
-      'class': studentsClass,
+      'studentsClass': studentsClass,
       'tag': tag.name,
       'duration': duration,
       'room': room,
@@ -51,23 +51,27 @@ class Activity {
 
   // Create a Activity object from a Map
   factory Activity.fromMap(Map<String, dynamic> map) {
+    if (map['id'] == null ||
+        map['subject'] == null ||
+        map['teacher'] == null ||
+        map['studentsClass'] == null ||
+        map['duration'] == null ||
+        map['tag'] == null) {
+      throw ArgumentError('Missing required field');
+    }
     return Activity(
         id: map['id'],
-        subject: map['subject'] ?? '', // Default to empty string if null
-        teacher: map['teacher'] ?? '', // Default to empty string if null
-        studentsClass: map['class'] ?? '', // Default to empty string if null
-        tag: map['tag'] != null
-            ? ActivityTag.values.firstWhere(
-                (e) => e.name == map['tag'],
-                orElse: () =>
-                    ActivityTag.lecture, // Default to 'lecture' if invalid tag
-              )
-            : ActivityTag.lecture, // Default to 'lecture' if null
-        day: WorkDay.values.firstWhere((d) => d.name == map['day']),
+        subject: map['subject'],
+        teacher: map['teacher'],
+        studentsClass: map['studentsClass'],
+        tag: ActivityTag.values.firstWhere((e) => e.name == map['tag']),
+        day: map['day'] != null
+            ? WorkDay.values.firstWhere((d) => d.name == map['day'])
+            : null,
         startTime: map['startTime'],
         endTime: map['endTime'],
-        isActive: map['isActive'] ?? true, // Default to true if null
-        duration: map['duration'] ?? 0, // Default to 0 if null
+        isActive: map['isActive'],
+        duration: map['duration'],
         room: map['room']);
   }
 
@@ -125,6 +129,6 @@ class Activity {
 
   @override
   String toString() {
-    return 'Activity{\nid: $id,\n subject: $subject,\n teacher: $teacher,\n class: $studentsClass,\n tag: $tag,\n isActive: $isActive,\n duration(minutes): $duration,\n room: $room,\n startTime: $startTime,\n $endTime\n}';
+    return 'Activity{\nid: $id,\n subject: $subject,\n teacher: $teacher,\n class: $studentsClass,\n tag: $tag,\n isActive: $isActive,\n duration(minutes): $duration,\n room: $room,\n startTime: $startTime,\n endTime: $endTime\n}';
   }
 }

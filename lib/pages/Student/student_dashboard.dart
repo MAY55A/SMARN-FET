@@ -1,3 +1,5 @@
+/*
+
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/Student/view_timetable.dart';
 import 'package:smarn/pages/Teacher/Manage%20qualified%20subjects/manage_qualified_subjects_form.dart';
@@ -78,7 +80,7 @@ class StudentDashboard extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const ViewTimetable()),
+                            ViewTimetable()),
                   );
                 },
                 trailing: const Icon(Icons.arrow_forward_ios),
@@ -90,7 +92,7 @@ class StudentDashboard extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const ViewTimetable()),
+                            ViewTimetable()),
                   );
                 },
                 trailing: const Icon(Icons.arrow_forward_ios),
@@ -102,3 +104,4 @@ class StudentDashboard extends StatelessWidget {
     );
   }
 }
+*/
