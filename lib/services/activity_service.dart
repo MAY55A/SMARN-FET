@@ -15,8 +15,8 @@ class ActivityService {
       });
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': e};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 
@@ -57,7 +57,7 @@ class ActivityService {
       final response = await callable.call();
       List<Activity> activitiesList = (response.data["activities"] as List)
           .map((item) => Map<String, dynamic>.from(item as Map))
-          .map((c) => Activity.fromMap(c))
+          .map((a) => Activity.fromMap(a))
           .toList();
       return activitiesList;
     } catch (e) {

@@ -49,7 +49,8 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
   }
 
   Future<void> _fetchTeachers() async {
-    List<Map<String, dynamic>> teachers = await _teacherService.getAllTeachers();
+    List<Map<String, dynamic>> teachers =
+        await _teacherService.getAllTeachers();
     setState(() {
       _teachers = teachers;
       _selectedTeacherId = teachers.isNotEmpty ? teachers[0]['id'] : null;
@@ -104,35 +105,15 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-
-                    // Room Dropdown always visible
-                    DropdownButton<String?>( 
-                      value: _selectedRoomId,
-                      hint: const Text("Select Room", style: TextStyle(color: Colors.white)),
-                      items: _rooms.isEmpty
-                          ? [const DropdownMenuItem<String?>(child: Text('Loading...'), value: null)]
-                          : _rooms.map((room) {
-                              return DropdownMenuItem<String?>( 
-                                value: room.id,
-                                child: Text(room.name, style: const TextStyle(color: Colors.white)),
-                              );
-                            }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedRoomId = value;
-                        });
-                      },
-                      dropdownColor: Colors.grey[800],
-                    ),
-
-                    const SizedBox(height: 16),
-                    DropdownButton<SpaceConstraintType>( 
+                    DropdownButton<SpaceConstraintType>(
                       value: _selectedType,
-                      hint: const Text("Select Constraint Type", style: TextStyle(color: Colors.white)),
+                      hint: const Text("Select Constraint Type",
+                          style: TextStyle(color: Colors.white)),
                       items: SpaceConstraintType.values.map((type) {
                         return DropdownMenuItem<SpaceConstraintType>(
                           value: type,
-                          child: Text(type.name, style: const TextStyle(color: Colors.white)),
+                          child: Text(type.name,
+                              style: const TextStyle(color: Colors.white)),
                         );
                       }).toList(),
                       onChanged: (value) {
@@ -153,13 +134,15 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
 
                     // Show Activity Type dropdown only if RoomType is selected
                     if (_selectedType == SpaceConstraintType.roomType)
-                      DropdownButton<ActivityTag>( 
+                      DropdownButton<ActivityTag>(
                         value: _selectedActivityType,
-                        hint: const Text("Select Activity Type", style: TextStyle(color: Colors.white)),
+                        hint: const Text("Select Activity Type",
+                            style: TextStyle(color: Colors.white)),
                         items: ActivityTag.values.map((activity) {
                           return DropdownMenuItem<ActivityTag>(
                             value: activity,
-                            child: Text(activity.name, style: const TextStyle(color: Colors.white)),
+                            child: Text(activity.name,
+                                style: const TextStyle(color: Colors.white)),
                           );
                         }).toList(),
                         onChanged: (value) {
@@ -172,14 +155,16 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
                     const SizedBox(height: 16),
 
                     // Show Room Type fields only if RoomType is selected
-                    if (_selectedType == SpaceConstraintType.roomType) ...[ 
-                      DropdownButton<RoomType?>( 
+                    if (_selectedType == SpaceConstraintType.roomType) ...[
+                      DropdownButton<RoomType?>(
                         value: _selectedRoomType,
-                        hint: const Text("Select Room Type", style: TextStyle(color: Colors.white)),
+                        hint: const Text("Select Room Type",
+                            style: TextStyle(color: Colors.white)),
                         items: RoomType.values.map((roomType) {
-                          return DropdownMenuItem<RoomType?>( 
+                          return DropdownMenuItem<RoomType?>(
                             value: roomType,
-                            child: Text(roomType.name, style: const TextStyle(color: Colors.white)),
+                            child: Text(roomType.name,
+                                style: const TextStyle(color: Colors.white)),
                           );
                         }).toList(),
                         onChanged: (value) {
@@ -194,7 +179,36 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
                     // Show Radio Buttons for Teacher, Class, and Subject if PreferredRoom is selected
                     if (_selectedType == SpaceConstraintType.preferredRoom) ...[
                       const SizedBox(height: 16),
-                      Text("Select Option:", style: TextStyle(color: Colors.white)),
+                      const Text("Choose Preferred Room",
+                          style: TextStyle(color: Colors.white)),
+                      const SizedBox(height: 16),
+                      DropdownButton<String?>(
+                        value: _selectedRoomId,
+                        hint: const Text("Select Room",
+                            style: TextStyle(color: Colors.white)),
+                        items: _rooms.isEmpty
+                            ? [
+                                const DropdownMenuItem<String?>(
+                                    value: null, child: Text('Loading...'))
+                              ]
+                            : _rooms.map((room) {
+                                return DropdownMenuItem<String?>(
+                                  value: room.id,
+                                  child: Text(room.name,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                );
+                              }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedRoomId = value;
+                          });
+                        },
+                        dropdownColor: Colors.grey[800],
+                      ),
+                      const SizedBox(height: 16),
+                      Text("Select Option:",
+                          style: TextStyle(color: Colors.white)),
                       Row(
                         children: [
                           Radio<String>(
@@ -208,9 +222,11 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
                                 _selectedSubjectId = null;
                               });
                             },
-                            activeColor: const Color.fromARGB(255, 129, 77, 139),
+                            activeColor:
+                                const Color.fromARGB(255, 129, 77, 139),
                           ),
-                          const Text('Teacher', style: TextStyle(color: Colors.white)),
+                          const Text('Teacher',
+                              style: TextStyle(color: Colors.white)),
                           Radio<String>(
                             value: 'class',
                             groupValue: _selectedOption,
@@ -222,9 +238,11 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
                                 _selectedSubjectId = null;
                               });
                             },
-                            activeColor: const Color.fromARGB(255, 129, 77, 139),
+                            activeColor:
+                                const Color.fromARGB(255, 129, 77, 139),
                           ),
-                          const Text('Class', style: TextStyle(color: Colors.white)),
+                          const Text('Class',
+                              style: TextStyle(color: Colors.white)),
                           Radio<String>(
                             value: 'subject',
                             groupValue: _selectedOption,
@@ -236,9 +254,11 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
                                 _selectedClassId = null;
                               });
                             },
-                            activeColor: const Color.fromARGB(255, 129, 77, 139),
+                            activeColor:
+                                const Color.fromARGB(255, 129, 77, 139),
                           ),
-                          const Text('Subject', style: TextStyle(color: Colors.white)),
+                          const Text('Subject',
+                              style: TextStyle(color: Colors.white)),
                         ],
                       ),
                     ],
@@ -247,15 +267,22 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
 
                     // Show corresponding dropdown based on selected option
                     if (_selectedOption == 'teacher') ...[
-                      DropdownButton<String?>( 
+                      DropdownButton<String?>(
                         value: _selectedTeacherId,
-                        hint: const Text("Select Teacher", style: TextStyle(color: Colors.white)),
+                        hint: const Text("Select Teacher",
+                            style: TextStyle(color: Colors.white)),
                         items: _teachers.isEmpty
-                            ? [const DropdownMenuItem<String?>(child: Text('Loading...'), value: null)]
+                            ? [
+                                const DropdownMenuItem<String?>(
+                                    child: Text('Loading...'), value: null)
+                              ]
                             : _teachers.map((teacher) {
-                                return DropdownMenuItem<String?>( 
+                                return DropdownMenuItem<String?>(
                                   value: teacher['teacher'].id,
-                                  child: Text(teacher['teacher'].name ?? 'Unknown', style: const TextStyle(color: Colors.white)),
+                                  child: Text(
+                                      teacher['teacher'].name ?? 'Unknown',
+                                      style:
+                                          const TextStyle(color: Colors.white)),
                                 );
                               }).toList(),
                         onChanged: (value) {
@@ -266,15 +293,21 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
                         dropdownColor: Colors.grey[800],
                       ),
                     ] else if (_selectedOption == 'class') ...[
-                      DropdownButton<String?>( 
+                      DropdownButton<String?>(
                         value: _selectedClassId,
-                        hint: const Text("Select Class", style: TextStyle(color: Colors.white)),
+                        hint: const Text("Select Class",
+                            style: TextStyle(color: Colors.white)),
                         items: _classes.isEmpty
-                            ? [const DropdownMenuItem<String?>(child: Text('Loading...'), value: null)]
+                            ? [
+                                const DropdownMenuItem<String?>(
+                                    child: Text('Loading...'), value: null)
+                              ]
                             : _classes.map((classItem) {
-                                return DropdownMenuItem<String?>( 
+                                return DropdownMenuItem<String?>(
                                   value: classItem.id,
-                                  child: Text(classItem.name, style: const TextStyle(color: Colors.white)),
+                                  child: Text(classItem.name,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
                                 );
                               }).toList(),
                         onChanged: (value) {
@@ -285,15 +318,21 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
                         dropdownColor: Colors.grey[800],
                       ),
                     ] else if (_selectedOption == 'subject') ...[
-                      DropdownButton<String?>( 
+                      DropdownButton<String?>(
                         value: _selectedSubjectId,
-                        hint: const Text("Select Subject", style: TextStyle(color: Colors.white)),
+                        hint: const Text("Select Subject",
+                            style: TextStyle(color: Colors.white)),
                         items: _subjects.isEmpty
-                            ? [const DropdownMenuItem<String?>(child: Text('Loading...'), value: null)]
+                            ? [
+                                const DropdownMenuItem<String?>(
+                                    child: Text('Loading...'), value: null)
+                              ]
                             : _subjects.map((subject) {
-                                return DropdownMenuItem<String?>( 
+                                return DropdownMenuItem<String?>(
                                   value: subject.id,
-                                  child: Text(subject.name, style: const TextStyle(color: Colors.white)),
+                                  child: Text(subject.name,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
                                 );
                               }).toList(),
                         onChanged: (value) {
@@ -310,8 +349,10 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
                       onPressed: _saveConstraint,
                       child: const Text('Save Constraint'),
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 129, 77, 139)),
-                        foregroundColor: MaterialStateProperty.all(Colors.white),
+                        backgroundColor: MaterialStateProperty.all(
+                            const Color.fromARGB(255, 129, 77, 139)),
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.white),
                       ),
                     ),
                   ],
@@ -324,93 +365,99 @@ class _AddSpaceConstraintViewState extends State<AddSpaceConstraintView> {
     );
   }
 
- void _saveConstraint() async {
-  if (_selectedType == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a constraint type.')));
-    return;
+  void _saveConstraint() async {
+    if (_selectedType == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a constraint type.')));
+      return;
+    }
+
+    // Validation for 'roomType' constraint
+    if (_selectedType == SpaceConstraintType.roomType &&
+        _selectedRoomType == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a room type.')));
+      return;
+    }
+
+    // Validation for 'preferredRoom' constraint
+    if (_selectedType == SpaceConstraintType.preferredRoom) {
+      if (_selectedRoomId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select a room.')));
+        return;
+      }
+      if (_selectedOption == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content:
+                Text('Please select an option (Teacher, Class, or Subject).')));
+        return;
+      }
+
+      // Validate based on the selected option
+      if (_selectedOption == 'teacher' && _selectedTeacherId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select a teacher.')));
+        return;
+      }
+      if (_selectedOption == 'class' && _selectedClassId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select a class.')));
+        return;
+      }
+      if (_selectedOption == 'subject' && _selectedSubjectId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select a subject.')));
+        return;
+      }
+    }
+
+    // Confirm before saving
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[850], // Gray background for alert
+          title: const Text("Confirm Constraint Addition",
+              style: TextStyle(color: Colors.white)),
+          content: const Text("Are you sure you want to save this constraint?",
+              style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child:
+                  const Text("Cancel", style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child:
+                  const Text("Confirm", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm != true) return;
+
+    final newConstraint = SpaceConstraint(
+      id: '',
+      type: _selectedType!,
+      activityType: _selectedActivityType,
+      roomId: _selectedRoomId,
+      teacherId: _selectedTeacherId,
+      classId: _selectedClassId,
+      subjectId: _selectedSubjectId,
+      requiredRoomType: _selectedRoomType,
+    );
+
+    final result =
+        await _constraintService.createSpaceConstraint(newConstraint);
+    if (result['success']) {
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(result['message'])));
+    }
   }
-
-  // Validation for 'roomType' constraint
-  if (_selectedType == SpaceConstraintType.roomType && _selectedRoomType == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a room type.')));
-    return;
-  }
-
-  // Validation for 'preferredRoom' constraint
-  if (_selectedType == SpaceConstraintType.preferredRoom) {
-    if (_selectedRoomId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a room.')));
-      return;
-    }
-    if (_selectedOption == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select an option (Teacher, Class, or Subject).')));
-      return;
-    }
-
-    // Validate based on the selected option
-    if (_selectedOption == 'teacher' && _selectedTeacherId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a teacher.')));
-      return;
-    }
-    if (_selectedOption == 'class' && _selectedClassId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a class.')));
-      return;
-    }
-    if (_selectedOption == 'subject' && _selectedSubjectId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a subject.')));
-      return;
-    }
-  }
-
-  // Confirm before saving
-  final confirm = await showDialog<bool>(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        backgroundColor: Colors.grey[850], // Gray background for alert
-        title: const Text("Confirm Constraint Addition", style: TextStyle(color: Colors.white)),
-        content: const Text("Are you sure you want to save this constraint?", style: TextStyle(color: Colors.white)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text("Cancel", style: TextStyle(color: Colors.white)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text("Confirm", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      );
-    },
-  );
-
-  if (confirm != true) return;
-
-  final newConstraint = SpaceConstraint(
-    id: '',
-    type: _selectedType!,
-    activityType: _selectedActivityType,
-    roomId: _selectedRoomId,
-    teacherId: _selectedTeacherId,
-    classId: _selectedClassId,
-    subjectId: _selectedSubjectId,
-    requiredRoomType: _selectedRoomType,
-  );
-
-  final result = await _constraintService.createSpaceConstraint(newConstraint);
-  if (result['success']) {
-    Navigator.pop(context);
-  } else {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(result['message'])));
-  }
-}
-
 }

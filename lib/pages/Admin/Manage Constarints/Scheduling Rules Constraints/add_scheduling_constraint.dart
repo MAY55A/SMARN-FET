@@ -3,8 +3,10 @@ import 'package:smarn/CRUD_test.dart';
 import 'package:smarn/models/constraint.dart';
 import 'package:smarn/models/work_day.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Scheduling%20Rules%20Constraints/scheduling_rules_view.dart';
+import 'package:smarn/pages/widgets/duration_form_field.dart';
 import 'package:smarn/services/constraint_service.dart';
-import 'package:smarn/pages/widgets/multi_select_dialog.dart'; // Import MultiSelectDialog
+import 'package:smarn/pages/widgets/multi_select_dialog.dart';
+import 'package:smarn/services/time_service.dart'; // Import MultiSelectDialog
 
 class AddSchedulingRuleForm extends StatefulWidget {
   @override
@@ -16,9 +18,9 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
   final _constraintService = ConstraintService();
 
   final _durationController = TextEditingController();
-  final _startTimeController = TextEditingController();
-  final _endTimeController = TextEditingController();
-  List<SchedulingRuleType> _types = SchedulingRuleType.values;
+  String? _selectedStartTime;
+  String? _selectedEndTime;
+  final List<SchedulingRuleType> _types = SchedulingRuleType.values;
   SchedulingRuleType _selectedType = SchedulingRuleType.workPeriod;
   List<WorkDay> _selectedDays = [];
   bool _isLoading = false;
@@ -101,8 +103,10 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      if (_selectedType == SchedulingRuleType.minActivityDuration ||
-                          _selectedType == SchedulingRuleType.maxActivityDuration)
+                      if (_selectedType ==
+                              SchedulingRuleType.minActivityDuration ||
+                          _selectedType ==
+                              SchedulingRuleType.maxActivityDuration)
                         TextFormField(
                           controller: _durationController,
                           style: const TextStyle(color: Colors.white),
@@ -119,12 +123,14 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                             if (value == null || int.tryParse(value) == null) {
                               return 'Please enter a duration';
                             }
-                            if (_selectedType == SchedulingRuleType.maxActivityDuration &&
+                            if (_selectedType ==
+                                    SchedulingRuleType.maxActivityDuration &&
                                 _minDuration != null &&
                                 int.parse(value) < _minDuration!) {
                               return 'Max Duration must be >= Min Duration: $_minDuration';
                             }
-                            if (_selectedType == SchedulingRuleType.minActivityDuration &&
+                            if (_selectedType ==
+                                    SchedulingRuleType.minActivityDuration &&
                                 _maxDuration != null &&
                                 int.parse(value) > _maxDuration!) {
                               return 'Min Duration must be <= Max Duration: $_maxDuration';
@@ -138,43 +144,29 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                       if (_selectedType == SchedulingRuleType.workPeriod ||
                           _selectedType == SchedulingRuleType.breakPeriod) ...[
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _startTimeController,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: 'Start Time',
-                            labelStyle: const TextStyle(color: Colors.white),
-                            filled: true,
-                            fillColor: Colors.grey[800],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter start time';
-                            }
-                            return null;
+                        durationFormField(
+                          "Start Time",
+                          TimeService.timeToMinutes("08:00"),
+                          60,
+                          TimeService.timeToMinutes("20:00"),
+                          (time) {
+                            setState(() {
+                              _selectedStartTime =
+                                  TimeService.minutesToTime(time!);
+                            });
                           },
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _endTimeController,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: 'End Time',
-                            labelStyle: const TextStyle(color: Colors.white),
-                            filled: true,
-                            fillColor: Colors.grey[800],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter end time';
-                            }
-                            return null;
+                        durationFormField(
+                          "End Time",
+                          TimeService.timeToMinutes("08:00"),
+                          60,
+                          TimeService.timeToMinutes("20:00"),
+                          (time) {
+                            setState(() {
+                              _selectedEndTime =
+                                  TimeService.minutesToTime(time!);
+                            });
                           },
                         ),
                         const SizedBox(height: 16),
@@ -191,7 +183,11 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Select Applicable Days: ${_selectedDays.map((e) => e.name).join(', ')}",
+                                  _selectedDays.isEmpty
+                                      ? "Select Applicable Days"
+                                      : _selectedDays
+                                          .map((e) => e.name.substring(0, 3))
+                                          .join(', '),
                                   style: const TextStyle(color: Colors.white),
                                 ),
                                 const Icon(Icons.arrow_drop_down,
@@ -206,12 +202,14 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
                         onPressed: _isLoading
                             ? null
                             : () {
-                                if (_formKey.currentState?.validate() ?? false) {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
                                   _addSchedulingRule();
                                 }
                               },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+                          backgroundColor:
+                              const Color.fromARGB(255, 129, 77, 139),
                           foregroundColor: Colors.white,
                         ),
                         child: const Text('Submit'),
@@ -228,6 +226,31 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
   }
 
   Future<void> _addSchedulingRule() async {
+    if (_selectedType == SchedulingRuleType.workPeriod ||
+        _selectedType == SchedulingRuleType.breakPeriod) {
+      if (_selectedStartTime == null || _selectedEndTime == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please choose start and end times.')),
+        );
+        return;
+      }
+
+      if (TimeService.timeToMinutes(_selectedStartTime!) >=
+          TimeService.timeToMinutes(_selectedEndTime!)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Start time must be less than end time.')),
+        );
+        return;
+      }
+
+      if (_selectedDays.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select at least one day.')),
+        );
+        return;
+      }
+    }
     setState(() {
       _isLoading = true;
     });
@@ -235,11 +258,12 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
     final newSchedulingRule = SchedulingRule(
       type: _selectedType,
       duration: int.tryParse(_durationController.text),
-      startTime: _startTimeController.text.isEmpty ? null : _startTimeController.text,
-      endTime: _endTimeController.text.isEmpty ? null : _endTimeController.text,
+      startTime: _selectedStartTime,
+      endTime: _selectedEndTime,
       applicableDays: _selectedDays.isEmpty ? null : _selectedDays,
     );
-    final response = await _constraintService.createSchedulingRule(newSchedulingRule);
+    final response =
+        await _constraintService.createSchedulingRule(newSchedulingRule);
     if (response['success'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Scheduling Rule added successfully')),

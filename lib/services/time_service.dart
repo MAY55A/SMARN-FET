@@ -19,21 +19,20 @@ class TimeService {
   }
 
 // Helper function to return list of hours based on given time range and duration
-  static List<String> generateHours(
+  static Map<String, List<String>> generateHours(
       String start, String end, int durationMinutes) {
-    final result = <String>[];
+    final startTimes = <String>[];
+    final endTimes = <String>[];
 
     final startMinutes = timeToMinutes(start);
     final endMinutes = timeToMinutes(end);
-
     for (var current = startMinutes;
         current + durationMinutes <= endMinutes;
         current += durationMinutes) {
-      final startTime = minutesToTime(current);
-      final endTime = minutesToTime(current + durationMinutes);
-      result.add('$startTime - $endTime');
+      startTimes.add(minutesToTime(current));
+      endTimes.add(minutesToTime(current + durationMinutes));
     }
 
-    return result;
+    return {"startTimes": startTimes, "endTimes": endTimes};
   }
 }

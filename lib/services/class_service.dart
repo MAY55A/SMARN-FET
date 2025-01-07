@@ -72,12 +72,11 @@ class ClassService {
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('getAllClassesNbStudents');
       final response = await callable.call();
-      var classesList = response.data["classes"] as List<Map>;
+      var classesList = response.data["classes"] as List;
       Map<String, int> nbStudentsPerClass = {};
       for (var classMap in classesList) {
         classMap = Map<String, dynamic>.from(classMap);
-        nbStudentsPerClass[classMap["id"]] =
-            classesList[classMap["nbStudents"]] as int;
+        nbStudentsPerClass[classMap["id"]] = classMap["nbStudents"] as int;
       }
       return nbStudentsPerClass;
     } catch (e) {

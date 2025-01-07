@@ -20,17 +20,16 @@ class ScheduleService {
     }
   }
 
-  Future<Schedule?> getSchedule(String scheduleId) async {
+  Future<Schedule?> getLatestScheduleFor(String id) async {
     try {
       // Call function to get Schedule details
       final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('getSchedule');
-      final response =
-          await callable.call(<String, dynamic>{'scheduleId': scheduleId});
+          FirebaseFunctions.instance.httpsCallable('getLatestScheduleFor');
+      final response = await callable.call(<String, dynamic>{'id': id});
 
       return Schedule.fromMap(response.data);
     } catch (e) {
-      print('Error fetching Schedule: $e');
+      print('Error fetching Schedule for $id : $e');
       return null;
     }
   }

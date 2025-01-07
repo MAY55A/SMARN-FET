@@ -4,7 +4,6 @@ import 'package:smarn/pages/Teacher/Manage%20qualified%20subjects/manage_qualifi
 import 'package:smarn/pages/Teacher/Request/view_requests.dart';
 import 'package:smarn/pages/Teacher/timetable/view_timetable.dart';
 import 'package:smarn/pages/Teacher/Teacher_menu.dart';
-import 'package:smarn/services/auth_service.dart';
 
 class TeacherDashboard extends StatelessWidget {
   const TeacherDashboard({super.key});
@@ -49,7 +48,7 @@ class TeacherDashboard extends StatelessWidget {
     final items = [
       {'title': 'Timetable', 'icon': Icons.schedule, 'page': ManageTimetableTeacher()},
       {'title': 'Subjects', 'icon': Icons.book_outlined, 'page': ManageQualifiedSubjectsForm()},
-      {'title': 'Activities', 'icon': Icons.assignment, 'page': ViewActivities()},
+      {'title': 'Activities', 'icon': Icons.assignment, 'page': const ViewActivities()},
       {'title': 'Requests', 'icon': Icons.location_on_outlined, 'page': const ViewRequests()},
     ];
 
@@ -66,11 +65,11 @@ class TeacherDashboard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.grey[700],
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black26,
               blurRadius: 8.0,
-              offset: const Offset(0, 4),
+              offset: Offset(0, 4),
             ),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/Admin/admin_dashboard.dart';
 import 'package:smarn/services/admin_service.dart';
 import 'package:smarn/pages/widgets/canstants.dart'; // Ensure this is available for your color palette
 
@@ -25,8 +26,10 @@ class _AdminFormState extends State<AdminForm> {
       );
 
       if (res["success"]) {
-        Navigator.pushReplacementNamed(context, '/admin_dashboard');
-      } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AdminDashboard()),
+          );      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:

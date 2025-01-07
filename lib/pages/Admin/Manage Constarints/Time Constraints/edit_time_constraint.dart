@@ -3,11 +3,13 @@ import 'package:smarn/models/class.dart';
 import 'package:smarn/models/constraint.dart';
 import 'package:smarn/models/room.dart';
 import 'package:smarn/models/work_day.dart';
+import 'package:smarn/pages/widgets/duration_form_field.dart';
 import 'package:smarn/services/constraint_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 import 'package:smarn/services/class_service.dart';
 import 'package:smarn/services/room_service.dart';
 import 'package:smarn/pages/widgets/multi_select_dialog.dart';
+import 'package:smarn/services/time_service.dart';
 
 class EditTimeConstraintView extends StatefulWidget {
   final TimeConstraint constraint;
@@ -25,12 +27,10 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   final ClassService _classService = ClassService();
   final RoomService _roomService = RoomService();
 
-  late TextEditingController _startTimeController;
-  late TextEditingController _endTimeController;
+  String? _selectedStartTime;
+  String? _selectedEndTime;
   List<WorkDay> _selectedDays = [];
-  String? _selectedTeacherId;
-  String? _selectedClassId;
-  String? _selectedRoomId;
+  String? _selectedId;
   bool _isActive = true; // Active toggle state
 
   List<Map<String, dynamic>> _teachers = [];
@@ -41,12 +41,11 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
   void initState() {
     super.initState();
 
-    _startTimeController =
-        TextEditingController(text: widget.constraint.startTime);
-    _endTimeController = TextEditingController(text: widget.constraint.endTime);
-    _selectedTeacherId = widget.constraint.teacherId;
-    _selectedClassId = widget.constraint.classId;
-    _selectedRoomId = widget.constraint.roomId;
+    _selectedStartTime = widget.constraint.startTime;
+    _selectedEndTime = widget.constraint.endTime;
+    _selectedId = widget.constraint.teacherId ??
+        widget.constraint.classId ??
+        widget.constraint.roomId;
     _selectedDays = widget.constraint.availableDays;
     _isActive = widget.constraint.isActive; // Initialize active state
 
@@ -106,9 +105,9 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Center(
-        
         child: Container(
-          constraints: BoxConstraints(maxWidth: 600), // Limiter la largeur du formulaire
+          constraints: const BoxConstraints(
+              maxWidth: 600), // Limiter la largeur du formulaire
           padding: const EdgeInsets.all(16.0),
           child: Card(
             color: Colors.grey[850],
@@ -125,45 +124,47 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                     Text(widget.constraint.type.name,
                         style: const TextStyle(color: Colors.white)),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _startTimeController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        labelText: 'Start Time',
-                        labelStyle: TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
+                    durationFormField(
+                        "Start Time",
+                        TimeService.timeToMinutes("08:00"),
+                        60,
+                        TimeService.timeToMinutes("20:00"), (time) {
+                      setState(() {
+                        _selectedStartTime = TimeService.minutesToTime(time!);
+                      });
+                    }, TimeService.timeToMinutes(_selectedStartTime!)),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _endTimeController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        labelText: 'End Time',
-                        labelStyle: TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
+                    durationFormField(
+                        "End Time",
+                        TimeService.timeToMinutes("08:00"),
+                        60,
+                        TimeService.timeToMinutes("20:00"), (time) {
+                      setState(() {
+                        _selectedEndTime = TimeService.minutesToTime(time!);
+                      });
+                    }, TimeService.timeToMinutes(_selectedEndTime!)),
                     const SizedBox(height: 16),
                     if (widget.constraint.type ==
                         TimeConstraintType.teacherAvailability)
                       _teachers.isEmpty
                           ? const CircularProgressIndicator()
                           : DropdownButton<String>(
-                              value: _selectedTeacherId,
+                              value: _selectedId,
                               hint: const Text("Select Teacher",
                                   style: TextStyle(color: Colors.white)),
                               items: _teachers
                                   .map<DropdownMenuItem<String>>((teacher) {
                                 return DropdownMenuItem<String>(
                                   value: teacher['id'],
-                                  child: Text(teacher['teacher'].name ?? 'Unknown',
-                                      style: const TextStyle(color: Colors.white)),
+                                  child: Text(
+                                      teacher['teacher'].name ?? 'Unknown',
+                                      style:
+                                          const TextStyle(color: Colors.white)),
                                 );
                               }).toList(),
                               onChanged: (value) {
                                 setState(() {
-                                  _selectedTeacherId = value;
+                                  _selectedId = value;
                                 });
                               },
                               style: const TextStyle(color: Colors.white),
@@ -175,7 +176,7 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                       _classes.isEmpty
                           ? const CircularProgressIndicator()
                           : DropdownButton<String>(
-                              value: _selectedClassId,
+                              value: _selectedId,
                               hint: const Text("Select Class",
                                   style: TextStyle(color: Colors.white)),
                               items: _classes
@@ -183,35 +184,39 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                                 return DropdownMenuItem<String>(
                                   value: classItem.id,
                                   child: Text(classItem.name,
-                                      style: const TextStyle(color: Colors.white)),
+                                      style:
+                                          const TextStyle(color: Colors.white)),
                                 );
                               }).toList(),
                               onChanged: (value) {
                                 setState(() {
-                                  _selectedClassId = value;
+                                  _selectedId = value;
                                 });
                               },
                               style: const TextStyle(color: Colors.white),
                               dropdownColor: Colors.grey[800],
                             ),
                     const SizedBox(height: 16),
-                    if (widget.constraint.type == TimeConstraintType.roomAvailability)
+                    if (widget.constraint.type ==
+                        TimeConstraintType.roomAvailability)
                       _rooms.isEmpty
                           ? const CircularProgressIndicator()
                           : DropdownButton<String>(
-                              value: _selectedRoomId,
+                              value: _selectedId,
                               hint: const Text("Select Room",
                                   style: TextStyle(color: Colors.white)),
-                              items: _rooms.map<DropdownMenuItem<String>>((room) {
+                              items:
+                                  _rooms.map<DropdownMenuItem<String>>((room) {
                                 return DropdownMenuItem<String>(
                                   value: room.id,
                                   child: Text(room.name,
-                                      style: const TextStyle(color: Colors.white)),
+                                      style:
+                                          const TextStyle(color: Colors.white)),
                                 );
                               }).toList(),
                               onChanged: (value) {
                                 setState(() {
-                                  _selectedRoomId = value;
+                                  _selectedId = value;
                                 });
                               },
                               style: const TextStyle(color: Colors.white),
@@ -221,7 +226,8 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                     GestureDetector(
                       onTap: () => _selectDays(context),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 15),
                         decoration: BoxDecoration(
                           color: Colors.grey,
                           borderRadius: BorderRadius.circular(5),
@@ -230,10 +236,15 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Select Available Days: ${_selectedDays.map((e) => e.name).join(', ')}",
+                              _selectedDays.isEmpty
+                                  ? "Select available Days"
+                                  : _selectedDays
+                                      .map((e) => e.name.substring(0, 3))
+                                      .join(', '),
                               style: const TextStyle(color: Colors.white),
                             ),
-                            const Icon(Icons.arrow_drop_down, color: Colors.white),
+                            const Icon(Icons.arrow_drop_down,
+                                color: Colors.white),
                           ],
                         ),
                       ),
@@ -260,12 +271,13 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: _editConstraint,
-                      child: const Text('Save Changes'),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
                             const Color.fromARGB(255, 129, 77, 139)),
-                        foregroundColor: MaterialStateProperty.all(Colors.white),
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.white),
                       ),
+                      child: const Text('Save Changes'),
                     ),
                   ],
                 ),
@@ -281,12 +293,19 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
     final updatedConstraint = TimeConstraint(
       id: widget.constraint.id,
       type: widget.constraint.type,
-      startTime: _startTimeController.text,
-      endTime: _endTimeController.text,
+      startTime: _selectedStartTime,
+      endTime: _selectedEndTime,
       availableDays: _selectedDays,
-      teacherId: _selectedTeacherId,
-      classId: _selectedClassId,
-      roomId: _selectedRoomId,
+      teacherId:
+          widget.constraint.type == TimeConstraintType.teacherAvailability
+              ? _selectedId
+              : null,
+      classId: widget.constraint.type == TimeConstraintType.classAvailability
+          ? _selectedId
+          : null,
+      roomId: widget.constraint.type == TimeConstraintType.roomAvailability
+          ? _selectedId
+          : null,
       isActive: _isActive, // Include active state in the updated constraint
     );
     if (widget.constraint.equals(updatedConstraint)) {
@@ -294,32 +313,55 @@ class _EditTimeConstraintViewState extends State<EditTimeConstraintView> {
         content: Text('No changes were made to the constraint'),
       ));
     } else {
+      if (_selectedStartTime == null || _selectedEndTime == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please choose start and end times.')),
+        );
+        return;
+      }
+
+      if (TimeService.timeToMinutes(_selectedStartTime!) >=
+          TimeService.timeToMinutes(_selectedEndTime!)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Start time must be less than end time.')),
+        );
+        return;
+      }
+
+      if (_selectedDays.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select at least one day.')),
+        );
+        return;
+      }
       // Show confirmation dialog
       bool? confirm = await showDialog<bool>(
         context: context,
         builder: (context) {
-  return AlertDialog(
-  backgroundColor: Colors.grey[800], // Set background color to gray
-  title: const Text(
-    "Confirm Constraint Addition",
-    style: TextStyle(color: Colors.white), // White title text
-  ),
-  content: const Text(
-    "Are you sure you want to confirm this changes?",
-    style: TextStyle(color: Colors.white), // White content text
-  ),
-  actions: [
-    TextButton(
-      onPressed: () => Navigator.pop(context, false),
-      child: const Text("Cancel", style: TextStyle(color: Colors.white)),
-    ),
-    TextButton(
-      onPressed: () => Navigator.pop(context, true),
-      child: const Text("Confirm", style: TextStyle(color: Colors.white)),
-    ),
-  ],
-);
-
+          return AlertDialog(
+            backgroundColor: Colors.grey[800], // Set background color to gray
+            title: const Text(
+              "Confirm Constraint Addition",
+              style: TextStyle(color: Colors.white), // White title text
+            ),
+            content: const Text(
+              "Are you sure you want to confirm this changes?",
+              style: TextStyle(color: Colors.white), // White content text
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child:
+                    const Text("Cancel", style: TextStyle(color: Colors.white)),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Confirm",
+                    style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
         },
       );
 

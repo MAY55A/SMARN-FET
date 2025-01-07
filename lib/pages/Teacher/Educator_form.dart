@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/CRUD_test.dart';
+import 'package:smarn/pages/Teacher/teacher_dashboard.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/teacher_service.dart';
@@ -28,8 +29,10 @@ class _EducatorFormState extends State<EducatorForm> {
           _passwordController.text.trim(),
         );
         if (res['success']) {
-          Navigator.pushReplacementNamed(context, '/teacher_dashboard');
-        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const TeacherDashboard()),
+          );        } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(res['message'])),
           );
@@ -140,7 +143,7 @@ class _EducatorFormState extends State<EducatorForm> {
                         foregroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 255, 255, 255)), // Button text color black
                       ),
                       child: const Text(
-                        'Submit',
+                        'confirm',
                         style: TextStyle(
                           color: Color.fromARGB(255, 255, 255, 255), // Button text color black
                         ),

@@ -17,6 +17,7 @@ import 'package:smarn/services/constraint_service.dart';
 import 'package:smarn/services/room_service.dart';
 import 'package:smarn/services/subject_service.dart';
 import 'package:smarn/services/teacher_service.dart';
+import 'package:smarn/services/timetable_generation_service.dart';
 import 'models/teacher.dart';
 import 'services/auth_service.dart';
 
@@ -31,8 +32,13 @@ final activityService = ActivityService();
 final changeRequestService = ChangeRequestService();
 final constraintService = ConstraintService();
 
+void generationTest() {
+  var generationService = TimetableGenerationService();
+  generationService.generateTimetables();
+}
+
 void constraintCrud() async {
-  print(await constraintService.getAllConstraints());
+  ///print(await constraintService.getAllConstraints());
   SchedulingRule constraint = SchedulingRule(
     type: SchedulingRuleType.workPeriod,
     startTime: "08:00",
@@ -40,8 +46,15 @@ void constraintCrud() async {
     applicableDays: WorkDay.values,
   );
   //print(constraint);
-  print(await constraintService.createSchedulingRule(constraint));
-  print(await constraintService.getAllConstraints());
+  //print(await constraintService.createSchedulingRule(constraint));
+  //print(await constraintService.getAllConstraints());
+  TimeConstraint constraint2 = TimeConstraint(
+      type: TimeConstraintType.teacherAvailability,
+      startTime: "08:00",
+      endTime: "18:00",
+      availableDays: WorkDay.values,
+      teacherId: "TEA005");
+  print(await constraintService.createTimeConstraint(constraint2));
 }
 
 void addTeacher() async {

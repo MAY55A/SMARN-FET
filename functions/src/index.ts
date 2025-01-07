@@ -66,6 +66,7 @@ import {
   updateActivity,
   getActivity,
   getAllActivities,
+  getActiveActivities,
   getActivitiesByTeacher,
   getActivitiesByClass,
   deleteActivity,
@@ -86,7 +87,7 @@ import {
 
 import {
   createSchedules,
-  getSchedule,
+  getLatestScheduleFor,
   getSchedulesForType,
   updateSchedule,
 } from "./functions/schedule_functions";
@@ -147,6 +148,7 @@ export {
   addActivity,
   updateActivity,
   getActivity,
+  getActiveActivities,
   getAllActivities,
   getActivitiesByTeacher,
   getActivitiesByClass,
@@ -168,7 +170,7 @@ export {
 
 export {
   createSchedules,
-  getSchedule,
+  getLatestScheduleFor,
   getSchedulesForType,
   updateSchedule,
 };
