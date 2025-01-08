@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/pages/Admin/Account%20Settings/account_setting.dart';
-import 'package:smarn/pages/Admin/Account%20Settings/account_setting.dart';
-import 'package:smarn/pages/Admin/Manage%20Activities/manage_activities_form.dart';
-import 'package:smarn/pages/Admin/Manage%20Classes/manage_classes.dart';
-import 'package:smarn/pages/Admin/Manage%20Subjects/manage_subjects_form.dart';
 import 'package:smarn/pages/Admin/Manage%20Tables/manage_timetable.dart';
 import 'package:smarn/pages/Admin/Manage%20Teachers/manage_teachers_form.dart';
-import 'package:smarn/pages/Admin/Manage%20Teachers/manage_teachers_form.dart';
-import 'package:smarn/pages/Admin/Manage%20Space/space_constraints_form.dart';
-import 'package:smarn/pages/Admin/Manage%20Constarints/constarints_selection_page.dart';
 import 'package:smarn/pages/Admin/Manage%20requests/manage_requests_form.dart';
-import 'package:smarn/pages/Admin/admin_dashboard.dart';
 import 'package:smarn/pages/home.dart';
 import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
@@ -59,7 +51,7 @@ class _AdminMenuState extends State<AdminMenu> {
               currentAccountPicture: CircleAvatar(
                 backgroundImage: AssetImage(userImageUrl!),
               ),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.appBarColor,
               ),
             ),
@@ -69,15 +61,12 @@ class _AdminMenuState extends State<AdminMenu> {
             // Other Menu Items
             _buildMenuItem(context, Icons.person_outline, 'Manage Teachers',
                 const ManageTeachersForm()),
-            _buildMenuItem(context, Icons.schedule, 'Manage Tables',
-                 ManageTimetable()),
+            _buildMenuItem(context, Icons.schedule, 'Manage Timetables',
+                const ManageTimetable()),
             _buildMenuItem(context, Icons.report_problem_outlined,
                 'Manage Requests', const ManageComplaintsForm()),
-                _buildMenuItem(
-  context, Icons.account_circle, 'Account Settings', const AccountSettingsPage()),
-                
-
-                
+            _buildMenuItem(context, Icons.account_circle, 'Account Settings',
+                const AccountSettingsPage()),
 
             // Spacer for alignment
             const Spacer(),

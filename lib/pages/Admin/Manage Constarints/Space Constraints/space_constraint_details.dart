@@ -16,33 +16,43 @@ class SpaceConstraintDetails extends StatelessWidget {
         elevation: 0, // Remove app bar shadow for cleaner look
       ),
       body: Center(
-        child: SizedBox(
-          height: 400, // Adjusted height for better fit with active field
-          width: 380, // Slightly adjusted width for better proportion
-          child: Card(
-            elevation: 10, // Add shadow for a raised card effect
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0), // Smoother rounded corners
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 400, // Set a max width for the card
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16.0), // Ensure content is clipped with rounded corners
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color.fromARGB(255, 45, 45, 45), // Dark background color
-                      const Color.fromARGB(255, 34, 34, 34), // Slightly lighter
-                    ],
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0), // Increased padding for more spacious feel
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _buildDetails(),
-                  ),
+            child: Card(
+              color: Colors.grey[850], // Card color
+              elevation: 10,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0), // Rounded corners
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0), // Padding inside the card
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Minimum space needed
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        'Space Constraint Details',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20, // Font size
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Divider(
+                      color: Colors.white54,
+                      thickness: 1,
+                      height: 16,
+                    ),
+                    const SizedBox(height: 12),
+                    ..._buildDetails(),
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
             ),

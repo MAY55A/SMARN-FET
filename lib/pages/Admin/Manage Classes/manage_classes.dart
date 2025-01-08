@@ -98,7 +98,8 @@ class _ManageClassesState extends State<ManageClasses> {
         classes.remove(classItem);
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Class "${classItem.name}" deleted successfully.')),
+        SnackBar(
+            content: Text('Class "${classItem.name}" deleted successfully.')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -114,7 +115,8 @@ class _ManageClassesState extends State<ManageClasses> {
       appBar: AppBar(
         title: const Text('Manage Classes'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
-        foregroundColor: Colors.white,
+        foregroundColor:
+            Colors.black, // Le texte de l'AppBar est maintenant en noir
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -138,7 +140,8 @@ class _ManageClassesState extends State<ManageClasses> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          prefixIcon: const Icon(Icons.search, color: Colors.white),
+                          prefixIcon:
+                              const Icon(Icons.search, color: Colors.white),
                         ),
                       ),
                     ),
@@ -171,23 +174,29 @@ class _ManageClassesState extends State<ManageClasses> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(Icons.edit, color: Colors.white),
+                                    icon: const Icon(Icons.edit,
+                                        color: Colors.white),
                                     onPressed: () => _editClass(classItem),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.red),
                                     onPressed: () => _confirmDelete(classItem),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                                    icon: const Icon(Icons.arrow_forward,
+                                        color: Colors.white),
                                     onPressed: () async {
-                                      final classDetails = await _classService
-                                          .getClassDetails(classItem.name, classItem.accessKey!);
+                                      final classDetails =
+                                          await _classService.getClassDetails(
+                                              classItem.name,
+                                              classItem.accessKey!);
                                       if (classDetails != null) {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => ViewClass(classItem: classDetails),
+                                            builder: (context) => ViewClass(
+                                                classItem: classDetails),
                                           ),
                                         );
                                       }

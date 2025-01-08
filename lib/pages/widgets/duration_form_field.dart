@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/services/time_service.dart';
 
-Widget durationFormField(String label, int minDuration, int maxDuration,
-    void Function(int?)? onChange,
+Widget durationFormField(String label, int minDuration, int step,
+    int maxDuration, void Function(int?)? onChange,
     [int? selected]) {
   var availableDurations = List.generate(
-    ((maxDuration - minDuration) ~/ minDuration) + 1,
-    (index) => minDuration + (index * minDuration),
+    ((maxDuration - minDuration) ~/ step) + 1,
+    (index) => minDuration + (index * step),
   );
   return DropdownButtonFormField<int>(
     value: selected,

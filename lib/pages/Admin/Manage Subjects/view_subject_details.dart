@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/subject.dart';
-import 'package:smarn/models/teacher.dart';
 import 'package:smarn/services/teacher_service.dart';
 
 class ViewSubjectDetails extends StatefulWidget {
@@ -55,57 +54,92 @@ class _ViewSubjectDetailsState extends State<ViewSubjectDetails> {
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Center(
-        child: Container(
-          height: 400,
-          constraints: BoxConstraints(maxWidth: 800), // Limiter la largeur de la carte
+        child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Card(
-            color: Colors.grey[850],
-            elevation: 8,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Name: ${widget.subject.name}',
-                      style: const TextStyle(color: Colors.white, fontSize: 18)),
-                  const SizedBox(height: 5), // Réduire l'espace
-                  Text('Long Name: ${widget.subject.longName ?? 'Not Provided'}',
-                      style: const TextStyle(color: Colors.white, fontSize: 18)),
-                  const SizedBox(height: 5), // Réduire l'espace
-                  Text('Description: ${widget.subject.description ?? 'Not Provided'}',
-                      style: const TextStyle(color: Colors.white, fontSize: 18)),
-                  const SizedBox(height: 10), // Réduire l'espace
-                  const Text('Teachers:',
-                      style: TextStyle(color: Colors.white, fontSize: 20)),
-                  const SizedBox(height: 10), // Réduire l'espace
-                  Expanded(
-                    child: _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _errorMessage.isNotEmpty
-                            ? Center(
-                                child: Text(_errorMessage,
-                                    style: const TextStyle(color: Colors.red)))
-                            : _teachers.isEmpty
-                                ? const Center(
-                                    child: Text('No teachers found for this subject.',
-                                        style: TextStyle(color: Colors.white)))
-                                : ListView.builder(
-                                    itemCount: _teachers.length,
-                                    itemBuilder: (context, index) {
-                                      final teacher = _teachers[index];
-                                      return ListTile(
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(vertical: 5),
-                                        title: Text(teacher["name"]!,
-                                            style: const TextStyle(color: Colors.white)),
-                                        subtitle: Text(teacher["id"]!,
-                                            style: const TextStyle(color: Colors.grey)),
-                                      );
-                                    },
-                                  ),
-                  ),
-                ],
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 600, // Set a max width for the card
+            ),
+            child: Card(
+              color: Colors.grey[850], // Card background color
+              elevation: 10, // Shadow effect
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0), // Rounded corners
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0), // Padding inside the card
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Minimum space needed
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        widget.subject.name ?? 'No name available',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20, // Font size for the name
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Divider(
+                      color: Colors.white54,
+                      thickness: 1,
+                      height: 16,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "Long Name: ${widget.subject.longName ?? 'Not Provided'}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "Description: ${widget.subject.description ?? 'Not Provided'}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Teachers:',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : _errorMessage.isNotEmpty
+                              ? Center(
+                                  child: Text(_errorMessage,
+                                      style: const TextStyle(color: Colors.red)))
+                              : _teachers.isEmpty
+                                  ? const Center(
+                                      child: Text('No teachers found for this subject.',
+                                          style: TextStyle(color: Colors.white)))
+                                  : ListView.builder(
+                                      itemCount: _teachers.length,
+                                      itemBuilder: (context, index) {
+                                        final teacher = _teachers[index];
+                                        return ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(vertical: 5),
+                                          title: Text(teacher["name"]!,
+                                              style: const TextStyle(color: Colors.white)),
+                                          subtitle: Text(teacher["id"]!,
+                                              style: const TextStyle(color: Colors.grey)),
+                                        );
+                                      },
+                                    ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

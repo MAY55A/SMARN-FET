@@ -71,9 +71,11 @@ class _AddActivityState extends State<AddActivity> {
   }
 
   Future<void> _fetchTeachers() async {
-    final teachersList = await _teacherService.getAllTeachers(); // Récupérer tous les enseignants
+    final teachersList = await _teacherService
+        .getAllTeachers(); // Récupérer tous les enseignants
     setState(() {
-      _allTeachers = teachersList.map((item) => item['teacher'] as Teacher).toList();
+      _allTeachers =
+          teachersList.map((item) => item['teacher'] as Teacher).toList();
       _teachers = _allTeachers; // Initialiser la liste des enseignants
     });
   }
@@ -215,6 +217,7 @@ class _AddActivityState extends State<AddActivity> {
                     durationFormField(
                         "Duration", // Field label
                         _minDuration, // Minimum duration in minutes
+                        _minDuration,
                         _maxDuration, // Maximum duration in minutes
                         (value) {
                       setState(() {
@@ -228,7 +231,8 @@ class _AddActivityState extends State<AddActivity> {
                       onPressed: _saveActivity,
                       child: const Text('Save Activity'),
                       style: ButtonStyle(
-                        foregroundColor: MaterialStateProperty.all(Colors.black),
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.black),
                         backgroundColor: MaterialStateProperty.all(
                             const Color.fromARGB(255, 129, 77, 139)),
                       ),

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smarn/models/teacher.dart';
 import 'package:smarn/pages/Teacher/Account%20Settings/account_settings.dart';
+import 'package:smarn/pages/Teacher/Manage%20Info/edit_personal_information_form.dart';
 import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 
@@ -140,7 +141,10 @@ class _ManagePersonnelInformationFormState
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const AccountSettingsPage(),
+                                     EditPersonnelInformationForm(
+                                       teacher: currentTeacher!,
+                                       teacherId: personnelId,
+                                     ),
                               ),
                             );
                           },

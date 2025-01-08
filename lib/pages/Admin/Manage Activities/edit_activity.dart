@@ -236,7 +236,8 @@ class _EditActivityState extends State<EditActivity> {
                           const SizedBox(height: 16),
 
                           // Class Dropdown
-                          activityDropdownMenu("class", _selectedClass, _classes,
+                          activityDropdownMenu(
+                              "class", _selectedClass, _classes,
                               (dynamic newValue) {
                             setState(() {
                               _selectedClass = newValue as Class;
@@ -257,6 +258,7 @@ class _EditActivityState extends State<EditActivity> {
                           durationFormField(
                               "Duration", // Field label
                               _minDuration, // Minimum duration in minutes
+                              _minDuration,
                               _maxDuration, // Maximum duration in minutes
                               (value) {
                             setState(() {

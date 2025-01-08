@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/change_request.dart';
+import 'package:smarn/models/change_request_status.dart';
 import 'package:smarn/models/room.dart';
 import 'package:smarn/services/activity_service.dart';
 import 'package:smarn/services/auth_service.dart';
@@ -52,12 +53,12 @@ class _EditRequestFormState extends State<EditRequestForm> {
     _reasonController.text = widget.request.reason;
     _newTimeSlotController.text = widget.request.newTimeSlot ?? '';
     _selectedRoom = widget.request.newRoom != null
-        ? _availableRooms.firstWhere(
-            (room) => room.id == widget.request.newRoom)
+        ? _availableRooms
+            .firstWhere((room) => room.id == widget.request.newRoom)
         : null;
     _selectedActivity = widget.request.activity != null
-        ? _availableActivities.firstWhere(
-            (activity) => activity['id'] == widget.request.activity)
+        ? _availableActivities
+            .firstWhere((activity) => activity['id'] == widget.request.activity)
         : null;
   }
 
@@ -67,25 +68,33 @@ class _EditRequestFormState extends State<EditRequestForm> {
     });
 
     final updatedRequest = ChangeRequest(
-      id: widget.request.id,
-      reason: _reasonController.text.trim(),
-      content: _descriptionController.text.trim(),
-      newRoom: _selectedRoom?.id,
-      activity: _selectedActivity?['id'],
-      newTimeSlot: _newTimeSlotController.text.trim(),
-      teacher: widget.request.teacher,
-    );
+        id: widget.request.id,
+        reason: _reasonController.text.trim(),
+        content: _descriptionController.text.trim(),
+        newRoom: _selectedRoom?.id,
+        activity: _selectedActivity?['id'],
+        newTimeSlot: _newTimeSlotController.text.trim(),
+        teacher: widget.request.teacher,
+        status: ChangeRequestStatus.pending);
 
-    final response = await ChangeRequestService().updateChangeRequest(
-      widget.request.id!,
-      updatedRequest,
-    );
+    if (!updatedRequest.equals(widget.request)) {
+      final response = await ChangeRequestService().updateChangeRequest(
+        widget.request.id!,
+        updatedRequest,
+      );
 
-    if (response['success']) {
-      Navigator.pop(context);
+      if (response['success']) {
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text('Failed to update request: ${response['message']}')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update request: ${response['message']}')),
+        const SnackBar(content: Text('No changes were made to the class')),
       );
     }
 
@@ -104,7 +113,8 @@ class _EditRequestFormState extends State<EditRequestForm> {
       body: Center(
         child: SingleChildScrollView(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600), // Set max width for web
+            constraints:
+                const BoxConstraints(maxWidth: 600), // Set max width for web
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
@@ -115,7 +125,8 @@ class _EditRequestFormState extends State<EditRequestForm> {
                       controller: _descriptionController,
                       maxLines: 5,
                       decoration: InputDecoration(
-                        hintText: 'Enter your description for the changes you wish to be made',
+                        hintText:
+                            'Enter your description for the changes you wish to be made',
                         hintStyle: const TextStyle(color: Colors.white),
                         filled: true,
                         fillColor: Colors.grey[800],
@@ -237,7 +248,8 @@ class _EditRequestFormState extends State<EditRequestForm> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue,
-                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 12, horizontal: 20),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),

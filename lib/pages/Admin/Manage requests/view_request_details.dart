@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:smarn/models/change_request.dart';
 import 'package:smarn/models/change_request_status.dart';
-import 'package:smarn/pages/widgets/canstants.dart';
 import 'package:smarn/services/change_request_service.dart';
 import 'package:smarn/services/teacher_service.dart';
 
@@ -161,150 +160,165 @@ class _ViewChangeRequestDetailsState extends State<ViewChangeRequestDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: Colors.black, // Dark background
       appBar: AppBar(
-        title: const Text("Change Request Details"),
-        backgroundColor: AppColors.appBarColor,
+        title: const Text("Request Details"),
+        backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              double cardWidth = constraints.maxWidth * 0.8; // 80% of available width
-              if (constraints.maxWidth < 600) {
-                cardWidth = constraints.maxWidth * 0.95; // On smaller screens, use 95% width
-              }
-
-              return SizedBox(
-                width: cardWidth,
-                child: Card(
-                  color: const Color.fromARGB(255, 64, 64, 64),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 5,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (widget.request.teacher != null)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Teacher ID: ${widget.request.teacher}',
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 16),
-                                ),
-                                const SizedBox(height: 8),
-                                if (teacherName != null)
-                                  Text(
-                                    'Teacher Name: $teacherName',
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 18),
-                                  ),
-                              ],
-                            ),
-                          const SizedBox(height: 8),
-
-                          if (widget.request.newTimeSlot != null)
-                            Text(
-                              'New Time Slot: ${widget.request.newTimeSlot}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-
-                          if (widget.request.newRoom != null)
-                            Text(
-                              'New Room: ${widget.request.newRoom}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-
-                          if (widget.request.activity != null)
-                            Text(
-                              'Activity: ${widget.request.activity}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-
-                          const SizedBox(height: 8),
-
-                          if (widget.request.reason != null)
-                            Text(
-                              'Reason: ${widget.request.reason}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          const SizedBox(height: 10),
-
-                          if (widget.request.content != null)
-                            Text(
-                              'Content: ${widget.request.content}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-
-                          if (widget.request.submissionDate != null)
-                            Text(
-                              'Date Submitted: ${formatDate(widget.request.submissionDate)}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-
-                          const SizedBox(height: 20),
-
-                          if (widget.request.status != null)
-                            Row(
-                              children: [
-                                Icon(
-                                  widget.request.status ==
-                                          ChangeRequestStatus.approved
-                                      ? Icons.check_circle
-                                      : widget.request.status ==
-                                              ChangeRequestStatus.rejected
-                                          ? Icons.cancel
-                                          : Icons.pending,
-                                  color: getStatusColor(widget.request.status!),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Status: ${widget.request.status?.name ?? 'N/A'}',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-
-                          const SizedBox(height: 20),
-
-                          if (widget.request.status == ChangeRequestStatus.pending)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    showConfirmationDialog('approve');
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                  ),
-                                  child: const Text('Approve'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    showConfirmationDialog('reject');
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  child: const Text('Reject'),
-                                ),
-                              ],
-                            ),
-                        ],
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 400, // Set a max width for the card
+            ),
+            child: Card(
+              color: Colors.grey[850], // Card color
+              elevation: 10,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0), // Rounded corners
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0), // Padding inside the card
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Minimum space needed
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        'Change Request Details',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20, // Font size
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
+                    const Divider(
+                      color: Colors.white54,
+                      thickness: 1,
+                      height: 16,
+                    ),
+                    const SizedBox(height: 12),
+                    if (widget.request.teacher != null)
+                      Text(
+                        'Teacher ID: ${widget.request.teacher}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    if (teacherName != null)
+                      Text(
+                        'Teacher Name: $teacherName',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    if (widget.request.newTimeSlot != null)
+                      Text(
+                        'New Time Slot: ${widget.request.newTimeSlot}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    if (widget.request.newRoom != null)
+                      Text(
+                        'New Room: ${widget.request.newRoom}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    if (widget.request.activity != null)
+                      Text(
+                        'Activity: ${widget.request.activity}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    if (widget.request.reason != null)
+                      Text(
+                        'Reason: ${widget.request.reason}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    if (widget.request.content != null)
+                      Text(
+                        'Content: ${widget.request.content}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    if (widget.request.submissionDate != null)
+                      Text(
+                        'Date Submitted: ${formatDate(widget.request.submissionDate)}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    if (widget.request.status != null)
+                      Row(
+                        children: [
+                          Icon(
+                            widget.request.status == ChangeRequestStatus.approved
+                                ? Icons.check_circle
+                                : widget.request.status == ChangeRequestStatus.rejected
+                                    ? Icons.cancel
+                                    : Icons.pending,
+                            color: getStatusColor(widget.request.status!),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Status: ${widget.request.status?.name ?? 'N/A'}',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 20),
+                    if (widget.request.status == ChangeRequestStatus.pending)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              showConfirmationDialog('approve');
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
+                            child: const Text('Approve'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              showConfirmationDialog('reject');
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                            ),
+                            child: const Text('Reject'),
+                          ),
+                        ],
+                      ),
+                  ],
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
       ),

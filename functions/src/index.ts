@@ -1,7 +1,9 @@
 import * as admin from "firebase-admin";
 
+// Initialisation Firebase
 admin.initializeApp();
 
+// Importation des fonctions depuis différents modules
 import {
   createTeacherAccount,
   updateTeacherAccount,
@@ -13,6 +15,7 @@ import {
   getAllTeachersNames,
   getTeacherName,
 } from "./functions/teacher_functions";
+
 import {
   addClass,
   deleteClass,
@@ -23,6 +26,7 @@ import {
   regenerateClassKey,
   updateClass,
 } from "./functions/class_functions";
+
 import {
   addRoom,
   deleteRoom,
@@ -31,6 +35,7 @@ import {
   getRoomsByBuilding,
   updateRoom,
 } from "./functions/room_functions";
+
 import {
   addBuilding,
   getBuilding,
@@ -38,6 +43,7 @@ import {
   updateBuilding,
   deleteBuilding,
 } from "./functions/building_functions";
+
 import {
   addSubject,
   updateSubject,
@@ -45,6 +51,7 @@ import {
   getAllSubjects,
   deleteSubject,
 } from "./functions/subject_functions";
+
 import {
   createChangeRequest,
   updateChangeRequest,
@@ -53,16 +60,18 @@ import {
   deleteChangeRequest,
   getChangeRequestsByTeacher,
 } from "./functions/change_request_functions";
+
 import {
   addActivity,
   updateActivity,
   getActivity,
   getAllActivities,
+  getActiveActivities,
   getActivitiesByTeacher,
   getActivitiesByClass,
   deleteActivity,
-  // getActiveActivities,
 } from "./functions/activity_functions";
+
 import {
   createSchedulingRule,
   createSpaceConstraint,
@@ -75,8 +84,15 @@ import {
   getMinMaxDuration,
   updateConstraint,
 } from "./functions/constraint_functions";
-import { createSchedules, getSchedule, getSchedulesForType, updateSchedule } from "./functions/schedule_functions";
 
+import {
+  createSchedules,
+  getLatestScheduleFor,
+  getSchedulesForType,
+  updateSchedule,
+} from "./functions/schedule_functions";
+
+// Exportation des fonctions pour utilisation dans Firebase
 export {
   createTeacherAccount,
   updateTeacherAccount,
@@ -88,6 +104,7 @@ export {
   getTeachersBySubject,
   getAllTeachersNames,
 };
+
 export {
   addClass,
   updateClass,
@@ -98,7 +115,9 @@ export {
   getAllClasses,
   deleteClass,
 };
+
 export { addSubject, updateSubject, getSubject, getAllSubjects, deleteSubject };
+
 export {
   addRoom,
   updateRoom,
@@ -107,6 +126,7 @@ export {
   getAllRooms,
   deleteRoom,
 };
+
 export {
   addBuilding,
   updateBuilding,
@@ -114,6 +134,7 @@ export {
   getAllBuildings,
   deleteBuilding,
 };
+
 export {
   createChangeRequest,
   updateChangeRequest,
@@ -122,16 +143,18 @@ export {
   getChangeRequestsByTeacher,
   deleteChangeRequest,
 };
+
 export {
   addActivity,
   updateActivity,
   getActivity,
+  getActiveActivities,
   getAllActivities,
- // getActiveActivities,
   getActivitiesByTeacher,
   getActivitiesByClass,
   deleteActivity,
 };
+
 export {
   createTimeConstraint,
   createSpaceConstraint,
@@ -142,11 +165,12 @@ export {
   getActiveConstraintsByCategory,
   updateConstraint,
   deleteConstraint,
-  getMinMaxDuration
+  getMinMaxDuration,
 };
+
 export {
   createSchedules,
-  getSchedule,
+  getLatestScheduleFor,
   getSchedulesForType,
-  updateSchedule
+  updateSchedule,
 };

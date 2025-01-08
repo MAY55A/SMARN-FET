@@ -16,8 +16,8 @@ class ChangeRequestService {
       });
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': e};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 

@@ -15,21 +15,43 @@ class TimeConstraintDetails extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Center(
-        child: Container(
-          height: 400,
-          width: 800,
-          color: Colors.black,
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                color: Colors.grey[850],
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _buildDetails(),
-                  ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 400, // Set a max width for the card
+            ),
+            child: Card(
+              color: Colors.grey[850], // Card color
+              elevation: 10,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0), // Rounded corners
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0), // Padding inside the card
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Minimum space needed
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        'Time Constraint Details',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20, // Font size
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Divider(
+                      color: Colors.white54,
+                      thickness: 1,
+                      height: 16,
+                    ),
+                    const SizedBox(height: 12),
+                    ..._buildDetails(),
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
             ),
@@ -93,11 +115,13 @@ class TimeConstraintDetails extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
             ),
           ),
         ],
@@ -109,6 +133,6 @@ class TimeConstraintDetails extends StatelessWidget {
 // Add a string extension to capitalize the first letter
 extension StringExtension on String {
   String capitalize() {
-    return this[0].toUpperCase() + substring(1).toLowerCase();
+    return this.isNotEmpty ? this[0].toUpperCase() + substring(1).toLowerCase() : '';
   }
 }
