@@ -137,162 +137,166 @@ class _EditTeacherFormState extends State<EditTeacherForm> {
         ),
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            color: Colors.grey[850], // Couleur de la carte
-            elevation: 8,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 8.0, horizontal: 16.0), // Reduced vertical padding
-              child: Form(
-                key: _formKey,
-                child: ListView(
-                  shrinkWrap:
-                      true, // Ensures the ListView takes only the needed space
-                  children: [
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: "Name",
-                        labelStyle: TextStyle(color: Colors.white),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Name is required.";
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 8), // Reduced space
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: "Email",
-                        labelStyle: TextStyle(color: Colors.white),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Email is required.";
-                        }
-                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                          return "Enter a valid email address.";
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 8), // Reduced space
-                    TextFormField(
-                      controller: _phoneController,
-                      decoration: const InputDecoration(
-                        labelText: "Phone",
-                        labelStyle: TextStyle(color: Colors.white),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      keyboardType: TextInputType.phone,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Phone is required.";
-                        }
-                        if (value.length != 8) {
-                          return "Phone number must be 8 digits.";
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 8), // Reduced space
-                    TextFormField(
-                      controller: _nbHoursController,
-                      decoration: const InputDecoration(
-                        labelText: "Target Hours",
-                        labelStyle: TextStyle(color: Colors.white),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Number of target hours is required.";
-                        }
-                        if (int.tryParse(value)! <= 0 ||
-                            int.tryParse(value)! > 40) {
-                          return "Number of target hours must be between 1 and 40.";
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 8), // Reduced space
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        labelStyle: const TextStyle(color: Colors.white),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 400, // Set a maximum width for the form
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              color: Colors.grey[850], // Couleur de la carte
+              elevation: 8,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 8.0, horizontal: 16.0), // Reduced vertical padding
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    shrinkWrap: true, // Ensures the ListView takes only the needed space
+                    children: [
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          labelText: "Name",
+                          labelStyle: TextStyle(color: Colors.white),
                         ),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      obscureText: _obscurePassword,
-                      validator: (value) {
-                        if (value != null && value.isNotEmpty) {
-                          if (value.length < 6) {
-                            return "Password must be at least 6 characters.";
+                        style: const TextStyle(color: Colors.white),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Name is required.";
                           }
-                          if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)')
-                              .hasMatch(value)) {
-                            return "Password must include upper, lower case, and a number.";
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 8), // Reduced space
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: "Email",
+                          labelStyle: TextStyle(color: Colors.white),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Email is required.";
                           }
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 12), // Reduced space
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                AppColors.appBarColor),
-                          ),
-                          onPressed: _isLoading
-                              ? null
-                              : _updateTeacher, // Disable button when loading
-                          child: _isLoading
-                              ? const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.black),
-                                )
-                              : const Text(
-                                  "Update Teacher",
-                                  style: TextStyle(color: Colors.white),
-                                ),
+                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                            return "Enter a valid email address.";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 8), // Reduced space
+                      TextFormField(
+                        controller: _phoneController,
+                        decoration: const InputDecoration(
+                          labelText: "Phone",
+                          labelStyle: TextStyle(color: Colors.white),
                         ),
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.grey),
-                          ),
-                          onPressed: _cancelUpdates,
-                          child: const Text(
-                            "Cancel",
-                            style: TextStyle(color: Colors.white),
+                        style: const TextStyle(color: Colors.white),
+                        keyboardType: TextInputType.phone,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Phone is required.";
+                          }
+                          if (value.length != 8) {
+                            return "Phone number must be 8 digits.";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 8), // Reduced space
+                      TextFormField(
+                        controller: _nbHoursController,
+                        decoration: const InputDecoration(
+                          labelText: "Target Hours",
+                          labelStyle: TextStyle(color: Colors.white),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Number of target hours is required.";
+                          }
+                          if (int.tryParse(value)! <= 0 ||
+                              int.tryParse(value)! > 40) {
+                            return "Number of target hours must be between 1 and 40.";
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 8), // Reduced space
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: "Password",
+                          labelStyle: const TextStyle(color: Colors.white),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                        style: const TextStyle(color: Colors.white),
+                        obscureText: _obscurePassword,
+                        validator: (value) {
+                          if (value != null && value.isNotEmpty) {
+                            if (value.length < 6) {
+                              return "Password must be at least 6 characters.";
+                            }
+                            if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)')
+                                .hasMatch(value)) {
+                              return "Password must include upper, lower case, and a number.";
+                            }
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12), // Reduced space
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                  AppColors.appBarColor),
+                            ),
+                            onPressed: _isLoading
+                                ? null
+                                : _updateTeacher, // Disable button when loading
+                            child: _isLoading
+                                ? const CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.black),
+                                  )
+                                : const Text(
+                                    "Update Teacher",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                          ),
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.grey),
+                            ),
+                            onPressed: _cancelUpdates,
+                            child: const Text(
+                              "Cancel",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

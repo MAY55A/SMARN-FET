@@ -116,7 +116,7 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.white70,
                   ),
                 ),
-                SizedBox(height:60)
+                SizedBox(height: 60)
               ],
             ),
           ),
@@ -129,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                   vertical: 20,
                   horizontal: 30,
                 ),
-                backgroundColor: const Color.fromARGB(255, 59, 130, 189),
+                backgroundColor: const Color.fromARGB(192, 167, 68, 164),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),

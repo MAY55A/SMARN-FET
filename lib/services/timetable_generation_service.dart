@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:smarn/models/activity.dart';
 import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/models/constraint.dart';
@@ -9,6 +10,7 @@ import 'package:smarn/services/activity_service.dart';
 import 'package:smarn/services/class_service.dart';
 import 'package:smarn/services/room_service.dart';
 import 'package:smarn/services/constraint_service.dart';
+import 'package:smarn/services/schedule_service.dart';
 import 'package:smarn/services/time_service.dart';
 
 enum ConstraintCheck {
@@ -18,61 +20,69 @@ enum ConstraintCheck {
 }
 
 class TimetableGenerationService {
-  late List<Activity> _allActivities;
-  late List<Room> _allRooms;
-  late Map<String, List<TimeConstraint>> _timeConstraints;
-  late Map<String, List<SpaceConstraint>> _constraintsPerRoom;
-  late Map<WorkDay, List<String>> _hoursPerDay;
-  late Map<WorkDay, List<String>> _breaksPerDay;
-  late Map<WorkDay, List<String>> _availableHoursPerDay;
-  late Map<String, int> _nbStudentsPerClass;
-  late Map<ActivityTag, RoomType> _activitiesRequiredRoomType;
-  late int _minActivityDuration;
-  late int _maxActivityDuration;
+  final ConstraintService _constraintService = ConstraintService();
+  final ValueNotifier<List<String>> logs = ValueNotifier([]);
+  final Map<String, int> _entitiesFailingRates = {};
+
+  List<Activity> _allActivities = [];
+  List<Room> _allRooms = [];
+  final Map<String, List<TimeConstraint>> _timeConstraints = {};
+  final Map<String, List<SpaceConstraint>> _constraintsPerRoom = {};
+  final Map<WorkDay, Map<String, List<String>>> _hoursPerDay = {};
+  final Map<WorkDay, Map<String, List<String>>> _breaksPerDay = {};
+  final Map<WorkDay, Map<String, List<String>>> _availableHoursPerDay = {};
+  Map<String, int> _nbStudentsPerClass = {};
+  final Map<ActivityTag, RoomType> _activitiesRequiredRoomType = {};
+  int _minActivityDuration = 0;
+  int _maxActivityDuration = 0;
 
   final List<Activity> _scheduledActivities = [];
 
-  TimetableGenerationService() {
-    _fetchSchedulingRules();
-  }
+  Future<void> generateTimetables() async {
+    try {
+      await _fetchData();
+      _addLog("All data fetched successfully!");
 
-  Map<WorkDay, List<String>> get hoursPerDay => _hoursPerDay;
-  Map<WorkDay, List<String>> get breaksPerDay => _breaksPerDay;
-  Map<WorkDay, List<String>> get availableHoursPerDay => _availableHoursPerDay;
-  int get minActivityDuration => _minActivityDuration;
-  int get maxActivityDuration => _maxActivityDuration;
-
-  void generateTimetables() {
-    _fetchData();
-    var res = _scheduleActivities(_allActivities);
-
-    if (res) {
-      print("\n GENERATION SUCCESS");
-      //_assignSchedules();
-    } else {
-      print("\n GENERATION FAILED");
+      bool res = _scheduleActivities(_allActivities);
+      if (res) {
+        _addLog("\n GENERATION SUCCESS");
+        _addLog(
+            "*******Scheduled Activities : *********\n$_scheduledActivities");
+        //_assignSchedules();
+      } else {
+        _addLog("\n GENERATION FAILED");
+        _addLog("\n Most failing entities: \n");
+        _addLog(getMostFailingEntities()
+            .entries
+            .map((e) => "${e.key}: ${e.value}")
+            .join('\n'));
+      }
+    } catch (error) {
+      _addLog("An error occurred: $error");
     }
-    print("\n*******scheduled Activities : *********\n$_scheduledActivities");
   }
 
-  void _fetchData() {
-    _fetchActivities();
-    _fetchRooms();
-    _fetchTimeConstraints();
-    _fetchSpaceConstraints();
-    _fetchNbStudentsPerClass();
+  Future<void> _fetchData() {
+    return Future.wait([
+      _fetchActivities(),
+      _fetchRooms(),
+      _fetchTimeConstraints(),
+      _fetchSpaceConstraints(),
+      _fetchSchedulingRules(),
+      _fetchNbStudentsPerClass(),
+    ]);
   }
 
-  void _fetchActivities() async {
+  Future<void> _fetchActivities() async {
     _allActivities = await ActivityService().getActiveActivities();
   }
 
-  void _fetchRooms() async {
+  Future<void> _fetchRooms() async {
     _allRooms = await RoomService().getAllRooms();
   }
 
-  void _fetchTimeConstraints() async {
-    var timeConstraints = await ConstraintService()
+  Future<void> _fetchTimeConstraints() async {
+    var timeConstraints = await _constraintService
         .getActiveConstraintsByCategory(ConstraintCategory.timeConstraint);
     for (var constraint in timeConstraints) {
       constraint = (constraint as TimeConstraint);
@@ -85,11 +95,11 @@ class TimetableGenerationService {
       }
     }
 
-    print("***** fetched time constraints: *****\n$_timeConstraints\n");
+    _addLog("***** fetched time constraints: *****\n$_timeConstraints");
   }
 
-  void _fetchSpaceConstraints() async {
-    var spaceConstraints = await ConstraintService()
+  Future<void> _fetchSpaceConstraints() async {
+    var spaceConstraints = await _constraintService
         .getActiveConstraintsByCategory(ConstraintCategory.spaceConstraint);
     for (var constraint in spaceConstraints) {
       constraint = (constraint as SpaceConstraint);
@@ -105,21 +115,25 @@ class TimetableGenerationService {
       }
     }
 
-    print("***** fetched room constraints: *****\n$_constraintsPerRoom\n");
-    print(
-        "***** fetched roomType constraints: *****\n$_activitiesRequiredRoomType\n");
+    _addLog("***** fetched room constraints: *****\n$_constraintsPerRoom");
+    _addLog(
+        "***** fetched roomType constraints: *****\n$_activitiesRequiredRoomType");
   }
 
-  void _fetchSchedulingRules() async {
-    var schedulingRules = await ConstraintService()
-            .getActiveConstraintsByCategory(ConstraintCategory.schedulingRule)
-        as List<SchedulingRule>;
+  Future<void> _fetchSchedulingRules() async {
+    var schedulingRules = await _constraintService
+        .getActiveConstraintsByCategory(ConstraintCategory.schedulingRule);
     _minActivityDuration =
-        (await ConstraintService().getMinMaxDuration('min')) ?? 30;
+        (await _constraintService.getMinMaxDuration('min')) ?? 30;
     _maxActivityDuration =
-        (await ConstraintService().getMinMaxDuration('max')) ?? 240;
+        (await _constraintService.getMinMaxDuration('max')) ?? 240;
+    _addLog(
+        "***** fetched min activity duration : *****\n$_minActivityDuration");
+    _addLog(
+        "***** fetched max activity duration : *****\n$_maxActivityDuration");
 
     for (var rule in schedulingRules) {
+      rule = rule as SchedulingRule;
       if (rule.type == SchedulingRuleType.breakPeriod) {
         for (var day in rule.applicableDays!) {
           _breaksPerDay[day] = TimeService.generateHours(
@@ -134,19 +148,28 @@ class TimetableGenerationService {
     }
 
     for (var day in _hoursPerDay.keys) {
-      _availableHoursPerDay[day] = _hoursPerDay[day]!
-          .where((hour) => !(_breaksPerDay[day] ?? []).contains(hour))
-          .toList();
+      _availableHoursPerDay[day] = {
+        "startTimes": _hoursPerDay[day]!["startTimes"]!
+            .where((hour) =>
+                !(_breaksPerDay[day]?["startTimes"] ?? []).contains(hour))
+            .toList(),
+        "endTimes": _hoursPerDay[day]!["endTimes"]!
+            .where((hour) =>
+                !(_breaksPerDay[day]?["endTimes"] ?? []).contains(hour))
+            .toList()
+      };
     }
 
-    print(
-        "***** fetched scheduling rules: *****\n$_hoursPerDay\n$_breaksPerDay\n$_availableHoursPerDay\n");
+    _addLog(
+        "***** fetched scheduling rules: *****\n$_hoursPerDay\n$_breaksPerDay\n$_availableHoursPerDay");
+    _addLog(
+        "***** fetched durations: *****\n$_minActivityDuration\n$_maxActivityDuration");
   }
 
-  void _fetchNbStudentsPerClass() async {
+  Future<void> _fetchNbStudentsPerClass() async {
     _nbStudentsPerClass = await ClassService().getAllClassesNbStudents();
 
-    print("***** fetched NbStudentsPerClass: *****\n$_nbStudentsPerClass\n");
+    _addLog("***** fetched NbStudentsPerClass: *****\n$_nbStudentsPerClass");
   }
 
   bool _scheduleActivities(List<Activity> activities) {
@@ -159,12 +182,10 @@ class TimetableGenerationService {
     } else {
       for (Activity activity in possibleScheduledActivities) {
         _scheduledActivities.add(activity);
-        print("\n ADDING scheduled activity : $activity");
         if (_scheduleActivities(activities)) {
           return true;
         } else {
           _scheduledActivities.removeLast();
-          print("\n REMOVING scheduled activity : $activity");
         }
       }
       return false;
@@ -176,19 +197,22 @@ class TimetableGenerationService {
 
     for (var day in WorkDay.values) {
       if (_availableHoursPerDay[day] != null) {
-        for (var hour in _availableHoursPerDay[day]!) {
-          print("\n Scheduling activity : ${activity.id} on $day at $hour");
+        for (var hour in _availableHoursPerDay[day]!["startTimes"]!) {
           Activity scheduledActivity = activity.getScheduledActivity(day, hour);
+          if (!_availableHoursPerDay[day]!["endTimes"]!
+              .contains(scheduledActivity.endTime)) {
+            continue;
+          }
+          ;
           if (_checkTimeConstraints(scheduledActivity)) {
             for (Room room in _allRooms) {
               var res = _checkSpaceConstraints(scheduledActivity, room);
               if (res != ConstraintCheck.failsRequiredConstraints) {
                 scheduledActivity.room = room.id;
                 if (res == ConstraintCheck.passesAllConstraints) {
-                  possibleSchedules.add(scheduledActivity);
+                  possibleSchedules.insert(0, scheduledActivity);
                 } else {
-                  possibleSchedules.insert(
-                      possibleSchedules.length, scheduledActivity);
+                  possibleSchedules.add(scheduledActivity);
                 }
               }
             }
@@ -203,7 +227,6 @@ class TimetableGenerationService {
     // Check time constraints for the scheduled activity
     var res = _checkTeacherAvailability(scheduledActivity) &&
         _checkClassAvailability(scheduledActivity);
-    print("\n PASSED ALL TEACHER AND CLASS TIME CONSTRAINTS ? : $res");
     return res;
   }
 
@@ -214,14 +237,11 @@ class TimetableGenerationService {
         _checkRoomCapacity(activity, room) &&
         _checkRequiredRoomType(activity, room)) {
       if (_checkPreferredRoom(activity, room)) {
-        print("\n room ${room.id} passed all constraints");
         return ConstraintCheck.passesAllConstraints;
       } else {
-        print("\n room ${room.id} passed required constraints");
         return ConstraintCheck.passesRequiredConstraints;
       }
     }
-    print("\n room ${room.id} failed required constraints");
     return ConstraintCheck.failsRequiredConstraints;
   }
 
@@ -236,13 +256,10 @@ class TimetableGenerationService {
       // check if teacher teaches another activity
       if (!_scheduledActivities
           .any((a) => a.teacher == activity.teacher && a.overlaps(activity))) {
-        print("\n teacher ${activity.teacher} passed availability check");
-
         return true;
       }
     }
-    print("\n teacher ${activity.teacher} didn't pass availability check");
-
+    _incrementFailingRate(activity.teacher);
     return false;
   }
 
@@ -257,11 +274,10 @@ class TimetableGenerationService {
       // check if class is having another activity
       if (!_scheduledActivities.any((a) =>
           a.studentsClass == activity.studentsClass && a.overlaps(activity))) {
-        print("\n class ${activity.studentsClass} passed availability check");
         return true;
       }
     }
-    print("\n class ${activity.studentsClass} didn't pass availability check");
+    _incrementFailingRate(activity.studentsClass);
     return false;
   }
 
@@ -273,24 +289,23 @@ class TimetableGenerationService {
       // check if room is occupied by another activity
       if (!_scheduledActivities
           .any((a) => a.room == room.id && a.overlaps(activity))) {
-        print("\n room ${room.id} passed availability check");
         return true;
       }
     }
-    print("\n room ${room.id} didn't pass availability check");
+    _incrementFailingRate(room.id!);
     return false;
   }
 
   bool _checkRequiredRoomType(Activity activity, Room room) {
     var requiredRoomType = _activitiesRequiredRoomType[activity.tag];
     var res = requiredRoomType == null || requiredRoomType == room.type;
-    print("\n room ${room.id} passed required room type check ? $res");
+    if (!res) _incrementFailingRate(requiredRoomType.name);
     return res;
   }
 
   bool _checkRoomCapacity(Activity activity, Room room) {
     var res = room.capacity >= _nbStudentsPerClass[activity.studentsClass]!;
-    print("\n room ${room.id} passed required capacity check ? $res");
+    if (!res) _incrementFailingRate(room.id!);
     return res;
   }
 
@@ -302,7 +317,6 @@ class TimetableGenerationService {
             c.teacherId == activity.teacher ||
             c.classId == activity.studentsClass ||
             c.subjectId == activity.subject);
-    print("\n room ${room.id} passed preferred room check ? $res");
     return res;
   }
 
@@ -333,9 +347,10 @@ class TimetableGenerationService {
         schedules[id]!.activities.add(detailedActivity);
       }
     }
-    print("*** Schedules assigned successfully ***\n$schedules");
-    //ScheduleService().createSchedules(schedules.values.toList());
-    print("*** Schedules created successfully ***");
+    _addLog("*** Schedules assigned successfully ***\n$schedules");
+    var res =
+        await ScheduleService().createSchedules(schedules.values.toList());
+    _addLog(res["message"]);
   }
 
   Future<Activity> _getDetailedActivity(Activity activity) async {
@@ -353,5 +368,25 @@ class TimetableGenerationService {
       endTime: activity.endTime,
       room: _allRooms.firstWhere((r) => r.id == activity.room).name,
     );
+  }
+
+  void _addLog(String message) {
+    logs.value = [...logs.value, message];
+  }
+
+  void _incrementFailingRate(String entityId) {
+    if (!_entitiesFailingRates.containsKey(entityId)) {
+      _entitiesFailingRates[entityId] = 0;
+    }
+    _entitiesFailingRates[entityId] = 1 + _entitiesFailingRates[entityId]!;
+  }
+
+  Map<String, int> getMostFailingEntities() {
+    var top10Map = Map.fromEntries(
+      _entitiesFailingRates.entries.toList()
+        ..sort((e1, e2) => e2.value.compareTo(e1.value))
+        ..take(10),
+    );
+    return top10Map;
   }
 }

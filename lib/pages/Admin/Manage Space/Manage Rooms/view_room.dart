@@ -1,15 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/room.dart';
+import 'package:smarn/services/building_service.dart';
 
-class ViewRoom extends StatelessWidget {
+class ViewRoom extends StatefulWidget {
   final Room roomItem;
 
   const ViewRoom({super.key, required this.roomItem});
 
   @override
+  _ViewRoomState createState() => _ViewRoomState();
+}
+
+class _ViewRoomState extends State<ViewRoom> {
+  String buildingName = "Loading..."; // Placeholder while fetching building name
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBuildingName();
+  }
+
+  Future<void> _fetchBuildingName() async {
+    final buildingService = BuildingService();
+    final building = await buildingService.getBuildingDetails(widget.roomItem.building);
+    setState(() {
+      buildingName = building?.name ?? "Unknown Building"; // Update with fetched name
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Set background color to black
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Room Details'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
@@ -17,23 +39,23 @@ class ViewRoom extends StatelessWidget {
       ),
       body: Center(
         child: Container(
-          width: 600, // Fixed width to make it bigger
-          height: 300, // Set a fixed height to make the card larger
+          width: 600,
+          height: 300,
           child: Card(
-            color: const Color.fromARGB(255, 34, 34, 34), // Dark card color
+            color: const Color.fromARGB(255, 34, 34, 34),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0), // Rounded corners for the card
+              borderRadius: BorderRadius.circular(15.0),
             ),
-            elevation: 5.0, // Slight shadow for the card
+            elevation: 5.0,
             margin: const EdgeInsets.all(16.0),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView( // Allow scrolling if content overflows
+              child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Room Name: ${roomItem.name}',
+                      'Room Name: ${widget.roomItem.name}',
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -42,22 +64,22 @@ class ViewRoom extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Description: ${roomItem.description}',
+                      'Description: ${widget.roomItem.description}',
                       style: const TextStyle(fontSize: 16, color: Colors.white),
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Capacity: ${roomItem.capacity}',
+                      'Capacity: ${widget.roomItem.capacity}',
                       style: const TextStyle(fontSize: 16, color: Colors.white),
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Building: ${roomItem.building}',
+                      'Building: $buildingName', // Display building name
                       style: const TextStyle(fontSize: 16, color: Colors.white),
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Room Type: ${roomItem.type.name}',
+                      'Room Type: ${widget.roomItem.type.name}',
                       style: const TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ],

@@ -70,8 +70,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
     }).toList();
   }
 
-  Future<void> _confirmDeleteTeacher(
-      String teacherId, String teacherName) async {
+  Future<void> _confirmDeleteTeacher(String teacherId, String teacherName) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) {
@@ -226,8 +225,7 @@ class _ManageTeachersFormState extends State<ManageTeachersForm> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.white),
+                                icon: const Icon(Icons.edit, color: Colors.white),
                                 onPressed: () {
                                   Navigator.push(
                                     context,

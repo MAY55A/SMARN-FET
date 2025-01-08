@@ -52,24 +52,42 @@ export const createSchedules = functions.https.onCall(async (request) => {
   }
 });
 
-export const getSchedule = functions.https.onCall(async (request) => {
-  const { scheduleId } = request.data;
+export const getLatestScheduleFor = functions.https.onCall(async (request) => {
+  const { id } = request.data;
 
   // Check if the schedule id is provided
-  if (!scheduleId) {
+  if (!id) {
     throw new functions.https.HttpsError(
       "invalid-argument",
-      "Missing required parameters: scheduleId"
+      "Missing required parameters: id"
     );
   }
-  // Fetch schedule data from Firestore
-  const scheduleDoc = await db.collection("schedules").doc(scheduleId).get();
+  try {
+    // Query Firestore for schedules belonging to the given id
+    const schedulesQuerySnapshot = await db
+      .collection("schedules")
+      .where("belongsTo", "==", id)
+      .orderBy("creationDate", "desc") // Ensure the most recent is fetched first
+      .limit(1) // Fetch only the latest schedule
+      .get();
 
-  if (!scheduleDoc.exists) {
-    throw new functions.https.HttpsError("not-found", "Schedule not found");
+    // Check if any schedules exist
+    if (schedulesQuerySnapshot.empty) {
+      throw new functions.https.HttpsError("not-found", "Schedule not found");
+    }
+
+    // Retrieve the first (latest) schedule document
+    const latestScheduleDoc = schedulesQuerySnapshot.docs[0];
+
+    // Return the latest schedule data
+    return latestScheduleDoc.data();
+  } catch (error) {
+    console.error("Error fetching latest schedule:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "An error occurred while fetching the schedule"
+    );
   }
-
-  return scheduleDoc.data();
 });
 
 export const getSchedulesForType = functions.https.onCall(async (request) => {

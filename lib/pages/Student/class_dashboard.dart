@@ -1,7 +1,10 @@
+/*
+
 import 'package:flutter/material.dart';
+import 'package:smarn/pages/Student/view_timetable.dart';
 import 'package:smarn/pages/Teacher/Manage%20qualified%20subjects/manage_qualified_subjects_form.dart';
 import 'package:smarn/pages/Teacher/Manage%20Info/manage_personnel_information_form.dart';
-import 'package:smarn/pages/Teacher/timetable/view_timetable.dart';
+
 
 class ClassDashboard extends StatelessWidget {
   const ClassDashboard({super.key});
@@ -77,7 +80,7 @@ class ClassDashboard extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const ViewComplaintsOrPrintTimetable()),
+                            const ViewTimetable()),
                   );
                 },
                 trailing: const Icon(Icons.arrow_forward_ios),
@@ -89,7 +92,7 @@ class ClassDashboard extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const ViewComplaintsOrPrintTimetable()),
+                            const  ViewTimetable()),
                   );
                 },
                 trailing: const Icon(Icons.arrow_forward_ios),
@@ -101,3 +104,5 @@ class ClassDashboard extends StatelessWidget {
     );
   }
 }
+
+*/

@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:smarn/models/activity.dart';
 import 'package:smarn/models/activity_tag.dart';
+import 'package:smarn/models/class.dart';
 import 'package:smarn/models/work_day.dart';
 import 'package:smarn/services/schedule_service.dart';
-import 'package:smarn/services/teacher_service.dart';
 
-class ManageTimetableTeacher extends StatefulWidget {
+class ViewTimetable extends StatefulWidget {
+  final Class studentsClass;
+  ViewTimetable({required this.studentsClass});
+
   @override
-  _ManageTimetableTeacherState createState() => _ManageTimetableTeacherState();
+  _ViewTimetableState createState() => _ViewTimetableState();
 }
 
-class _ManageTimetableTeacherState extends State<ManageTimetableTeacher> {
+class _ViewTimetableState extends State<ViewTimetable> {
   List<Activity>? activities;
-
+  String searchQuery = '';
+  final List<WorkDay> daysOfWeek = WorkDay.values.toList();
   bool _isLoading = false;
 
   @override
@@ -25,24 +29,17 @@ class _ManageTimetableTeacherState extends State<ManageTimetableTeacher> {
     setState(() {
       _isLoading = true;
     });
-    var user = await TeacherService().fetchTeacherData();
-    if (user != null) {
-      var timetable = await ScheduleService().getLatestScheduleFor(user.id!);
-      if (timetable != null) {
-        setState(() {
-          activities = timetable.activities;
-        });
-      }
+    var timetable =
+        await ScheduleService().getLatestScheduleFor(widget.studentsClass.id!);
+    if (timetable != null) {
       setState(() {
-        _isLoading = false;
+        activities = timetable.activities;
       });
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
-
-  String searchQuery = '';
-
-  // Liste des jours (dimanche supprimé)
-  final List<WorkDay> daysOfWeek = WorkDay.values.toList();
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +47,7 @@ class _ManageTimetableTeacherState extends State<ManageTimetableTeacher> {
     if (activities != null) {
       // Filtrer les horaires en fonction de la recherche
       List<Activity> filteredTimetable = activities!.where((entry) {
-        return entry.studentsClass
+        return entry.teacher
                 .toLowerCase()
                 .contains(searchQuery.toLowerCase()) ||
             entry.subject.toLowerCase().contains(searchQuery.toLowerCase());
@@ -92,7 +89,7 @@ class _ManageTimetableTeacherState extends State<ManageTimetableTeacher> {
                             });
                           },
                           decoration: InputDecoration(
-                            labelText: 'Search Class/Subject',
+                            labelText: 'Search Teacher/Subject',
                             labelStyle: const TextStyle(color: Colors.white),
                             filled: true,
                             fillColor: Colors.grey.shade800,
@@ -167,7 +164,7 @@ class _ManageTimetableTeacherState extends State<ManageTimetableTeacher> {
                                                 ),
                                                 DataColumn(
                                                   label: Text(
-                                                    'Class',
+                                                    'Teacher',
                                                     style: TextStyle(
                                                       color: Colors.white,
                                                       fontWeight:
@@ -225,7 +222,7 @@ class _ManageTimetableTeacherState extends State<ManageTimetableTeacher> {
                                                       ),
                                                     ),
                                                     DataCell(Text(
-                                                      timingEntry.studentsClass,
+                                                      timingEntry.teacher,
                                                       style: const TextStyle(
                                                         color: Colors.white,
                                                         fontSize: 14,
@@ -265,7 +262,7 @@ class _ManageTimetableTeacherState extends State<ManageTimetableTeacher> {
     );
   }
 
-  // Assigner une couleur à chaque activité
+// Assigner une couleur à chaque activité
   Color _getColorForActivity(ActivityTag tag) {
     switch (tag) {
       case ActivityTag.lecture:

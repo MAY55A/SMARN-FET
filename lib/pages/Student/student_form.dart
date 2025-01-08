@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/student/class_dashboard.dart';
+import 'package:smarn/pages/Student/view_timetable.dart';
 import 'package:smarn/services/class_service.dart';
+import 'package:smarn/pages/widgets/canstants.dart'; // Assuming AppColors is defined here
 
 class StudentForm extends StatefulWidget {
   const StudentForm({super.key});
@@ -17,17 +18,27 @@ class _StudentFormState extends State<StudentForm> {
 
   Future<void> _accessClassSchedule() async {
     if (_formKey.currentState!.validate()) {
-      var studentsClass = await _classService.getClassDetails(
-        _classController.text.trim(),
-        _keyController.text.trim(),
-      );
-      if (studentsClass != null) {
-        Navigator.pushReplacementNamed(context, '/class_dashboard');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+      try {
+        var studentsClass = await _classService.getClassDetails(
+          _classController.text.trim(),
+          _keyController.text.trim(),
+        );
+        if (studentsClass != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ViewTimetable(studentsClass: studentsClass,)),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
               content:
-                  Text("Incorrect Class or Key. Please check your inputs.")),
+                  Text("Incorrect Class or Key. Please check your inputs."),
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("An error occurred: $e")),
         );
       }
     }
@@ -38,8 +49,7 @@ class _StudentFormState extends State<StudentForm> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
       appBar: AppBar(
-        backgroundColor:
-            const Color.fromARGB(255, 129, 77, 139), // AppBar color
+        backgroundColor: AppColors.appBarColor, // AppBar color
         title: const Text('Student Form'),
       ),
       body: Center(
@@ -47,43 +57,43 @@ class _StudentFormState extends State<StudentForm> {
           padding: const EdgeInsets.all(16.0),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 236, 248, 253),
+              color: AppColors.formColor, // Form background
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blue.withOpacity(0.5),
-                  spreadRadius: 3,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+              // Removed shadow effect here
             ),
             padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 400, // Limits the form width for larger screens
-                ),
-                child: ListView(
-                  shrinkWrap: true, // Makes the ListView fit its content
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 400, // Match width of EducatorForm
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
-                      'Student Information',
+                      'Access Class Schedule',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white, // Title text color
                       ),
-                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
 
                     // Class Field
                     TextFormField(
                       controller: _classController,
+                      style: const TextStyle(
+                          color: Colors.white), // Text color inside field
                       decoration: const InputDecoration(
                         labelText: 'Class',
                         border: OutlineInputBorder(),
+                        labelStyle:
+                            TextStyle(color: Colors.white), // Label text color
+                        fillColor:
+                            Color.fromARGB(255, 58, 58, 58), // Field background
+                        filled: true,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -97,9 +107,16 @@ class _StudentFormState extends State<StudentForm> {
                     // Key Field
                     TextFormField(
                       controller: _keyController,
+                      style: const TextStyle(
+                          color: Colors.white), // Text color inside field
                       decoration: const InputDecoration(
                         labelText: 'Key to Connect',
                         border: OutlineInputBorder(),
+                        labelStyle:
+                            TextStyle(color: Colors.white), // Label text color
+                        fillColor:
+                            Color.fromARGB(255, 58, 58, 58), // Field background
+                        filled: true,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -112,19 +129,15 @@ class _StudentFormState extends State<StudentForm> {
 
                     ElevatedButton(
                       onPressed: _accessClassSchedule,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5), // Less vertical padding
-                        backgroundColor: const Color.fromARGB(
-                            255, 129, 77, 139), // Button color
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            AppColors.appBarColor), // Button color
+                        foregroundColor: MaterialStateProperty.all(
+                            Colors.white), // Button text color
                       ),
                       child: const Text(
                         'Submit',
-                        style: TextStyle(
-                          fontSize: 16, // Adjust font size if needed
-                          color: Color.fromARGB(
-                              255, 255, 236, 249), // Text color set to white
-                        ),
+                        style: TextStyle(fontSize: 16),
                       ),
                     ),
                   ],

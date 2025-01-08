@@ -27,7 +27,7 @@ export const generateId = async (prefix: string, collectionName: string): Promis
       transaction.update(counterDocRef, {count: newCount});
 
       // Return the newly generated ID with the prefix
-      return prefix + newCount.toString().padStart(3, "0");
+      return prefix + newCount.toString().padStart(4, "0");
     });
 
     return id; // Return the generated ID

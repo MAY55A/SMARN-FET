@@ -264,7 +264,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                                 style: const TextStyle(color: Colors.white),
                               ),
                               subtitle: Text(
-                                'By ${activity["teacher"]["name"]}\nOn ${activity['day'] ?? "??"} ${activity['startTime'] ?? "??"}h --> ${activity['endTime'] ?? "??"}h',
+                                'By ${activity["teacher"]["name"]}',
                                 style: const TextStyle(color: Colors.white),
                               ),
                               trailing: Row(
@@ -294,6 +294,7 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
           ),
         ],
       ),
+      
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context,

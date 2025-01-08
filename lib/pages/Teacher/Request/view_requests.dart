@@ -126,6 +126,7 @@ class _ViewRequestsState extends State<ViewRequests> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text("View Requests"),
         backgroundColor: Colors.blue,
@@ -193,7 +194,7 @@ class _ViewRequestsState extends State<ViewRequests> {
         backgroundColor: Colors.blue,
         child: const Icon(Icons.add),
       ),
-      backgroundColor: const Color(0xFF2C2C2C),
+      
     );
   }
 }
