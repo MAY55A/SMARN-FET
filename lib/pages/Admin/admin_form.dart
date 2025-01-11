@@ -43,7 +43,7 @@ class _AdminFormState extends State<AdminForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 9, 17), // Dark background
+      backgroundColor: const Color.fromARGB(255, 0, 9, 17),
       appBar: AppBar(
         title: const Text('Admin Form'),
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),

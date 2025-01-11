@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:smarn/models/activity.dart';
 import 'package:smarn/models/class.dart';
