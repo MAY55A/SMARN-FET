@@ -198,7 +198,7 @@ class _EditActivityState extends State<EditActivity> {
           ? const Center(child: CircularProgressIndicator())
           : Center(
               child: ConstrainedBox(
-                constraints: BoxConstraints(
+                constraints: const BoxConstraints(
                   maxWidth: 400, // Set a maximum width for the form
                 ),
                 child: Card(
@@ -290,13 +290,13 @@ class _EditActivityState extends State<EditActivity> {
                           // Save Button
                           ElevatedButton(
                             onPressed: _saveActivity,
-                            child: const Text('Save Activity'),
                             style: ButtonStyle(
                               foregroundColor:
                                   MaterialStateProperty.all(Colors.black),
                               backgroundColor: MaterialStateProperty.all(
                                   const Color.fromARGB(255, 129, 77, 139)),
                             ),
+                            child: const Text('Save Activity'),
                           ),
                         ],
                       ),

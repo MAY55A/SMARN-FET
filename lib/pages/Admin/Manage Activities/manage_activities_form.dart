@@ -110,6 +110,19 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
     });
   }
 
+  void _addActivity() async {
+    final added = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AddActivity()),
+    );
+
+    if (added != null && added) {
+      setState(() {
+        _fetchActivities();
+      });
+    }
+  }
+
   void _editActivity(Map<String, dynamic> activity) async {
     final updated = await Navigator.push(
       context,
@@ -260,11 +273,11 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
                             margin: const EdgeInsets.all(8.0),
                             child: ListTile(
                               title: Text(
-                                "${activity['subject']['longName']} - ${activity["studentsClass"]["name"]}",
+                                "${activity['subject']['longName']} - ${activity["tag"]}",
                                 style: const TextStyle(color: Colors.white),
                               ),
                               subtitle: Text(
-                                'By ${activity["teacher"]["name"]}',
+                                'By ${activity["teacher"]["name"]} - ${activity["studentsClass"]["name"]}',
                                 style: const TextStyle(color: Colors.white),
                               ),
                               trailing: Row(
@@ -294,14 +307,10 @@ class _ManageActivitiesFormState extends State<ManageActivitiesForm> {
           ),
         ],
       ),
-      
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AddActivity()));
-        },
-        child: const Icon(Icons.add),
+        onPressed: _addActivity,
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
+        child: const Icon(Icons.add),
       ),
     );
   }

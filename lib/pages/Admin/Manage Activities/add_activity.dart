@@ -4,6 +4,7 @@ import 'package:smarn/models/activity_tag.dart';
 import 'package:smarn/models/class.dart';
 import 'package:smarn/models/subject.dart';
 import 'package:smarn/models/teacher.dart';
+import 'package:smarn/pages/Admin/Manage%20Activities/manage_activities_form.dart';
 import 'package:smarn/pages/widgets/dropDownMenu.dart';
 import 'package:smarn/pages/widgets/duration_form_field.dart';
 import 'package:smarn/services/class_service.dart';
@@ -129,7 +130,9 @@ class _AddActivityState extends State<AddActivity> {
       // Add the activity using the service
       ActivityService().addActivity(activity).then((result) {
         if (result['success']) {
-          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Activity added successfully')));
+          Navigator.pop(context, true);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(result['message'])),
