@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smarn/services/auth_service.dart';
 import 'package:smarn/pages/widgets/canstants.dart';
 
@@ -73,109 +72,117 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         backgroundColor: AppColors.appBarColor,
       ),
       body: Center(
-        // Centering the content on the screen
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Card(
-            color: AppColors.formColor, // Card background color
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Password Update Section
-                  const Text(
-                    'Update Password',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _currentPasswordController,
-                    obscureText: !_isPasswordVisible, // Control visibility
-                    decoration: InputDecoration(
-                      labelText: 'Current Password',
-                      labelStyle: TextStyle(color: Colors.white),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible =
-                                !_isPasswordVisible; // Toggle visibility
-                          });
-                        },
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 600), // Limit form width
+            child: Container(
+              height: 400,
+              child: Card(
+                
+                color: AppColors.formColor, // Card background color
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Password Update Section
+                      const Text(
+                        'Update Password',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
-                    ),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _newPasswordController,
-                    obscureText: !_isPasswordVisible, // Control visibility
-                    decoration: InputDecoration(
-                      labelText: 'New Password',
-                      labelStyle: TextStyle(color: Colors.white),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Colors.white,
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _currentPasswordController,
+                        obscureText: !_isPasswordVisible, // Control visibility
+                        decoration: InputDecoration(
+                          labelText: 'Current Password',
+                          labelStyle: TextStyle(color: Colors.white),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible =
+                                    !_isPasswordVisible; // Toggle visibility
+                              });
+                            },
+                          ),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible =
-                                !_isPasswordVisible; // Toggle visibility
-                          });
-                        },
+                        style: const TextStyle(color: Colors.white),
                       ),
-                    ),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _newPasswordConfirmController,
-                    obscureText: !_isPasswordVisible, // Control visibility
-                    decoration: InputDecoration(
-                      labelText: 'Confirm New Password',
-                      labelStyle: TextStyle(color: Colors.white),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Colors.white,
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _newPasswordController,
+                        obscureText: !_isPasswordVisible, // Control visibility
+                        decoration: InputDecoration(
+                          labelText: 'New Password',
+                          labelStyle: TextStyle(color: Colors.white),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible =
+                                    !_isPasswordVisible; // Toggle visibility
+                              });
+                            },
+                          ),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible =
-                                !_isPasswordVisible; // Toggle visibility
-                          });
-                        },
+                        style: const TextStyle(color: Colors.white),
                       ),
-                    ),
-                    style: const TextStyle(color: Colors.white),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _newPasswordConfirmController,
+                        obscureText: !_isPasswordVisible, // Control visibility
+                        decoration: InputDecoration(
+                          labelText: 'Confirm New Password',
+                          labelStyle: TextStyle(color: Colors.white),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible =
+                                    !_isPasswordVisible; // Toggle visibility
+                              });
+                            },
+                          ),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: _updateCredentials,
+                          child: const Text('Update Credentials'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.appBarColor,
+                            foregroundColor: Colors.white,
+                            textStyle: const TextStyle(
+                                color: Color.fromARGB(255, 255, 255, 255)),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _updateCredentials,
-                    child: const Text('Update Credentials'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.appBarColor,
-                      foregroundColor: Colors.white,
-                      textStyle: const TextStyle(
-                          color: Color.fromARGB(255, 255, 255, 255)),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

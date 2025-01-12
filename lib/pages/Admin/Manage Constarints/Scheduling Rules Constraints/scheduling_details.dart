@@ -16,34 +16,49 @@ class SchedulingRuleDetails extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 129, 77, 139),
       ),
       body: Center(
-        child: Container(
-          height: 800,
-          width: 500,
-          color: Colors.black,
-          child: Center( // Center the card in the body
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Center(
-                child: Card(
-                  color: Colors.grey[850], // Card background color
-                  elevation: 8, // Shadow effect
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SingleChildScrollView( // Make the entire content scrollable
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildDetailRow('ID:', rule.id ?? 'Unknown'),
-                          _buildDetailRow('Type:', rule.type.toString().split('.').last),
-                          if (rule.duration != null) _buildDetailRow('Duration:', rule.duration.toString()),
-                          if (rule.startTime != null) _buildDetailRow('Start Time:', rule.startTime ?? 'Not Available'),
-                          if (rule.endTime != null) _buildDetailRow('End Time:', rule.endTime ?? 'Not Available'),
-                          if (rule.applicableDays != null && rule.applicableDays!.isNotEmpty) 
-                            _buildWorkDaysSection(rule.applicableDays!),
-                          _buildDetailRow('Active:', rule.isActive ? 'Yes' : 'No'), // New row for active state
-                        ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 500, // Set a max width for the card
+            ),
+            child: Card(
+              color: Colors.grey[850], // Card background color
+              elevation: 10, // Shadow effect
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0), // Rounded corners
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0), // Padding inside the card
+                child: SingleChildScrollView( // Make the entire content scrollable
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          'Scheduling Rule Details',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20, // Font size
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
+                      const Divider(
+                        color: Colors.white54,
+                        thickness: 1,
+                        height: 16,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildDetailRow('ID:', rule.id ?? 'Unknown'),
+                      _buildDetailRow('Type:', rule.type.toString().split('.').last),
+                      if (rule.duration != null) _buildDetailRow('Duration:', rule.duration.toString()),
+                      if (rule.startTime != null) _buildDetailRow('Start Time:', rule.startTime ?? 'Not Available'),
+                      if (rule.endTime != null) _buildDetailRow('End Time:', rule.endTime ?? 'Not Available'),
+                      if (rule.applicableDays != null && rule.applicableDays!.isNotEmpty) 
+                        _buildWorkDaysSection(rule.applicableDays!),
+                      _buildDetailRow('Active:', rule.isActive ? 'Yes' : 'No'), // New row for active state
+                    ],
                   ),
                 ),
               ),
@@ -68,11 +83,13 @@ class SchedulingRuleDetails extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
             ),
           ),
         ],

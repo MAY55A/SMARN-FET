@@ -52,37 +52,49 @@ class _ViewBuildingState extends State<ViewBuilding> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
+          : Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 600), // Constrain width
                   child: Card(
-                    color: const Color.fromARGB(255, 34, 34, 34),
+                    color: Colors.grey[850], // Card background color
+                    elevation: 10, // Shadow effect
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.0), // Rounded corners
+                    ),
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0), // Padding inside the card
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Building Info Section
-                          Text(
-                            'Building Information',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          Center(
+                            child: Text(
+                              'Building Information',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const Divider(
+                            color: Colors.white54,
+                            thickness: 1,
+                            height: 16,
+                          ),
+                          const SizedBox(height: 12),
                           Text(
-                            'Description: ${widget.building.description}',
+                            'Description: ${widget.building.description ?? 'Not Provided'}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16.0,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           Text(
-                            'Long Name: ${widget.building.longName}',
+                            'Long Name: ${widget.building.longName ?? 'Not Provided'}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16.0,
@@ -126,7 +138,8 @@ class _ViewBuildingState extends State<ViewBuilding> {
                                       child: Card(
                                         margin: const EdgeInsets.symmetric(
                                             vertical: 8.0),
-                                        color: const Color.fromARGB(255, 50, 50, 50),
+                                        color: const Color.fromARGB(
+                                            255, 50, 50, 50),
                                         child: Padding(
                                           padding: const EdgeInsets.all(12.0),
                                           child: Column(

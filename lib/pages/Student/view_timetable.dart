@@ -45,7 +45,7 @@ class _ViewTimetableState extends State<ViewTimetable> {
   Widget build(BuildContext context) {
     Map<String, List<Activity>> groupedByDay = {};
     if (activities != null) {
-      // Filtrer les horaires en fonction de la recherche
+      // Filter timetable based on search query
       List<Activity> filteredTimetable = activities!.where((entry) {
         return entry.teacher
                 .toLowerCase()
@@ -53,7 +53,7 @@ class _ViewTimetableState extends State<ViewTimetable> {
             entry.subject.toLowerCase().contains(searchQuery.toLowerCase());
       }).toList();
 
-      // Regrouper les horaires par jour
+      // Group activities by day
       for (var day in daysOfWeek) {
         groupedByDay[day.name] =
             filteredTimetable.where((entry) => entry.day == day).toList();
@@ -63,7 +63,7 @@ class _ViewTimetableState extends State<ViewTimetable> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Timetable '),
+        title: const Text('Timetable'),
         backgroundColor: Colors.blue,
       ),
       body: Padding(
@@ -79,7 +79,7 @@ class _ViewTimetableState extends State<ViewTimetable> {
                   )
                 : Column(
                     children: [
-                      // Barre de recherche
+                      // Search bar
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: TextField(
@@ -105,7 +105,10 @@ class _ViewTimetableState extends State<ViewTimetable> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: Column(
-                            children: daysOfWeek.map((day) {
+                            children: daysOfWeek
+                                .where((day) =>
+                                    (groupedByDay[day.name] ?? []).isNotEmpty)
+                                .map((day) {
                               final activities = groupedByDay[day.name] ?? [];
                               return Card(
                                 margin:
@@ -121,7 +124,7 @@ class _ViewTimetableState extends State<ViewTimetable> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      // En-tête du jour
+                                      // Day header
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 8.0),
@@ -134,120 +137,101 @@ class _ViewTimetableState extends State<ViewTimetable> {
                                           ),
                                         ),
                                       ),
-                                      // Affichage des activités ou message
-                                      activities.isNotEmpty
-                                          ? DataTable(
-                                              headingRowHeight: 50,
-                                              dataRowHeight: 60,
-                                              columns: const [
-                                                DataColumn(
-                                                  label: Text(
-                                                    'Time',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                ),
-                                                DataColumn(
-                                                  label: Text(
-                                                    'Subject',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                ),
-                                                DataColumn(
-                                                  label: Text(
-                                                    'Teacher',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                ),
-                                                DataColumn(
-                                                  label: Text(
-                                                    'Room',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                              rows:
-                                                  activities.map((timingEntry) {
-                                                return DataRow(
-                                                  cells: [
-                                                    DataCell(Text(
-                                                      "${timingEntry.startTime} - ${timingEntry.endTime}",
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                      ),
-                                                    )),
-                                                    DataCell(
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color:
-                                                              _getColorForActivity(
-                                                                  timingEntry
-                                                                      .tag),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                        ),
-                                                        child: Text(
-                                                          timingEntry.subject,
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 14,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    DataCell(Text(
-                                                      timingEntry.teacher,
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                      ),
-                                                    )),
-                                                    DataCell(Text(
-                                                      timingEntry.room!,
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                      ),
-                                                    )),
-                                                  ],
-                                                );
-                                              }).toList(),
-                                            )
-                                          : Center(
-                                              child: Text(
-                                                'No activities scheduled for ${day.name}',
-                                                style: const TextStyle(
-                                                  color: Colors.grey,
-                                                  fontSize: 16,
-                                                ),
+                                      // Display activities
+                                      DataTable(
+                                        headingRowHeight: 50,
+                                        dataRowHeight: 60,
+                                        columns: const [
+                                          DataColumn(
+                                            label: Text(
+                                              'Time',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
                                               ),
                                             ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Subject',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Teacher',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Room',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                        rows: activities.map((timingEntry) {
+                                          return DataRow(
+                                            cells: [
+                                              DataCell(Text(
+                                                "${timingEntry.startTime} - ${timingEntry.endTime}",
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                ),
+                                              )),
+                                              DataCell(
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        _getColorForActivity(
+                                                            timingEntry.tag),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                  child: Text(
+                                                    timingEntry.subject,
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              DataCell(Text(
+                                                timingEntry.teacher,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                ),
+                                              )),
+                                              DataCell(Text(
+                                                timingEntry.room!,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                ),
+                                              )),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -262,7 +246,7 @@ class _ViewTimetableState extends State<ViewTimetable> {
     );
   }
 
-// Assigner une couleur à chaque activité
+  // Assign a color for each activity
   Color _getColorForActivity(ActivityTag tag) {
     switch (tag) {
       case ActivityTag.lecture:
