@@ -2,21 +2,19 @@ import * as admin from "firebase-admin";
 
 const db = admin.firestore();
 
-export const freeTime = async (teacherId: string): Promise<number> => {
+export const totalDuration = async (classId: string, subjectId: String): Promise<number> => {
   try {
-    const teacherSnapshot = await db.collection("teachers").where("id", "==", teacherId).get();
-    const maxDuration = teacherSnapshot.docs[0].data().nbHours * 60;
+    let totalDuration = 0;
 
     const activitiesSnapshot = await db
       .collection("activities")
-      .where("teacher", "==", teacherId)
+      .where("studentsClass", "==", classId)
+      .where("subject", "==", subjectId)
       .get();
 
     if (activitiesSnapshot.empty) {
-      return maxDuration;
+      return totalDuration;
     }
-
-    let totalDuration = 0;
 
     activitiesSnapshot.forEach((doc) => {
       const activity = doc.data();
@@ -25,7 +23,7 @@ export const freeTime = async (teacherId: string): Promise<number> => {
       }
     });
 
-    return maxDuration - totalDuration;
+    return totalDuration;
   } catch (error) {
     console.error("Error fetching activities:", error);
     throw new Error("Failed to calculate the sum of durations");
