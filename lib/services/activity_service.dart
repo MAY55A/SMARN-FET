@@ -78,8 +78,8 @@ class ActivityService {
       });
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': e};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 
@@ -92,8 +92,8 @@ class ActivityService {
           await callable.call(<String, dynamic>{'activityId': activityId});
 
       return response.data;
-    } catch (e) {
-      return {'success': false, 'message': e};
+    } on FirebaseFunctionsException catch (e) {
+      return {'success': false, 'message': e.message};
     }
   }
 
