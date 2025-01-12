@@ -123,7 +123,7 @@ class _ManageComplaintsFormState extends State<ManageComplaintsForm> {
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
                         title: Text(
-                          request.teacher ?? 'Unknown Teacher',
+                          request.teacher,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

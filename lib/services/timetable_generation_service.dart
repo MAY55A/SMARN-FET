@@ -48,7 +48,7 @@ class TimetableGenerationService {
         _addLog("\n GENERATION SUCCESS");
         _addLog(
             "*******Scheduled Activities : *********\n$_scheduledActivities");
-        //_assignSchedules();
+        _assignSchedules();
       } else {
         _addLog("\n GENERATION FAILED");
         _addLog("\n Most failing entities: \n");
