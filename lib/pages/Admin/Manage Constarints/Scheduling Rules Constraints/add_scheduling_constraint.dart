@@ -20,12 +20,12 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
   final _durationController = TextEditingController();
   String? _selectedStartTime;
   String? _selectedEndTime;
-  final List<SchedulingRuleType> _types = SchedulingRuleType.values;
+  final List<SchedulingRuleType> _types = List.of(SchedulingRuleType.values);
   SchedulingRuleType _selectedType = SchedulingRuleType.workPeriod;
   List<WorkDay> _selectedDays = [];
   bool _isLoading = false;
-  late int? _minDuration;
-  late int? _maxDuration;
+  int? _minDuration = 60;
+  int? _maxDuration = 240;
 
   @override
   void initState() {
@@ -37,12 +37,12 @@ class _AddSchedulingRuleFormState extends State<AddSchedulingRuleForm> {
     final min = await _constraintService.getMinMaxDuration('min');
     final max = await _constraintService.getMinMaxDuration('max');
     setState(() {
-      _minDuration = min;
-      _maxDuration = max;
       if (min != null) {
         _types.remove(SchedulingRuleType.minActivityDuration);
+        _minDuration = min;
       }
       if (max != null) {
+        _maxDuration = max;
         _types.remove(SchedulingRuleType.maxActivityDuration);
       }
     });
