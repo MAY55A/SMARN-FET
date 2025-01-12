@@ -17,7 +17,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _userRole = ''; // Tracks user role (admin, teacher, or empty if none)
   late StreamSubscription<User?> _authSubscription;
-  User? _currentUser;
 
   @override
   void initState() {
@@ -39,7 +38,6 @@ class _HomePageState extends State<HomePage> {
     User? user = AuthService().getCurrentUser();
     String? role = await AuthService().getUserRole(user);
     setState(() {
-      _currentUser = user;
       _userRole = role ?? '';
     });
   }

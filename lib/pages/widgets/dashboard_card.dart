@@ -1,6 +1,5 @@
 // Dashboard card with 3D effect, shadow, and hover animation
 import 'package:flutter/material.dart';
-import 'package:smarn/pages/widgets/canstants.dart';
 
 Widget buildAnimatedDashboardCard(
     BuildContext context, String title, IconData icon, Widget page, Color color) {

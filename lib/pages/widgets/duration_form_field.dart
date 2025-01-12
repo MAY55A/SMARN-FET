@@ -9,6 +9,7 @@ Widget durationFormField(String label, int minDuration, int step,
     (index) => minDuration + (index * step),
   );
   return DropdownButtonFormField<int>(
+    menuMaxHeight: 200,
     value: selected,
     decoration: InputDecoration(
       labelText: label,
