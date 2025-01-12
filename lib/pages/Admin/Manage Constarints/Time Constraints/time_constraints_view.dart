@@ -3,6 +3,7 @@ import 'package:smarn/models/constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Time%20Constraints/add_time_constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Time%20Constraints/edit_time_constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Time%20Constraints/time_constaint.details.dart';
+import 'package:smarn/pages/widgets/delete_confirmation_dialog.dart';
 import 'package:smarn/services/constraint_service.dart';
 
 class TimeConstraintsView extends StatefulWidget {
@@ -24,7 +25,8 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
 
   Future<void> _fetchTimeConstraints() async {
     try {
-      List<Constraint> constraints = await _constraintService.getAllConstraints();
+      List<Constraint> constraints =
+          await _constraintService.getAllConstraints();
       List<TimeConstraint> timeConstraints = constraints
           .where((constraint) =>
               constraint.category == ConstraintCategory.timeConstraint)
@@ -64,32 +66,6 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
         builder: (context) => TimeConstraintDetails(constraint: constraint),
       ),
     );
-  }
-
-  Future<void> _confirmDelete(TimeConstraint constraint) async {
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Deletion'),
-          content: const Text('Are you sure you want to delete this constraint?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirmed == true) {
-      await _deleteConstraint(constraint.id!);
-    }
   }
 
   Future<void> _deleteConstraint(String constraintId) async {
@@ -192,13 +168,19 @@ class _TimeConstraintsViewState extends State<TimeConstraintsView> {
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Color.fromARGB(255, 255, 79, 79)),
+                    icon: const Icon(Icons.delete,
+                        color: Color.fromARGB(255, 255, 79, 79)),
                     onPressed: () {
-                      _confirmDelete(constraint); // Show confirmation dialog
+                      showDeleteConfirmationDialog(
+                          context,
+                          "time constraint",
+                          () => _deleteConstraint(
+                              constraint.id!)); // Show confirmation dialog
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                    icon: const Icon(Icons.arrow_forward_ios,
+                        color: Colors.white),
                     onPressed: () {
                       _navigateToDetails(constraint);
                     },
