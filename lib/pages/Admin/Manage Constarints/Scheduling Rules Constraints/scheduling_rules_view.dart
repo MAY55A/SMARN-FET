@@ -3,6 +3,7 @@ import 'package:smarn/models/constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Scheduling%20Rules%20Constraints/add_scheduling_constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Scheduling%20Rules%20Constraints/edit_scheduling_constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Scheduling%20Rules%20Constraints/scheduling_details.dart';
+import 'package:smarn/pages/widgets/delete_confirmation_dialog.dart';
 import 'package:smarn/services/constraint_service.dart';
 
 class SchedulingRulesView extends StatefulWidget {
@@ -73,37 +74,6 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
     }
   }
 
-  void _showDeleteConfirmationDialog(VoidCallback onDelete) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Confirm Delete'),
-          content: const Text(
-              'Are you sure you want to delete this scheduling rule?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close dialog without deleting
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Close dialog
-                onDelete(); // Execute delete action
-              },
-              style: const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.red),
-                  foregroundColor: WidgetStatePropertyAll(Colors.white)),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,7 +122,7 @@ class _SchedulingRulesViewState extends State<SchedulingRulesView> {
                     },
                     onDelete: () {
                       if (rule.id != null) {
-                        _showDeleteConfirmationDialog(
+                        showDeleteConfirmationDialog(context, "scheduling rule",
                             () => _deleteSchedulingRule(rule.id!));
                       }
                     },

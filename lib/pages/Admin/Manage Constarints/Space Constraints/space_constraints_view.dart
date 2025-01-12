@@ -3,6 +3,7 @@ import 'package:smarn/models/constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Space%20Constraints/add_space_constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Space%20Constraints/edit_space_constraint.dart';
 import 'package:smarn/pages/Admin/Manage%20Constarints/Space%20Constraints/space_constraint_details.dart'; // Import the details page
+import 'package:smarn/pages/widgets/delete_confirmation_dialog.dart';
 import 'package:smarn/services/constraint_service.dart';
 
 class SpaceConstraintsView extends StatefulWidget {
@@ -42,38 +43,25 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
     ).then((_) => _fetchConstraints()); // Refresh data after editing
   }
 
-  void _deleteConstraint(SpaceConstraint constraint) async {
-    // Show confirmation dialog before deleting
-    final confirmDelete = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color.fromARGB(255, 82, 82, 82),
-          title: const Text('Delete Constraint',style: TextStyle(color: Colors.white),),
-          content:
-              const Text('Are you sure you want to delete this constraint?',style: TextStyle(color: Colors.white)),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              style: const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.red),
-                  foregroundColor: WidgetStatePropertyAll(Colors.white)),
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
-            ),
-          ],
+  void _deleteSpaceConstraint(String constraintId) async {
+    try {
+      final result = await _constraintService.deleteConstraint(constraintId);
+      if (result['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Space constraint deleted successfully.')),
         );
-      },
-    );
-
-    if (confirmDelete == true) {
-      // Proceed with deletion
-      await _constraintService.deleteConstraint(constraint
-          .id!); // Assuming deleteConstraint is implemented in the service
-      _fetchConstraints(); // Refresh the list after deletion
+        _fetchConstraints(); // Refresh the list
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to delete space constraint.')),
+        );
+      }
+    } catch (e) {
+      print('Error deleting space constraint: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error occurred while deleting.')),
+      );
     }
   }
 
@@ -96,10 +84,13 @@ class _SpaceConstraintsViewState extends State<SpaceConstraintsView> {
                   itemCount: _constraints.length,
                   itemBuilder: (context, index) {
                     return _buildConstraintCard(
-                      constraint: _constraints[index],
-                      onEdit: () => _navigateToEdit(_constraints[index]),
-                      onDelete: () => _deleteConstraint(_constraints[index]),
-                    );
+                        constraint: _constraints[index],
+                        onEdit: () => _navigateToEdit(_constraints[index]),
+                        onDelete: () => showDeleteConfirmationDialog(
+                            context,
+                            "space constraint",
+                            () => _deleteSpaceConstraint(
+                                _constraints[index].id!)));
                   },
                 ),
               ),
